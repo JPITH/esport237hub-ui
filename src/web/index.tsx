@@ -68,8 +68,8 @@ export function Card({ className, ...rest }: CardProps) {
 /* ------------------------------------------------------------------ */
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
-  /** accent = vert (défaut), cyan, gold, danger, neutral. */
-  tone?: 'accent' | 'cyan' | 'gold' | 'danger' | 'neutral';
+  /** accent = vert (défaut), cyan, gold, danger, warning, neutral. */
+  tone?: 'accent' | 'cyan' | 'gold' | 'danger' | 'warning' | 'neutral';
 }
 
 export function Badge({ tone = 'accent', className, ...rest }: BadgeProps) {

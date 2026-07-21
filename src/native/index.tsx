@@ -109,7 +109,7 @@ export function Card({ children, style }: CardProps) {
 
 export interface BadgeProps {
   children: ReactNode;
-  tone?: 'accent' | 'cyan' | 'gold' | 'danger' | 'neutral';
+  tone?: 'accent' | 'cyan' | 'gold' | 'danger' | 'warning' | 'neutral';
   style?: StyleProp<ViewStyle>;
 }
 
@@ -122,9 +122,11 @@ export function Badge({ children, tone = 'accent', style }: BadgeProps) {
         ? c.gold
         : tone === 'danger'
           ? c.danger
-          : tone === 'neutral'
-            ? c.textSecondary
-            : c.accent;
+          : tone === 'warning'
+            ? c.warning
+            : tone === 'neutral'
+              ? c.textSecondary
+              : c.accent;
 
   return (
     <View style={[styles.badge, { backgroundColor: `${toneColor}24` }, style]}>

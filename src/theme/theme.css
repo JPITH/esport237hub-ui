@@ -170,6 +170,11 @@
   color: var(--e237-danger);
 }
 
+.e237-badge--warning {
+  background: color-mix(in srgb, var(--e237-warning) 16%, transparent);
+  color: var(--e237-warning);
+}
+
 .e237-badge--neutral {
   background: color-mix(in srgb, var(--e237-text-secondary) 14%, transparent);
   color: var(--e237-text-secondary);
