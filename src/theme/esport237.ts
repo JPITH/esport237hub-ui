@@ -11,7 +11,7 @@
  */
 import { defineTheme } from '@astryxdesign/core/theme';
 
-import { color, font, radius } from '../tokens/index.ts';
+import { color, font, radius } from '../tokens';
 
 export const esport237 = defineTheme({
   name: 'esport237',

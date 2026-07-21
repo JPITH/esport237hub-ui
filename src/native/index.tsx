@@ -17,7 +17,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 
-import { color, font, radius, spacing, type ColorScale, type ThemeMode } from '../tokens/index.ts';
+import { color, font, radius, spacing, type ColorScale, type ThemeMode } from '../tokens';
 
 export { color, font, radius, spacing };
 export type { ColorScale, ThemeMode };
