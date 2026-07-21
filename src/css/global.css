@@ -1,0 +1,13 @@
+/**
+ * Feuille globale ESPORT 237 HUB.
+ * Importer une seule fois par application web (Next, Astro, Vite) :
+ *   import '@esport237hub/ui/css';
+ *
+ * Ordre : reset Astryx → styles composants Astryx → thème neutral (base
+ * de variables Astryx) → thème ESPORT 237 (variables --e237-* + surcharges).
+ */
+
+@import '@astryxdesign/core/reset.css';
+@import '@astryxdesign/core/astryx.css';
+@import '@astryxdesign/theme-neutral/theme.css';
+@import '../theme/theme.css';

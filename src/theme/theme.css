@@ -1,0 +1,237 @@
+/**
+ * Thème ESPORT 237 HUB — variables CSS light/dark.
+ *
+ * Chaque variable utilise light-dark() : le mode actif est piloté par la
+ * propriété `color-scheme`, elle-même contrôlée par l'attribut `data-theme`
+ * posé sur <html> ("light" | "dark" | absent = système).
+ * Mêmes valeurs que src/tokens/index.ts (source de vérité TS).
+ */
+
+:root {
+  color-scheme: light dark;
+
+  /* Couleurs sémantiques */
+  --e237-bg: light-dark(#f7f9fb, #0b0f14);
+  --e237-surface: light-dark(#ffffff, #111826);
+  --e237-surface-raised: light-dark(#ffffff, #1a2332);
+  --e237-border: light-dark(#e2e8f0, #1f2a37);
+  --e237-text-primary: light-dark(#0f172a, #f8fafc);
+  --e237-text-secondary: light-dark(#475569, #94a3b8);
+  --e237-text-muted: light-dark(#94a3b8, #64748b);
+  --e237-accent: light-dark(#16a34a, #22c55e);
+  --e237-accent-bright: light-dark(#22c55e, #4ade80);
+  --e237-on-accent: light-dark(#ffffff, #04120a);
+  --e237-cyan: light-dark(#0891b2, #22d3ee);
+  --e237-success: light-dark(#059669, #34d399);
+  --e237-danger: light-dark(#dc2626, #f87171);
+  --e237-warning: light-dark(#d97706, #fbbf24);
+  --e237-gold: light-dark(#ca8a04, #facc15);
+
+  /* Espacement */
+  --e237-spacing-1: 4px;
+  --e237-spacing-2: 8px;
+  --e237-spacing-3: 12px;
+  --e237-spacing-4: 16px;
+  --e237-spacing-5: 20px;
+  --e237-spacing-6: 24px;
+  --e237-spacing-8: 32px;
+  --e237-spacing-10: 40px;
+  --e237-spacing-12: 48px;
+
+  /* Rayons */
+  --e237-radius-sm: 6px;
+  --e237-radius-md: 10px;
+  --e237-radius-lg: 14px;
+  --e237-radius-xl: 20px;
+  --e237-radius-full: 9999px;
+
+  /* Typographie */
+  --e237-font-body: 'Inter', -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --e237-font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
+
+  /* Alignement avec les tokens Astryx (surcharge du thème neutral) */
+  --color-accent: light-dark(#16a34a, #22c55e);
+
+  /* Ombres */
+  --e237-shadow-card: 0 1px 2px rgb(2 8 20 / 0.06), 0 4px 16px rgb(2 8 20 / 0.08);
+}
+
+/* Bascule explicite par attribut (posée par next-themes / script Astro / app) */
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+/* ---------------------------------------------------------------- */
+/* Classes utilitaires des composants @esport237hub/ui               */
+/* ---------------------------------------------------------------- */
+
+.e237-body {
+  margin: 0;
+  background: var(--e237-bg);
+  color: var(--e237-text-primary);
+  font-family: var(--e237-font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.e237-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--e237-spacing-2);
+  border: 1px solid transparent;
+  border-radius: var(--e237-radius-md);
+  padding: 10px var(--e237-spacing-5);
+  font-family: var(--e237-font-body);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  text-decoration: none;
+  transition: filter 150ms ease, background-color 150ms ease, border-color 150ms ease;
+}
+
+.e237-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.e237-btn--primary {
+  background: var(--e237-accent);
+  color: var(--e237-on-accent);
+}
+
+.e237-btn--primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.e237-btn--secondary {
+  background: transparent;
+  color: var(--e237-text-primary);
+  border-color: var(--e237-border);
+}
+
+.e237-btn--secondary:hover:not(:disabled) {
+  border-color: var(--e237-accent);
+  color: var(--e237-accent);
+}
+
+.e237-btn--ghost {
+  background: transparent;
+  color: var(--e237-accent);
+}
+
+.e237-btn--ghost:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+.e237-btn--sm {
+  padding: 6px var(--e237-spacing-3);
+  font-size: 13px;
+  border-radius: var(--e237-radius-sm);
+}
+
+.e237-card {
+  background: var(--e237-surface);
+  border: 1px solid var(--e237-border);
+  border-radius: var(--e237-radius-lg);
+  padding: var(--e237-spacing-5);
+  box-shadow: var(--e237-shadow-card);
+}
+
+.e237-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: var(--e237-radius-full);
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  background: color-mix(in srgb, var(--e237-accent) 14%, transparent);
+  color: var(--e237-accent);
+}
+
+.e237-badge--cyan {
+  background: color-mix(in srgb, var(--e237-cyan) 14%, transparent);
+  color: var(--e237-cyan);
+}
+
+.e237-badge--gold {
+  background: color-mix(in srgb, var(--e237-gold) 16%, transparent);
+  color: var(--e237-gold);
+}
+
+.e237-badge--danger {
+  background: color-mix(in srgb, var(--e237-danger) 14%, transparent);
+  color: var(--e237-danger);
+}
+
+.e237-badge--neutral {
+  background: color-mix(in srgb, var(--e237-text-secondary) 14%, transparent);
+  color: var(--e237-text-secondary);
+}
+
+.e237-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-start;
+}
+
+.e237-stat__value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--e237-text-primary);
+}
+
+.e237-stat__label {
+  font-size: 12px;
+  color: var(--e237-text-secondary);
+}
+
+.e237-section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--e237-cyan);
+}
+
+.e237-player-card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--e237-accent) 22%, var(--e237-surface)),
+    var(--e237-surface) 55%
+  );
+  border: 1px solid color-mix(in srgb, var(--e237-accent) 35%, var(--e237-border));
+  border-radius: var(--e237-radius-xl);
+  padding: var(--e237-spacing-5);
+  color: var(--e237-text-primary);
+}
+
+.e237-player-card__rating {
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.e237-player-card__name {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.e237-player-card__meta {
+  font-size: 12px;
+  color: var(--e237-text-secondary);
+}
