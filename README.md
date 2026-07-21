@@ -80,9 +80,11 @@ Ce paquet est consommé **en source** (pas de build) : les apps le transpilent
 en **submodule git** dans le monorepo `esport237hub` (`packages/ui`).
 
 ```bash
-pnpm install        # dépendances (typescript, react, astryx…)
-pnpm typecheck      # tsc web (DOM) + tsc native (RN)
+bun install         # dépendances (typescript, react, astryx…)
+bun run typecheck   # tsc web (DOM) + tsc native (RN)
 ```
+
+> Gestionnaire de paquets : **Bun** uniquement (pas de npm/pnpm/yarn).
 
 Publication npm (plus tard) : ajouter un build `tsup` + `exports` vers `dist/`.
 

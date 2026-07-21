@@ -6,7 +6,7 @@
  *
  * Les tuples [light, dark] alimentent la bascule automatique de mode
  * (CSS light-dark()). Pour un build de production SSR :
- *   pnpm dlx astryx theme build src/theme/esport237.ts
+ *   bunx astryx theme build src/theme/esport237.ts
  * (produit esport237.css / .js / .d.ts — voir la doc « Runtime vs Built »).
  */
 import { defineTheme } from '@astryxdesign/core/theme';

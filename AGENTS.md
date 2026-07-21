@@ -12,8 +12,9 @@ monorepo where this repo is mounted as a git submodule at `packages/ui`.
 
 ## Commands
 
-- `pnpm install` — install deps (pnpm only; `npm` is NOT on PATH on the owner's machine)
-- `pnpm typecheck` — runs `tsc -p tsconfig.web.json` (DOM) and `tsc -p tsconfig.native.json` (React Native)
+- `bun install` — install deps (**Bun only** — npm/pnpm/yarn are not used; `npm` is not even on PATH on the owner's machine)
+- `bun run typecheck` — runs `tsc -p tsconfig.web.json` (DOM) and `tsc -p tsconfig.native.json` (React Native)
+- One-off tools: `bunx <tool>` (never `npx`/`pnpm dlx`)
 
 ## Hard rules
 
