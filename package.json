@@ -18,6 +18,7 @@
     "./theme.css": "./src/theme/theme.css",
     "./css": "./src/css/global.css",
     "./web": "./src/web/index.tsx",
+    "./web/astryx": "./src/web/astryx.ts",
     "./native": "./src/native/index.tsx"
   },
   "scripts": {

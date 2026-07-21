@@ -12,7 +12,9 @@ import type {
   ReactNode,
 } from 'react';
 
-export * from './astryx.ts';
+// Les ré-exports Astryx bruts vivent dans '@esport237hub/ui/web/astryx'
+// (entrypoint séparé : composants potentiellement client-only, à ne pas
+// entraîner dans le graphe RSC des pages serveur Next).
 export { color, font, radius, spacing, tokens } from '../tokens/index.ts';
 export type { ColorScale, ThemeMode } from '../tokens/index.ts';
 
