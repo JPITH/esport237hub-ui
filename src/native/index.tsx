@@ -22,6 +22,9 @@ import { color, font, radius, spacing, type ColorScale, type ThemeMode } from '.
 export { color, font, radius, spacing };
 export type { ColorScale, ThemeMode };
 
+// Famille de champs (Field + œil, Textarea, Stepper, PhoneField, SearchField).
+export * from './fields';
+
 /** Palette active selon le mode système (dark par défaut, ADN de la marque). */
 export function useE237Colors(): ColorScale {
   const scheme = useColorScheme();

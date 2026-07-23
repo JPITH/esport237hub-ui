@@ -19,6 +19,7 @@
     "./css": "./src/css/global.css",
     "./web": "./src/web/index.tsx",
     "./web/astryx": "./src/web/astryx.ts",
+    "./web/fields": "./src/web/fields.tsx",
     "./native": "./src/native/index.tsx"
   },
   "scripts": {
@@ -33,7 +34,8 @@
   "peerDependencies": {
     "react": ">=19.0.0",
     "react-dom": ">=19.0.0",
-    "react-native": "*"
+    "react-native": "*",
+    "react-native-svg": "*"
   },
   "peerDependenciesMeta": {
     "react-dom": {
@@ -41,12 +43,16 @@
     },
     "react-native": {
       "optional": true
+    },
+    "react-native-svg": {
+      "optional": true
     }
   },
   "devDependencies": {
     "@types/react": "^19.2.0",
     "react": "^19.2.0",
     "react-native": "^0.85.0",
+    "react-native-svg": "^15.0.0",
     "typescript": "^5.9.2"
   }
 }
