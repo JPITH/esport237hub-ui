@@ -1,4 +1,4 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["src/tokens", "src/native"]
+  "include": ["src/tokens", "src/lib", "src/native"]
 }

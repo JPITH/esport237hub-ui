@@ -1,0 +1,121 @@
+/**
+ * Choix du jeu — règle produit (porteur, 22/07/2026) :
+ * - 1 seul jeu   → aucune sélection, on l'affiche en statique ;
+ * - 2 ou 3 jeux  → boutons « checkbox » (chips à coche) à sélection unique ;
+ * - plus de 3    → liste déroulante en feuille (SelectSheet).
+ * EA Sports FC est toujours en tête et sert de choix par défaut.
+ */
+import { radius, spacing, useE237Colors } from './core';
+import { Check } from 'lucide-react-native';
+import { useEffect } from 'react';
+import { Pressable, Text, View } from 'react-native';
+
+import { SelectSheet, type SelectOption } from './select-sheet';
+
+const FC_FIRST = ['fc27', 'ea-sports-fc', 'easportsfc', 'fc26', 'fifa'];
+
+export function sortGamesFcFirst(options: SelectOption[]): SelectOption[] {
+  return [...options].sort((a, b) => {
+    const af = FC_FIRST.includes(a.value) ? 0 : 1;
+    const bf = FC_FIRST.includes(b.value) ? 0 : 1;
+    return af - bf || a.label.localeCompare(b.label);
+  });
+}
+
+export function GameSelect({
+  options,
+  value,
+  onChange,
+  label = 'Jeu',
+}: {
+  options: SelectOption[];
+  value: string | null;
+  onChange: (value: string) => void;
+  label?: string;
+}) {
+  const c = useE237Colors();
+  const sorted = sortGamesFcFirst(options);
+  const first = sorted[0]?.value;
+
+  // Défaut : EA Sports FC (premier de la liste triée).
+  useEffect(() => {
+    if (!value && first) onChange(first);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value, first]);
+
+  if (sorted.length === 0) return null;
+
+  if (sorted.length === 1) {
+    return (
+      <View style={{ gap: spacing['1'] }}>
+        <Text style={{ color: c.textSecondary, fontSize: 12, fontWeight: '500' }}>{label}</Text>
+        <View
+          style={{
+            alignSelf: 'flex-start',
+            borderWidth: 1,
+            borderColor: c.border,
+            backgroundColor: c.surface,
+            borderRadius: radius.full,
+            paddingHorizontal: spacing['3'],
+            paddingVertical: spacing['2'],
+          }}>
+          <Text style={{ color: c.textPrimary, fontSize: 14, fontWeight: '600' }}>
+            {sorted[0].label}
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
+  if (sorted.length <= 3) {
+    const selected = value ?? first;
+    return (
+      <View style={{ gap: spacing['1'] }}>
+        <Text style={{ color: c.textSecondary, fontSize: 12, fontWeight: '500' }}>{label}</Text>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing['2'] }}>
+          {sorted.map((o) => {
+            const active = o.value === selected;
+            return (
+              <Pressable
+                key={o.value}
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: active }}
+                onPress={() => onChange(o.value)}
+                style={{
+                  minHeight: 44,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: spacing['1'],
+                  borderWidth: 1,
+                  borderColor: active ? c.accent : c.border,
+                  backgroundColor: active ? `${c.accent}1A` : c.surface,
+                  borderRadius: radius.full,
+                  paddingHorizontal: spacing['3'],
+                }}>
+                {active ? <Check color={c.accent} size={16} /> : null}
+                <Text
+                  style={{
+                    color: active ? c.accent : c.textSecondary,
+                    fontSize: 13,
+                    fontWeight: active ? '700' : '500',
+                  }}>
+                  {o.label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </View>
+    );
+  }
+
+  return (
+    <SelectSheet
+      label={label}
+      placeholder="Choisir un jeu…"
+      options={sorted}
+      value={value}
+      onChange={onChange}
+    />
+  );
+}

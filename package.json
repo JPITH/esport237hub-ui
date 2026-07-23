@@ -17,6 +17,7 @@
     "./theme": "./src/theme/esport237.ts",
     "./theme.css": "./src/theme/theme.css",
     "./css": "./src/css/global.css",
+    "./lib": "./src/lib/index.ts",
     "./web": "./src/web/index.tsx",
     "./web/astryx": "./src/web/astryx.ts",
     "./web/fields": "./src/web/fields.tsx",
@@ -35,7 +36,11 @@
     "react": ">=19.0.0",
     "react-dom": ">=19.0.0",
     "react-native": "*",
-    "react-native-svg": "*"
+    "react-native-svg": "*",
+    "react-native-reanimated": "*",
+    "lucide-react": "*",
+    "lucide-react-native": "*",
+    "@esport237hub/types": "*"
   },
   "peerDependenciesMeta": {
     "react-dom": {
@@ -46,12 +51,26 @@
     },
     "react-native-svg": {
       "optional": true
+    },
+    "react-native-reanimated": {
+      "optional": true
+    },
+    "lucide-react-native": {
+      "optional": true
+    },
+    "@esport237hub/types": {
+      "optional": true
     }
   },
   "devDependencies": {
+    "@esport237hub/types": "workspace:*",
     "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "lucide-react": "^0.562.0",
+    "lucide-react-native": "^0.562.0",
     "react": "^19.2.0",
     "react-native": "^0.85.0",
+    "react-native-reanimated": "^4.0.0",
     "react-native-svg": "^15.0.0",
     "typescript": "^5.9.2"
   }

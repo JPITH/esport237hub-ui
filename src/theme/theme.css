@@ -17,7 +17,8 @@
   --e237-border: light-dark(#e2e8f0, #1f2a37);
   --e237-text-primary: light-dark(#0f172a, #f8fafc);
   --e237-text-secondary: light-dark(#475569, #94a3b8);
-  --e237-text-muted: light-dark(#94a3b8, #64748b);
+  /* Light #64748b ≈4.6:1 sur blanc ; dark #94a3b8 ≈5:1 sur surface — AA. */
+  --e237-text-muted: light-dark(#64748b, #94a3b8);
   --e237-accent: light-dark(#16a34a, #22c55e);
   --e237-accent-bright: light-dark(#22c55e, #4ade80);
   --e237-on-accent: light-dark(#ffffff, #04120a);
@@ -54,6 +55,9 @@
 
   /* Ombres */
   --e237-shadow-card: 0 1px 2px rgb(2 8 20 / 0.06), 0 4px 16px rgb(2 8 20 / 0.08);
+  --e237-glow-accent: 0 0 0 1px color-mix(in srgb, var(--e237-accent) 45%, transparent),
+    0 8px 30px -8px color-mix(in srgb, var(--e237-accent) 55%, transparent);
+  --e237-ring: 0 0 0 2px var(--e237-bg), 0 0 0 4px var(--e237-accent);
 }
 
 /* Bascule explicite par attribut (posée par next-themes / script Astro / app) */

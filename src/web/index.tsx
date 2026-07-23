@@ -1,166 +1,121 @@
 /**
  * Composants web ESPORT 237 HUB (React 19).
  *
- * Stylés par les classes .e237-* et les variables --e237-* de theme.css :
+ * Stylés par les classes .e237-* / .btn / .pcard et les variables --e237-* :
  * importer `@esport237hub/ui/css` une fois dans l'application.
  * Light/dark : poser data-theme="light" | "dark" sur <html>
  * (absent = suit le système).
+ *
+ * Les ré-exports Astryx bruts vivent dans '@esport237hub/ui/web/astryx'.
  */
-import type {
-  ButtonHTMLAttributes,
-  HTMLAttributes,
-  ReactNode,
-} from 'react';
-
-// Les ré-exports Astryx bruts vivent dans '@esport237hub/ui/web/astryx'
-// (entrypoint séparé : composants potentiellement client-only, à ne pas
-// entraîner dans le graphe RSC des pages serveur Next).
 export { color, font, radius, spacing, tokens } from '../tokens';
 export type { ColorScale, ThemeMode } from '../tokens';
 
-function cx(...parts: Array<string | false | null | undefined>): string {
-  return parts.filter(Boolean).join(' ');
-}
+export {
+  Card,
+  Badge,
+  Stat,
+  SectionLabel,
+} from './foundation';
+export type {
+  CardProps,
+  BadgeProps,
+  StatProps,
+  SectionLabelProps,
+} from './foundation';
 
-/* ------------------------------------------------------------------ */
-/* Button                                                              */
-/* ------------------------------------------------------------------ */
+export { Button, IconButton } from './button';
+export type { ButtonProps, IconButtonProps } from './button';
 
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  /** primary = CTA vert, secondary = contour, ghost = texte. */
-  variant?: 'primary' | 'secondary' | 'ghost';
-  size?: 'sm' | 'md';
-}
+export { Flag, CameroonFlag } from './flag';
+export { Table } from './table';
+export type { Column, TableProps } from './table';
 
-export function Button({
-  variant = 'primary',
-  size = 'md',
-  className,
-  type = 'button',
-  ...rest
-}: ButtonProps) {
-  return (
-    <button
-      type={type}
-      className={cx(
-        'e237-btn',
-        `e237-btn--${variant}`,
-        size === 'sm' && 'e237-btn--sm',
-        className,
-      )}
-      {...rest}
-    />
-  );
-}
+export { Tabs, FilterChip, Tooltip, Pagination } from './nav';
+export type { TabDef } from './nav';
 
-/* ------------------------------------------------------------------ */
-/* Card                                                                */
-/* ------------------------------------------------------------------ */
+export { Select, Combobox, DatePicker, TimePicker } from './pickers';
+export type {
+  SelectOption,
+  SelectProps,
+  ComboboxProps,
+  DatePickerProps,
+  TimePickerProps,
+} from './pickers';
 
-export type CardProps = HTMLAttributes<HTMLDivElement>;
+export { Modal, Drawer } from './overlay';
+export type { ModalProps, DrawerProps } from './overlay';
 
-export function Card({ className, ...rest }: CardProps) {
-  return <div className={cx('e237-card', className)} {...rest} />;
-}
+export { CardSlider } from './card-slider';
+export type { Slide } from './card-slider';
 
-/* ------------------------------------------------------------------ */
-/* Badge                                                               */
-/* ------------------------------------------------------------------ */
+export { GameSelect, sortGamesFcFirst } from './game-select';
+export type { GameSelectProps } from './game-select';
 
-export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
-  /** accent = vert (défaut), cyan, gold, danger, warning, neutral. */
-  tone?: 'accent' | 'cyan' | 'gold' | 'danger' | 'warning' | 'neutral';
-}
+export { VenueCard } from './venue-card';
+export type { VenueCardProps } from './venue-card';
 
-export function Badge({ tone = 'accent', className, ...rest }: BadgeProps) {
-  return (
-    <span
-      className={cx(
-        'e237-badge',
-        tone !== 'accent' && `e237-badge--${tone}`,
-        className,
-      )}
-      {...rest}
-    />
-  );
-}
+export {
+  PlayerCard,
+  GlobalCard,
+  PREMIUM_SKINS,
+  SKIN_LABELS,
+} from './player-card';
+export type {
+  CardSkin,
+  PlayerCardProps,
+  GlobalCardProps,
+  GlobalCardCard,
+} from './player-card';
 
-/* ------------------------------------------------------------------ */
-/* Stat                                                                */
-/* ------------------------------------------------------------------ */
+export {
+  BackLink,
+  PageHeader,
+  PageContainer,
+  DuelStatusBadge,
+  Spinner,
+  Skeleton,
+  EmptyState,
+  ErrorNote,
+  VerifiedMark,
+  Avatar,
+  formatDate,
+} from './primitives';
 
-export interface StatProps extends HTMLAttributes<HTMLDivElement> {
-  value: ReactNode;
-  label: ReactNode;
-}
+export {
+  Input,
+  Textarea,
+  NumberInput,
+  PhoneInput,
+  SearchField,
+} from './fields';
+export type {
+  InputProps,
+  TextareaProps,
+  NumberInputProps,
+  PhoneInputProps,
+  SearchFieldProps,
+} from './fields';
 
-export function Stat({ value, label, className, ...rest }: StatProps) {
-  return (
-    <div className={cx('e237-stat', className)} {...rest}>
-      <span className="e237-stat__value">{value}</span>
-      <span className="e237-stat__label">{label}</span>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* SectionLabel                                                        */
-/* ------------------------------------------------------------------ */
-
-export type SectionLabelProps = HTMLAttributes<HTMLSpanElement>;
-
-/** Label de section cyan en capitales (cf. maquettes). */
-export function SectionLabel({ className, ...rest }: SectionLabelProps) {
-  return <span className={cx('e237-section-label', className)} {...rest} />;
-}
-
-/* ------------------------------------------------------------------ */
-/* PlayerCard                                                          */
-/* ------------------------------------------------------------------ */
-
-export interface PlayerCardProps extends HTMLAttributes<HTMLDivElement> {
-  /** Pseudo du joueur (affiché en capitales). */
-  name: string;
-  /** Note générale (ex. 87). */
-  rating: number | string;
-  /** Division ou rang (ex. « Elite » ou « #128 »). */
-  division?: string;
-  /** Ligne secondaire libre (ville, discipline…). */
-  meta?: string;
-}
-
-/**
- * Carte joueur — valorise le niveau (P12 du cahier fonctionnel).
- * Identité graphique originale ESPORT 237 HUB (exigence du dossier V4 :
- * ne pas reproduire les cartes commerciales existantes).
- */
-export function PlayerCard({
-  name,
-  rating,
-  division,
-  meta,
-  className,
-  children,
-  ...rest
-}: PlayerCardProps) {
-  return (
-    <div className={cx('e237-player-card', className)} {...rest}>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'baseline',
-          justifyContent: 'space-between',
-          gap: 'var(--e237-spacing-4)',
-        }}
-      >
-        <span className="e237-player-card__rating">{rating}</span>
-        {division ? <Badge tone="gold">{division}</Badge> : null}
-      </div>
-      <div style={{ marginTop: 'var(--e237-spacing-4)' }}>
-        <div className="e237-player-card__name">{name}</div>
-        {meta ? <div className="e237-player-card__meta">{meta}</div> : null}
-      </div>
-      {children}
-    </div>
-  );
-}
+export {
+  cardStats,
+  cityAbbr,
+  gameCategory,
+  statValue,
+  STAT_DEFS,
+  DUEL_STATUS_META,
+  statusLabel,
+  DISPUTE_STATUSES,
+  DISPUTE_STATUS_META,
+  disputeStatusMeta,
+  buildGlobalCard,
+  GLOBAL_CARD_MAX_GAMES,
+} from '../lib';
+export type {
+  GameCategory,
+  StatDef,
+  DisputeStatus,
+  GameCardLike,
+  GlobalCardData,
+  GlobalCardGame,
+} from '../lib';

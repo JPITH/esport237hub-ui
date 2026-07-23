@@ -3,5 +3,5 @@
   "compilerOptions": {
     "lib": ["ES2023", "DOM", "DOM.Iterable"]
   },
-  "include": ["src/tokens", "src/theme", "src/web"]
+  "include": ["src/tokens", "src/theme", "src/lib", "src/web"]
 }

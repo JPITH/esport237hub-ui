@@ -37,8 +37,13 @@ monorepo where this repo is mounted as a git submodule at `packages/ui`.
 
 ```
 src/tokens/    TS design tokens (no deps) — colors light/dark, spacing, radius, font
-src/theme/     esport237.ts (Astryx defineTheme) + theme.css (--e237-* vars, .e237-* classes)
-src/css/       global.css = Astryx reset + astryx.css + neutral theme + our theme
-src/web/       React DOM components (Button, Card, Badge, Stat, SectionLabel, PlayerCard) + astryx.ts re-exports
-src/native/    React Native equivalents + useE237Colors()
+src/lib/       Helpers partagés (player-stats, duel-status, global-card)
+src/theme/     esport237.ts + theme.css (--e237-*) + components.css (.btn, .pcard, .ui-*)
+src/css/       global.css = Astryx reset + astryx.css + neutral + theme + components
+src/web/       React DOM : foundation, Button riche, fields, FUT PlayerCard/GlobalCard,
+               VenueCard, overlays, pickers, nav, table, primitives…
+src/native/    React Native : core, fields, cards/skins, sheets, pickers, ScoreInput…
 ```
+
+Peers optionnels : `lucide-react`, `lucide-react-native`, `react-native-reanimated`,
+`@esport237hub/types`. Pas de `next` / `expo-router` dans le package.

@@ -1,0 +1,867 @@
+/**
+ * Composants UI maison ESPORT 237 HUB (boutons, overlays, FUT cards…).
+ * Importé via @esport237hub/ui/css.
+ */
+
+/* ---------------------------------------------------------------- */
+/* Keyframes des composants (modales, drawers, listes, skeleton)      */
+/* ---------------------------------------------------------------- */
+@keyframes ui-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes ui-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes ui-slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes ui-slide-in-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes ui-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes ui-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+@keyframes ui-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ui-animate-fade {
+  animation: ui-fade-in 160ms ease-out;
+}
+.ui-animate-pop {
+  animation: ui-pop-in 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ui-animate-drawer {
+  animation: ui-slide-in-right 260ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.ui-animate-drawer-up {
+  animation: ui-slide-in-up 260ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Apparition en cascade des lignes de résultats (recherche, listes). */
+.ui-stagger > * {
+  animation: ui-rise 260ms ease-out both;
+}
+.ui-stagger > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+.ui-stagger > *:nth-child(2) {
+  animation-delay: 35ms;
+}
+.ui-stagger > *:nth-child(3) {
+  animation-delay: 70ms;
+}
+.ui-stagger > *:nth-child(4) {
+  animation-delay: 105ms;
+}
+.ui-stagger > *:nth-child(5) {
+  animation-delay: 140ms;
+}
+.ui-stagger > *:nth-child(6) {
+  animation-delay: 175ms;
+}
+.ui-stagger > *:nth-child(7) {
+  animation-delay: 210ms;
+}
+.ui-stagger > *:nth-child(n + 8) {
+  animation-delay: 240ms;
+}
+
+/* Skeleton de chargement (shimmer). */
+.ui-skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--e237-surface-raised);
+  border-radius: var(--e237-radius-md);
+}
+.ui-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--e237-text-muted) 14%, transparent),
+    transparent
+  );
+  animation: ui-shimmer 1.3s infinite;
+}
+
+/* Spinner générique. */
+.ui-spinner {
+  border-radius: 9999px;
+  border: 2px solid color-mix(in srgb, currentColor 25%, transparent);
+  border-top-color: currentColor;
+  animation: ui-spin 0.6s linear infinite;
+}
+
+/* Champ de saisie maison — base commune (Input, Select, Textarea). */
+.ui-field {
+  width: 100%;
+  background: var(--e237-surface);
+  border: 1px solid var(--e237-border);
+  border-radius: 10px;
+  color: var(--e237-text-primary);
+  font-size: 14px;
+  font-family: var(--e237-font-body);
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    background-color 150ms ease;
+}
+.ui-field::placeholder {
+  color: var(--e237-text-muted);
+}
+.ui-field:hover:not(:disabled):not(:focus) {
+  border-color: color-mix(in srgb, var(--e237-text-muted) 60%, transparent);
+}
+.ui-field:focus,
+.ui-field:focus-visible,
+/* Composites (NumberInput) : le ring s'applique au conteneur. */
+.ui-field:focus-within,
+/* Déclencheurs de menus (Select, Combobox, pickers) : le champ reste marqué
+   tant que le panneau est ouvert, même quand le focus part dans le panneau. */
+.ui-field[aria-expanded="true"] {
+  outline: none;
+  border-color: var(--e237-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--e237-accent) 18%, transparent);
+}
+
+/* Focus clavier visible et cohérent sur TOUT l'interactif non-champ
+   (boutons, liens, onglets, chips). Les .ui-field gardent leur ring dédié
+   (règle plus spécifique ci-dessus). */
+:where(a, button, [role="tab"], [role="button"]):focus-visible {
+  outline: 2px solid var(--e237-accent);
+  outline-offset: 2px;
+}
+.ui-field:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+
+/* Overlay (modales, drawers). */
+.ui-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: color-mix(in srgb, #01040a 62%, transparent);
+  backdrop-filter: blur(2px);
+  animation: ui-fade-in 160ms ease-out;
+}
+
+/* ---------------------------------------------------------------- */
+/* Boutons maison (variantes, tailles, loading, micro-interactions)   */
+/* ---------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-family: var(--e237-font-display);
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    transform 120ms ease,
+    filter 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+.btn:active:not(:disabled) {
+  transform: translateY(1px) scale(0.99);
+}
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.btn--sm {
+  height: 34px;
+  padding: 0 12px;
+  font-size: 13px;
+  border-radius: 8px;
+}
+.btn--md {
+  height: 40px;
+  padding: 0 16px;
+  font-size: 14px;
+}
+.btn--lg {
+  height: 46px;
+  padding: 0 22px;
+  font-size: 15px;
+}
+.btn--block {
+  width: 100%;
+}
+.btn--primary {
+  background: linear-gradient(
+    180deg,
+    var(--e237-accent-bright),
+    var(--e237-accent)
+  );
+  color: var(--e237-on-accent);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, #fff 25%, transparent) inset,
+    0 6px 18px -8px color-mix(in srgb, var(--e237-accent) 70%, transparent);
+}
+.btn--primary:hover:not(:disabled) {
+  box-shadow: var(--e237-glow-accent);
+}
+.btn--secondary {
+  background: var(--e237-surface);
+  color: var(--e237-text-primary);
+  border-color: var(--e237-border);
+}
+.btn--secondary:hover:not(:disabled) {
+  border-color: var(--e237-accent);
+  color: var(--e237-accent);
+}
+.btn--ghost {
+  background: transparent;
+  color: var(--e237-text-secondary);
+}
+.btn--ghost:hover:not(:disabled) {
+  background: var(--e237-surface-raised);
+  color: var(--e237-text-primary);
+}
+/* Danger bouton : rouge assez sombre pour blanc ≥4.5:1 (le token danger
+   reste clair en dark pour le texte/badges). */
+.btn--danger {
+  background: light-dark(#b91c1c, #dc2626);
+  color: #fff;
+}
+.btn--danger:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+/* Bouton icône carré. */
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  color: var(--e237-text-secondary);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition:
+    color 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+.icon-btn:hover:not(:disabled) {
+  background: var(--e237-surface-raised);
+  color: var(--e237-text-primary);
+}
+
+/* ---------------------------------------------------------------- */
+/* Puces de filtre (avec compteur/stat) + segments d'onglets          */
+/* ---------------------------------------------------------------- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 9999px;
+  border: 1px solid var(--e237-border);
+  background: var(--e237-surface);
+  color: var(--e237-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    color 150ms ease,
+    border-color 150ms ease,
+    background-color 150ms ease;
+}
+.chip:hover:not(.chip--on) {
+  border-color: color-mix(in srgb, var(--e237-text-muted) 60%, transparent);
+  color: var(--e237-text-primary);
+}
+.chip--on {
+  border-color: var(--e237-accent);
+  color: var(--e237-accent);
+  background: color-mix(in srgb, var(--e237-accent) 12%, transparent);
+}
+.chip__count {
+  font-family: var(--e237-font-display);
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--e237-text-muted) 18%, transparent);
+  color: inherit;
+}
+.chip--on .chip__count {
+  background: color-mix(in srgb, var(--e237-accent) 22%, transparent);
+}
+
+/* Groupe segmenté (onglets pilule). */
+.seg {
+  position: relative;
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 11px;
+  background: var(--e237-surface-raised);
+  border: 1px solid var(--e237-border);
+}
+/* Pastille glissante derrière l'onglet actif — simple slide, sans rebond. */
+.seg__pill {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 0;
+  border-radius: 8px;
+  background: var(--e237-surface);
+  box-shadow: 0 1px 2px rgb(2 6 12 / 0.25);
+  transition:
+    transform 200ms cubic-bezier(0.33, 1, 0.68, 1),
+    width 200ms cubic-bezier(0.33, 1, 0.68, 1);
+}
+.seg__item {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--e237-text-secondary);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  transition:
+    color 150ms ease,
+    background-color 150ms ease;
+}
+.seg__item:hover:not(.seg__item--on) {
+  color: var(--e237-text-primary);
+}
+.seg__item--on {
+  /* Le fond est porté par la pastille glissante (.seg__pill). */
+  color: var(--e237-accent);
+}
+
+/* Tooltip minimal. */
+.tt {
+  position: relative;
+  display: inline-flex;
+}
+.tt__bubble {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  translate: -50% 0;
+  z-index: 50;
+  padding: 5px 9px;
+  border-radius: 7px;
+  background: var(--e237-surface-raised);
+  border: 1px solid var(--e237-border);
+  color: var(--e237-text-primary);
+  font-size: 12px;
+  white-space: nowrap;
+  box-shadow: var(--e237-shadow-card);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 140ms ease;
+}
+.tt:hover .tt__bubble,
+.tt:focus-within .tt__bubble {
+  opacity: 1;
+}
+
+/* ================================================================ */
+/* Carte joueur façon FUT — skins cosmétiques, stats par catégorie   */
+/* ================================================================ */
+.pcard {
+  --pc-ink: #0b1220;
+  --pc-line: rgba(11, 18, 32, 0.16);
+  --pc-frame1: #eab308;
+  --pc-frame2: #fde68a;
+  --pc-bg1: #fef3c7;
+  --pc-bg2: #fbbf24;
+  --pc-accent: #b45309;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  /* Ratio de carte fixe → toutes les cartes ont la même hauteur (photo). */
+  aspect-ratio: 63 / 88;
+  border-radius: 20px;
+  padding: 16px 16px 14px;
+  color: var(--pc-ink);
+  background:
+    radial-gradient(120% 80% at 50% -10%, var(--pc-bg1), transparent 60%),
+    linear-gradient(170deg, var(--pc-bg2), var(--pc-frame1) 55%, var(--pc-frame2));
+  border: 1px solid color-mix(in srgb, var(--pc-frame1) 70%, #000 5%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.4) inset,
+    0 18px 40px -18px rgba(2, 6, 12, 0.7);
+  isolation: isolate;
+}
+/* Liseré intérieur brillant. */
+.pcard::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Skin « signature » (marque : bleu nuit + trim vert/or) — défaut du hub. */
+.pcard--signature {
+  --pc-ink: #eaf2ff;
+  --pc-line: rgba(255, 255, 255, 0.14);
+  --pc-frame1: #1b3a63;
+  --pc-frame2: #0d1f38;
+  --pc-bg1: rgba(34, 211, 238, 0.28);
+  --pc-bg2: #12294a;
+  --pc-accent: #22c55e;
+}
+.pcard--signature {
+  background:
+    radial-gradient(120% 80% at 78% -6%, rgba(34, 211, 238, 0.35), transparent 55%),
+    radial-gradient(90% 70% at 10% 110%, rgba(34, 197, 94, 0.28), transparent 55%),
+    linear-gradient(165deg, #163055, #0b1a30 60%, #0a1526);
+  border-color: rgba(250, 204, 21, 0.5);
+}
+.pcard--signature::before {
+  border-color: rgba(250, 204, 21, 0.35);
+}
+
+/* Skin « global » (carte d'identité tous jeux) — bleu nuit + or prestige. */
+.pcard--global {
+  --pc-ink: #fff7e6;
+  --pc-line: rgba(255, 255, 255, 0.16);
+  --pc-frame1: #b58a2b;
+  --pc-accent: #fde68a;
+  background:
+    radial-gradient(120% 80% at 78% -6%, rgba(250, 204, 21, 0.3), transparent 55%),
+    radial-gradient(90% 70% at 12% 112%, rgba(34, 211, 238, 0.22), transparent 55%),
+    linear-gradient(165deg, #1b2c4d, #0c1930 62%, #0a1424);
+  border-color: rgba(250, 204, 21, 0.6);
+}
+.pcard--global::before {
+  border-color: rgba(250, 204, 21, 0.4);
+}
+
+/* Skin « champion » — carte spéciale du n°1 du classement (or prestige). */
+.pcard--champion {
+  --pc-ink: #2a1e00;
+  --pc-line: rgba(42, 30, 0, 0.22);
+  --pc-frame1: #a97400;
+  --pc-accent: #7a5200;
+  background:
+    radial-gradient(120% 80% at 50% -12%, #fff3c4, transparent 55%),
+    linear-gradient(165deg, #f6cc4b, #c9930f 58%, #7a5200);
+  border-color: #ffd970;
+  box-shadow:
+    0 0 0 1px rgba(255, 215, 80, 0.55) inset,
+    0 0 26px -4px rgba(255, 200, 60, 0.55),
+    0 20px 46px -18px rgba(120, 80, 0, 0.7);
+}
+.pcard--champion::before {
+  border-color: rgba(255, 255, 255, 0.55);
+}
+
+/* Skin « émeraude » (vert du hub). */
+.pcard--emerald {
+  --pc-ink: #eafff3;
+  --pc-frame1: #16794a;
+  --pc-accent: #4ade80;
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(74, 222, 128, 0.3), transparent 60%),
+    linear-gradient(165deg, #0f5f3c, #07301f 70%);
+  border-color: rgba(74, 222, 128, 0.5);
+}
+.pcard--emerald::before {
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+/* ---------------------------------------------------------------- */
+/* Skins PREMIUM vendables — mêmes palettes que le mobile             */
+/* (apps/mobile/src/components/cards/card-skins.tsx).                 */
+/* ---------------------------------------------------------------- */
+
+/* « Indomptable » — or profond, rayons diagonaux (braise). */
+.pcard--indomptable {
+  --pc-ink: #f7ecca;
+  --pc-line: rgba(240, 205, 110, 0.22);
+  --pc-frame1: #8a6a1f;
+  --pc-accent: #f0cd6e;
+  --pc-sheenc: rgba(240, 205, 110, 0.17);
+  --pc-glowc: rgba(240, 205, 110, 0.4);
+  background:
+    repeating-linear-gradient(
+      -55deg,
+      transparent 0 14px,
+      rgba(240, 205, 110, 0.05) 14px 16px
+    ),
+    radial-gradient(120% 80% at 50% -10%, #3b2a0a, transparent 60%),
+    linear-gradient(170deg, #241905, #150e03 55%, #2b1f08);
+  border-color: rgba(240, 205, 110, 0.55);
+}
+.pcard--indomptable::before {
+  border-color: rgba(240, 205, 110, 0.38);
+}
+
+/* « 237 Héritage » — vert forêt, chevrons toghu jaune/rouge. */
+.pcard--heritage237 {
+  --pc-ink: #eef7e9;
+  --pc-line: rgba(252, 209, 22, 0.22);
+  --pc-frame1: #007a5e;
+  --pc-accent: #fcd116;
+  --pc-sheenc: rgba(252, 209, 22, 0.14);
+  --pc-glowc: rgba(0, 122, 94, 0.55);
+  background:
+    repeating-linear-gradient(
+      115deg,
+      transparent 0 18px,
+      rgba(252, 209, 22, 0.055) 18px 20px,
+      transparent 20px 38px,
+      rgba(206, 17, 38, 0.05) 38px 40px
+    ),
+    repeating-linear-gradient(
+      -115deg,
+      transparent 0 18px,
+      rgba(252, 209, 22, 0.045) 18px 20px
+    ),
+    radial-gradient(130% 90% at 50% 110%, #123b24, transparent 55%),
+    linear-gradient(170deg, #0b2e1b, #071f12 60%, #0e3520);
+  border-color: rgba(252, 209, 22, 0.55);
+}
+.pcard--heritage237::before {
+  border-color: rgba(252, 209, 22, 0.32);
+}
+
+/* « Nuit de Douala » — bleu nuit, scanlines cyan, touche magenta. */
+.pcard--nuit-douala {
+  --pc-ink: #e4f6ff;
+  --pc-line: rgba(53, 225, 225, 0.25);
+  --pc-frame1: #1b6ea8;
+  --pc-accent: #35e1e1;
+  --pc-sheenc: rgba(53, 225, 225, 0.15);
+  --pc-glowc: rgba(53, 225, 225, 0.42);
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 5px,
+      rgba(53, 225, 225, 0.045) 5px 6px
+    ),
+    radial-gradient(120% 70% at 85% -10%, rgba(193, 59, 255, 0.16), transparent 55%),
+    linear-gradient(170deg, #071226, #050b18 55%, #0b1e33);
+  border-color: rgba(53, 225, 225, 0.55);
+}
+.pcard--nuit-douala::before {
+  border-color: rgba(53, 225, 225, 0.3);
+}
+
+/* Effets animés des skins premium — transform/opacity uniquement. */
+.pcard__sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: inherit;
+}
+.pcard__sheen::before {
+  content: "";
+  position: absolute;
+  top: -25%;
+  bottom: -25%;
+  left: 0;
+  width: 36%;
+  background: linear-gradient(
+    105deg,
+    transparent,
+    var(--pc-sheenc, rgba(255, 255, 255, 0.1)) 50%,
+    transparent
+  );
+  transform: translateX(-130%) skewX(-18deg);
+  animation: pc-sheen 4.5s ease-in-out infinite;
+}
+@keyframes pc-sheen {
+  0% {
+    transform: translateX(-130%) skewX(-18deg);
+  }
+  55%,
+  100% {
+    transform: translateX(330%) skewX(-18deg);
+  }
+}
+/* Halo extérieur qui « respire » (braise, néon…). */
+.pcard--animated {
+  animation: pc-glow 3.2s ease-in-out infinite;
+}
+@keyframes pc-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 10px var(--pc-glowc, transparent);
+  }
+  50% {
+    box-shadow: 0 0 26px var(--pc-glowc, transparent);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pcard__sheen::before,
+  .pcard--animated {
+    animation: none;
+  }
+}
+
+/* En-tête : colonne badge (OVR/poste/drapeau) + zone image. */
+.pcard__head {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.pcard__badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding-top: 2px;
+  min-width: 46px;
+}
+.pcard__ovr {
+  font-family: var(--e237-font-display);
+  font-weight: 700;
+  font-size: 34px;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+}
+.pcard__ovrlabel {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  opacity: 0.75;
+}
+.pcard__pos {
+  margin-top: 3px;
+  font-family: var(--e237-font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+}
+.pcard__rule {
+  width: 26px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.4;
+  margin: 3px 0;
+}
+.pcard__flag {
+  width: 26px;
+  height: 17px;
+  border-radius: 2px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+/* Zone image (skin / photo) — remplie plus tard par le back. */
+.pcard__img {
+  position: relative;
+  flex: 1;
+  min-height: 96px;
+  display: grid;
+  place-items: end center;
+}
+/* Fallback silhouette quand la photo du joueur n'est pas encore fournie. */
+.pcard__imgph {
+  display: grid;
+  place-items: end center;
+  height: 100%;
+  width: 100%;
+}
+.pcard__imgph svg {
+  width: 78%;
+  height: auto;
+  opacity: 0.2;
+  translate: 0 6%;
+}
+.pcard__badge-tag {
+  font-family: var(--e237-font-display);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  opacity: 0.75;
+}
+.pcard__photo {
+  max-height: 150px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.4));
+}
+
+/* Nom + victoires qui le chevauchent. */
+.pcard__name-wrap {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  margin-top: 2px;
+}
+.pcard__wins {
+  font-family: var(--e237-font-display);
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 0.7;
+  letter-spacing: -0.04em;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--pc-accent) 92%, #fff),
+    var(--pc-accent)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 6px 16px color-mix(in srgb, var(--pc-accent) 45%, transparent);
+  position: relative;
+  z-index: 1;
+}
+.pcard__wins-lbl {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  opacity: 0.7;
+  vertical-align: super;
+  margin-left: 2px;
+}
+.pcard__name {
+  position: relative;
+  z-index: 2;
+  margin-top: -12px;
+  font-family: var(--e237-font-display);
+  font-weight: 700;
+  font-size: 19px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.pcard__meta {
+  font-size: 11px;
+  opacity: 0.72;
+}
+
+/* Stats bas de carte. */
+.pcard__stats {
+  position: relative;
+  z-index: 2;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--pc-line);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 18px;
+}
+.pcard__stat {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  font-variant-numeric: tabular-nums;
+}
+.pcard__stat b {
+  font-family: var(--e237-font-display);
+  font-weight: 700;
+  font-size: 15px;
+  min-width: 22px;
+}
+.pcard__stat span {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  opacity: 0.72;
+}
+
+/* ---------------------------------------------------------------- */
+/* Carte globale (identité tous jeux)                                 */
+/* ---------------------------------------------------------------- */
+.gcard {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  padding: 18px;
+  color: #eaf2ff;
+  background:
+    radial-gradient(90% 70% at 85% -10%, rgba(34, 211, 238, 0.25), transparent 55%),
+    linear-gradient(160deg, #16305a, #0b1a30 65%);
+  border: 1px solid rgba(250, 204, 21, 0.4);
+  box-shadow: 0 18px 40px -20px rgba(2, 6, 12, 0.75);
+}
+.gcard__ovr {
+  font-family: var(--e237-font-display);
+  font-weight: 700;
+  font-size: 46px;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  color: #fde68a;
+}
+
+/* Reduced-motion : animations décoratives UI (pas le feedback focus). */
+@media (prefers-reduced-motion: reduce) {
+  .ui-animate-fade,
+  .ui-animate-pop,
+  .ui-animate-drawer,
+  .ui-animate-drawer-up,
+  .ui-stagger > *,
+  .ui-spinner,
+  .ui-skeleton::after,
+  .pcard__sheen::before,
+  .pcard--animated {
+    animation: none !important;
+  }
+}
