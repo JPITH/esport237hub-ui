@@ -11,6 +11,7 @@
 import { useState } from 'react';
 import {
   ActivityIndicator,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -19,6 +20,7 @@ import {
   useColorScheme,
   type StyleProp,
   type TextInputProps,
+  type TextStyle,
   type ViewStyle,
 } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
@@ -30,6 +32,16 @@ function useColors(): ColorScale {
   const scheme = useColorScheme();
   return scheme === 'light' ? color.light : color.dark;
 }
+
+/**
+ * Focus visible ARRONDI : le liseré du champ passe à l'accent. Sur le web
+ * (react-native-web), l'outline navigateur par défaut est rectangulaire et
+ * ignore le border-radius — on le neutralise ici, le liseré prend le relais.
+ */
+const NO_WEB_OUTLINE =
+  Platform.OS === 'web'
+    ? ({ outlineStyle: 'none' } as unknown as TextStyle)
+    : null;
 
 /* ------------------------------------------------------------------ */
 /* Icônes internes (react-native-svg, style « trait »)                 */
@@ -134,6 +146,7 @@ export function Field({ label, style, secureTextEntry, ...props }: FieldProps) {
   const isPassword = !!secureTextEntry;
   // Le mot de passe démarre masqué ; l'œil bascule l'affichage.
   const [hidden, setHidden] = useState(true);
+  const [focused, setFocused] = useState(false);
 
   return (
     <View style={[{ gap: spacing['1'] }, style]}>
@@ -144,12 +157,21 @@ export function Field({ label, style, secureTextEntry, ...props }: FieldProps) {
         <TextInput
           placeholderTextColor={c.textMuted}
           {...props}
+          onFocus={(e) => {
+            setFocused(true);
+            props.onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setFocused(false);
+            props.onBlur?.(e);
+          }}
           secureTextEntry={isPassword ? hidden : secureTextEntry}
           style={[
             styles.field,
+            NO_WEB_OUTLINE,
             {
               backgroundColor: c.surface,
-              borderColor: c.border,
+              borderColor: focused ? c.accent : c.border,
               color: c.textPrimary,
             },
             isPassword && { paddingRight: 44 },
@@ -184,6 +206,7 @@ export function Field({ label, style, secureTextEntry, ...props }: FieldProps) {
 /** Zone de texte multiligne — même identité que Field. */
 export function Textarea({ label, style, ...props }: FieldProps) {
   const c = useColors();
+  const [focused, setFocused] = useState(false);
   return (
     <View style={[{ gap: spacing['1'] }, style]}>
       {label ? (
@@ -194,12 +217,21 @@ export function Textarea({ label, style, ...props }: FieldProps) {
         multiline
         textAlignVertical="top"
         {...props}
+        onFocus={(e) => {
+          setFocused(true);
+          props.onFocus?.(e);
+        }}
+        onBlur={(e) => {
+          setFocused(false);
+          props.onBlur?.(e);
+        }}
         style={[
           styles.field,
           styles.textarea,
+          NO_WEB_OUTLINE,
           {
             backgroundColor: c.surface,
-            borderColor: c.border,
+            borderColor: focused ? c.accent : c.border,
             color: c.textPrimary,
           },
         ]}
@@ -234,6 +266,7 @@ export function Stepper({
   style?: StyleProp<ViewStyle>;
 }) {
   const c = useColors();
+  const [focused, setFocused] = useState(false);
 
   const clamp = (n: number) => Math.min(max, Math.max(min, n));
   const parse = (text: string) => {
@@ -275,7 +308,7 @@ export function Stepper({
       <View
         style={[
           styles.stepper,
-          { backgroundColor: c.surface, borderColor: c.border },
+          { backgroundColor: c.surface, borderColor: focused ? c.accent : c.border },
         ]}
       >
         {side(-1)}
@@ -284,7 +317,9 @@ export function Stepper({
           value={String(value)}
           onChangeText={(t) => onChange(parse(t))}
           selectTextOnFocus
-          style={[styles.stepperInput, { color: c.textPrimary }]}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          style={[styles.stepperInput, NO_WEB_OUTLINE, { color: c.textPrimary }]}
         />
         {side(1)}
       </View>
@@ -323,6 +358,7 @@ export function PhoneField({
   style?: StyleProp<ViewStyle>;
 }) {
   const c = useColors();
+  const [focused, setFocused] = useState(false);
   return (
     <View style={[{ gap: spacing['1'] }, style]}>
       {label ? (
@@ -331,7 +367,7 @@ export function PhoneField({
       <View
         style={[
           styles.phoneWrap,
-          { backgroundColor: c.surface, borderColor: c.border },
+          { backgroundColor: c.surface, borderColor: focused ? c.accent : c.border },
         ]}
       >
         <View
@@ -352,7 +388,9 @@ export function PhoneField({
           value={formatCmPhone(value)}
           placeholder={placeholder}
           onChangeText={(t) => onChange(t.replace(/\D/g, '').slice(0, 9))}
-          style={[styles.phoneInput, { color: c.textPrimary }]}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          style={[styles.phoneInput, NO_WEB_OUTLINE, { color: c.textPrimary }]}
         />
       </View>
     </View>
@@ -380,11 +418,12 @@ export function SearchField({
   style?: StyleProp<ViewStyle>;
 }) {
   const c = useColors();
+  const [focused, setFocused] = useState(false);
   return (
     <View
       style={[
         styles.searchWrap,
-        { backgroundColor: c.surface, borderColor: c.border },
+        { backgroundColor: c.surface, borderColor: focused ? c.accent : c.border },
         style,
       ]}
     >
@@ -402,7 +441,9 @@ export function SearchField({
         placeholder={placeholder}
         placeholderTextColor={c.textMuted}
         returnKeyType="search"
-        style={[styles.searchInput, { color: c.textPrimary }]}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        style={[styles.searchInput, NO_WEB_OUTLINE, { color: c.textPrimary }]}
       />
       {value ? (
         <Pressable

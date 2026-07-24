@@ -37,6 +37,9 @@ export {
   SegmentedTabs,
 } from './primitives';
 
+export { StatTile, QuickAction } from './dashboard';
+export type { StatTileProps, StatTileTrend, QuickActionProps } from './dashboard';
+
 export { Sheet } from './sheet';
 export { SelectSheet } from './select-sheet';
 export type { SelectOption } from './select-sheet';
@@ -47,6 +50,7 @@ export {
   CARD_FONTS,
   CARD_SKINS,
   CardChrome,
+  CardSlot,
   PREMIUM_SKINS,
   useCardScale,
 } from './card-skins';

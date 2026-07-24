@@ -46,7 +46,11 @@ export function CardCrest({ spec, label }: { spec: SkinSpec; label: string }) {
           s.crest,
           { borderColor: spec.frame[0], backgroundColor: spec.linear[2] },
         ]}>
-        <Text numberOfLines={1} style={[s.crestText, { color: spec.ink }]}>
+        <Text
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.7}
+          style={[s.crestText, { color: spec.ink }]}>
           {label.toUpperCase()}
         </Text>
       </View>
@@ -59,7 +63,11 @@ export function DivisionChip({ spec, label }: { spec: SkinSpec; label: string })
   const s = useCardStyles();
   return (
     <View style={[s.division, { borderColor: spec.frame[0] }]}>
-      <Text numberOfLines={1} style={[s.divisionText, { color: spec.ink }]}>
+      <Text
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.7}
+        style={[s.divisionText, { color: spec.ink }]}>
         {label.toUpperCase()}
       </Text>
     </View>
@@ -144,7 +152,13 @@ function PlayerCardBody({
 
       <View style={s.head}>
         <View style={s.badge}>
-          <Text style={[s.ovr, { color: spec.ink }]}>{rating}</Text>
+          <Text
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.7}
+            style={[s.ovr, { color: spec.ink }]}>
+            {rating}
+          </Text>
           <Text style={[s.pos, { color: spec.ink }]}>{cityAbbr(city)}</Text>
           <View style={s.flag}>
             <Flag country={country} />
@@ -155,10 +169,18 @@ function PlayerCardBody({
       </View>
 
       <View style={[s.identity, { borderTopColor: spec.line }]}>
-        <Text numberOfLines={1} style={[s.name, { color: spec.ink }]}>
+        <Text
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.55}
+          style={[s.name, { color: spec.ink }]}>
           {username.toUpperCase()}
         </Text>
-        <Text numberOfLines={1} style={[s.record, { color: spec.ink }]}>
+        <Text
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.7}
+          style={[s.record, { color: spec.ink }]}>
           {wins} VICT.
         </Text>
       </View>
@@ -207,17 +229,20 @@ function makeStyles(k: number) {
     },
     crestText: { fontFamily: CARD_FONTS.extraBold, fontSize: 9 * k, letterSpacing: 1.2 * k },
     head: { flex: 1, flexDirection: 'row', justifyContent: 'space-between', gap: 8 * k },
-    badge: { alignItems: 'center', gap: 2 * k, paddingTop: 2 * k, minWidth: 52 * k, maxWidth: '26%' },
+    badge: { alignItems: 'center', gap: 2 * k, paddingTop: 2 * k, minWidth: 56 * k, maxWidth: '28%' },
+    /* Tailles volontairement PLUS PETITES que le web (retour porteur 24/07 :
+       « diminuer la taille des textes sur mobile ») tout en gardant la
+       hiérarchie FUT : OVR dominant, nom net, stats lisibles. */
     ovr: {
       fontFamily: CARD_FONTS.black,
-      fontSize: 34 * k,
-      lineHeight: 32 * k,
-      letterSpacing: -1.4 * k,
+      fontSize: 40 * k,
+      lineHeight: 37 * k,
+      letterSpacing: -2 * k,
     },
     pos: {
       marginTop: 3 * k,
       fontFamily: CARD_FONTS.extraBold,
-      fontSize: 13 * k,
+      fontSize: 12 * k,
       letterSpacing: 1 * k,
     },
     flag: {
@@ -238,7 +263,7 @@ function makeStyles(k: number) {
       paddingHorizontal: 5 * k,
       backgroundColor: 'rgba(0,0,0,0.28)',
     },
-    divisionText: { fontFamily: CARD_FONTS.extraBold, fontSize: 7 * k, letterSpacing: 0.8 * k },
+    divisionText: { fontFamily: CARD_FONTS.extraBold, fontSize: 8 * k, letterSpacing: 0.8 * k },
     img: { flex: 1, alignItems: 'center', justifyContent: 'flex-end' },
     portrait: { width: '96%', height: '96%' },
     /* Bandeau identité — bordure haute seulement (pas de bordure basse). */
@@ -251,16 +276,22 @@ function makeStyles(k: number) {
       paddingBottom: 2 * k,
       borderTopWidth: 1,
     },
+    /* Largeur bornée + centrage : indispensable pour qu'adjustsFontSizeToFit
+       ait une boîte de référence — le texte rétrécit au lieu de déborder. */
     name: {
+      width: '100%',
+      textAlign: 'center',
       fontFamily: CARD_FONTS.black,
-      fontSize: 19 * k,
-      letterSpacing: 0.8 * k,
+      fontSize: 17 * k,
+      letterSpacing: 0.9 * k,
       textTransform: 'uppercase',
     },
     record: {
+      maxWidth: '100%',
+      textAlign: 'center',
       marginTop: 3 * k,
       fontFamily: CARD_FONTS.bold,
-      fontSize: 10 * k,
+      fontSize: 9 * k,
       letterSpacing: 0.8 * k,
       opacity: 0.75,
     },
@@ -283,12 +314,12 @@ function makeStyles(k: number) {
     statRight: { paddingLeft: 12 * k },
     statValue: {
       fontFamily: CARD_FONTS.black,
-      fontSize: 15 * k,
+      fontSize: 14 * k,
       fontVariant: ['tabular-nums'],
     },
     statAbbr: {
       fontFamily: CARD_FONTS.extraBold,
-      fontSize: 10 * k,
+      fontSize: 9 * k,
       letterSpacing: 0.5 * k,
       opacity: 0.72,
     },
@@ -300,7 +331,7 @@ function makeStyles(k: number) {
       paddingHorizontal: 9 * k,
       backgroundColor: 'rgba(0,0,0,0.22)',
     },
-    chipText: { fontFamily: CARD_FONTS.extraBold, fontSize: 7 * k, letterSpacing: 0.9 * k },
+    chipText: { fontFamily: CARD_FONTS.extraBold, fontSize: 8 * k, letterSpacing: 0.65 * k },
   });
 }
 

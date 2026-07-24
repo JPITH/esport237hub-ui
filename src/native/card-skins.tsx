@@ -9,7 +9,7 @@
  * seule View Reanimated en transform : quasi gratuit.
  */
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -432,7 +432,29 @@ export function CardChrome({
   );
 }
 
+/**
+ * Gabarit d'affichage d'une carte : borne la largeur à la référence (300 px,
+ * celle pour laquelle les tailles ont été dessinées) et centre. À utiliser
+ * partout où une carte s'affiche seule (profil, deck, boutique) — sans lui,
+ * une carte pleine largeur d'écran clampe l'échelle à 1,2 et devient massive.
+ */
+export function CardSlot({
+  children,
+  maxWidth = BASE_WIDTH,
+  style,
+}: {
+  children: ReactNode;
+  maxWidth?: number;
+  style?: StyleProp<ViewStyle>;
+}) {
+  return <View style={[styles.slot, { maxWidth }, style]}>{children}</View>;
+}
+
 const styles = StyleSheet.create({
+  slot: {
+    width: '100%',
+    alignSelf: 'center',
+  },
   card: {
     width: '100%',
     /* Ratio de carte fixe — identique au web (63/88). */

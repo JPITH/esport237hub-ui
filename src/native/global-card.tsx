@@ -77,7 +77,13 @@ function GlobalCardBody({
 
       <View style={s.head}>
         <View style={s.badge}>
-          <Text style={[s.ovr, { color: spec.ink }]}>{g.overall}</Text>
+          <Text
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.7}
+            style={[s.ovr, { color: spec.ink }]}>
+            {g.overall}
+          </Text>
           <Text style={[s.pos, { color: spec.ink }]}>{cityAbbr(city)}</Text>
           <View style={s.flag}>
             <Flag />
@@ -88,10 +94,18 @@ function GlobalCardBody({
       </View>
 
       <View style={[s.identity, { borderTopColor: spec.line }]}>
-        <Text numberOfLines={1} style={[s.name, { color: spec.ink }]}>
+        <Text
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.55}
+          style={[s.name, { color: spec.ink }]}>
           {username.toUpperCase()}
         </Text>
-        <Text numberOfLines={1} style={[s.record, { color: spec.ink }]}>
+        <Text
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.7}
+          style={[s.record, { color: spec.ink }]}>
           {g.points} pts · {g.wins}V/{g.losses}D
           {g.extraGames > 0 ? ` · +${g.extraGames} jeux` : ''}
         </Text>
