@@ -24,6 +24,7 @@ export function Screen({ children }: { children: ReactNode }) {
     <ScrollView
       style={{ backgroundColor: c.bg }}
       contentContainerStyle={styles.screen}
+      contentInsetAdjustmentBehavior="automatic"
       keyboardShouldPersistTaps="handled"
     >
       {children}
@@ -46,7 +47,9 @@ export function ErrorNote({ message }: { message: string }) {
       ]}
     >
       <AlertCircle color={c.danger} size={16} />
-      <Text style={{ color: c.danger, fontSize: 13, flex: 1 }}>{message}</Text>
+      <Text selectable style={{ color: c.danger, fontSize: 13, flex: 1 }}>
+        {message}
+      </Text>
     </View>
   );
 }

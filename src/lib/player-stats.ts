@@ -86,12 +86,17 @@ export function statValue(
 
 /** Liste (abbr, valeur) prête à afficher pour un profil de jeu. */
 export function cardStats(input: {
-  gameSlug: string | undefined;
+  gameSlug?: string | undefined;
   rating: number;
   stats?: Record<string, number> | null;
   seed: string;
+  /** Stats configurées par le back-office (prioritaires sur les catégories internes). */
+  statDefs?: StatDef[];
 }): { abbr: string; label: string; value: number }[] {
-  const defs = STAT_DEFS[gameCategory(input.gameSlug)];
+  const defs =
+    input.statDefs && input.statDefs.length > 0
+      ? input.statDefs
+      : STAT_DEFS[gameCategory(input.gameSlug)];
   return defs.map((d) => ({
     abbr: d.abbr,
     label: d.label,

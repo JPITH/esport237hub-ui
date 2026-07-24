@@ -62,20 +62,20 @@ export function Modal({
 
   if (!mounted || !open) return null;
 
-  const maxW =
-    size === "sm" ? "max-w-sm" : size === "lg" ? "max-w-2xl" : "max-w-md";
+  const sizeClass =
+    size === "sm" ? "ui-modal--sm" : size === "lg" ? "ui-modal--lg" : "ui-modal--md";
 
   return createPortal(
     <>
       <div className="ui-overlay" onClick={onClose} />
-      <div className="fixed inset-0 z-[61] grid place-items-center p-4">
+      <div className="ui-modal-root">
         <div
           ref={panelRef}
           role="dialog"
           aria-modal="true"
           aria-label={title}
           tabIndex={-1}
-          className={`ui-animate-pop w-full ${maxW} rounded-2xl border border-edge bg-surface p-5 shadow-2xl outline-none`}
+          className={`ui-modal ui-animate-pop ${sizeClass}`}
         >
           {title || onClose ? (
             <div className="mb-3 flex items-start justify-between gap-4">
@@ -132,7 +132,7 @@ export function Drawer({
         aria-modal="true"
         aria-label={title}
         style={{ maxWidth: width }}
-        className="ui-animate-drawer fixed inset-y-0 right-0 z-[61] flex w-full flex-col border-l border-edge bg-surface"
+        className="ui-drawer ui-animate-drawer"
       >
         <div className="flex items-center justify-between gap-4 border-b border-edge px-5 py-4">
           <h2 className="text-base font-bold">{title}</h2>

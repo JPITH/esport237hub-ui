@@ -97,6 +97,9 @@ export type {
   SearchFieldProps,
 } from './fields';
 
+export { ColorPicker } from './color-picker';
+export type { ColorPickerProps } from './color-picker';
+
 export {
   cardStats,
   cityAbbr,

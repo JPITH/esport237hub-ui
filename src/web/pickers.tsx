@@ -67,9 +67,7 @@ function Panel({
   className?: string;
 }) {
   return (
-    <div
-      className={`ui-animate-pop absolute left-0 top-[calc(100%+6px)] z-50 min-w-full overflow-hidden rounded-xl border border-edge bg-surface shadow-2xl ${className}`}
-    >
+    <div className={`ui-popover ui-animate-pop ${className}`}>
       {children}
     </div>
   );
