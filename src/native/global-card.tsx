@@ -7,7 +7,6 @@
  * DÉRIVÉE de toutes ses cartes (`buildGlobalCard`) : OVERALL = meilleure note,
  * six disciplines maximum (le surplus est compté), victoires/défaites cumulées.
  */
-import { UserRound } from 'lucide-react-native';
 import { Text, View } from 'react-native';
 
 import { buildGlobalCard, type GameCardLike } from '../lib/global-card';
@@ -15,7 +14,13 @@ import { cityAbbr } from '../lib/player-stats';
 
 import { CARD_SKINS, CardChrome } from './card-skins';
 import { Flag } from './flag';
-import { CardCrest, CardFooter, DivisionChip, s } from './player-card';
+import {
+  CardCrest,
+  CardFooter,
+  CardPortrait,
+  DivisionChip,
+  useCardStyles,
+} from './player-card';
 
 const GAME_CODE: Record<string, string> = {
   fc27: 'FC',
@@ -33,26 +38,41 @@ function gameCode(slug: string | undefined, name: string): string {
     .toUpperCase();
 }
 
-export function GlobalCard({
-  username,
-  city,
-  cards,
-  division,
-  skin = 'global',
-}: {
+export interface GlobalCardProps {
   username: string;
   city?: string | null;
   cards: GameCardLike[];
   /** Division globale (Elite, Challenger…) sous le drapeau. */
   division?: string | null;
+  /** Photo détourée du joueur ; silhouette IA de repli sinon. */
+  imageUrl?: string | null;
   /** « champion » pour le n°1 du classement global. */
   skin?: 'global' | 'champion';
-}) {
+}
+
+export function GlobalCard({ skin = 'global', ...props }: GlobalCardProps) {
+  return (
+    <CardChrome skin={skin}>
+      <GlobalCardBody skin={skin} {...props} />
+    </CardChrome>
+  );
+}
+
+/** Corps de carte — rendu SOUS CardChrome pour recevoir l'échelle mesurée. */
+function GlobalCardBody({
+  username,
+  city,
+  cards,
+  division,
+  imageUrl,
+  skin = 'global',
+}: GlobalCardProps) {
   const spec = CARD_SKINS[skin];
+  const s = useCardStyles();
   const g = buildGlobalCard(cards);
 
   return (
-    <CardChrome skin={skin}>
+    <>
       <CardCrest spec={spec} label="Globale" />
 
       <View style={s.head}>
@@ -64,9 +84,7 @@ export function GlobalCard({
           </View>
           {division ? <DivisionChip spec={spec} label={division} /> : null}
         </View>
-        <View style={s.img}>
-          <UserRound size={96} color={spec.ink} strokeWidth={1.25} style={{ opacity: 0.2 }} />
-        </View>
+        <CardPortrait imageUrl={imageUrl} />
       </View>
 
       <View style={[s.identity, { borderTopColor: spec.line }]}>
@@ -87,8 +105,8 @@ export function GlobalCard({
               style={[
                 s.stat,
                 i % 2 === 0
-                  ? { borderRightWidth: 1, borderRightColor: spec.line, paddingRight: 12 }
-                  : { paddingLeft: 12 },
+                  ? [s.statLeft, { borderRightColor: spec.line }]
+                  : s.statRight,
               ]}>
               <Text style={[s.statValue, { color: spec.ink }]}>{game.rating}</Text>
               <Text style={[s.statAbbr, { color: spec.ink }]}>
@@ -102,6 +120,6 @@ export function GlobalCard({
       </View>
 
       <CardFooter spec={spec} />
-    </CardChrome>
+    </>
   );
 }

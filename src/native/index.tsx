@@ -44,13 +44,17 @@ export { DateField, TimeField } from './date-time';
 export { GameSelect, sortGamesFcFirst } from './game-select';
 export { Flag, CameroonFlag } from './flag';
 export {
+  CARD_FONTS,
   CARD_SKINS,
   CardChrome,
   PREMIUM_SKINS,
+  useCardScale,
 } from './card-skins';
 export type { CardSkin, SkinSpec } from './card-skins';
 export { PlayerCard } from './player-card';
+export type { PlayerCardProps } from './player-card';
 export { GlobalCard } from './global-card';
+export type { GlobalCardProps } from './global-card';
 export { DuelStatusBadge } from './duel-status-badge';
 export { ScoreInput } from './score-board';
 

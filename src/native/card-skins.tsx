@@ -8,7 +8,7 @@
  * Les skins PREMIUM (vendables) ajoutent un balayage « foil » animé — une
  * seule View Reanimated en transform : quasi gratuit.
  */
-import { useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
   Easing,
@@ -30,6 +30,32 @@ import Svg, {
   Rect,
   Stop,
 } from 'react-native-svg';
+
+/**
+ * Familles Inter chargées par les apps (expo-font / @expo-google-fonts/inter).
+ * Le fontWeight est encodé dans le nom du fichier — ne pas cumuler avec
+ * `fontWeight` (conflit Android).
+ */
+export const CARD_FONTS = {
+  black: 'Inter_900Black',
+  extraBold: 'Inter_800ExtraBold',
+  bold: 'Inter_700Bold',
+  semiBold: 'Inter_600SemiBold',
+} as const;
+
+/**
+ * Échelle de la carte : 1 = largeur de référence 300 (celle pour laquelle les
+ * tailles fixes ont été dessinées). Fournie par CardChrome après mesure,
+ * consommée par les styles des cartes (équivalent natif des `cqw` du web).
+ */
+const CardScaleContext = createContext(1);
+export function useCardScale(): number {
+  return useContext(CardScaleContext);
+}
+const BASE_WIDTH = 300;
+function cardScale(width: number): number {
+  return Math.min(1.2, Math.max(0.5, width / BASE_WIDTH));
+}
 
 export type CardSkin =
   | 'gold'
@@ -387,7 +413,21 @@ export function CardChrome({
         </Svg>
       ) : null}
       {size && spec.sheen ? <Sheen color={spec.sheen} w={size.w} h={size.h} /> : null}
-      <View style={styles.content}>{children}</View>
+      <CardScaleContext.Provider value={size ? cardScale(size.w) : 1}>
+        <View
+          style={[
+            styles.content,
+            size
+              ? {
+                  paddingHorizontal: 20 * cardScale(size.w),
+                  paddingTop: 24 * cardScale(size.w),
+                  paddingBottom: 36 * cardScale(size.w),
+                }
+              : null,
+          ]}>
+          {children}
+        </View>
+      </CardScaleContext.Provider>
     </View>
   );
 }
