@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import { UserRound } from "lucide-react";
 
-import { cardStats, cityAbbr } from "../lib/player-stats";
+import { cardStats, cityAbbr, type StatDef } from "../lib/player-stats";
 import { Flag } from "./flag";
 
 /** Skins cosmétiques de la carte (achetables plus tard sur le store). */
@@ -35,21 +35,27 @@ export const SKIN_LABELS: Record<CardSkin, string> = {
   "nuit-douala": "Nuit de Douala",
 };
 
-/** Photo du joueur, ou fallback silhouette (en attendant le socle médias). */
+/**
+ * Photo du joueur ; sinon PNG de fallback (silhouette IA fournie par l'app) ;
+ * sinon icône silhouette.
+ */
 function CardImage({
   imageUrl,
+  fallbackImageUrl,
   alt,
 }: {
   imageUrl?: string | null;
+  fallbackImageUrl?: string | null;
   alt: string;
 }) {
-  if (imageUrl) {
+  const src = imageUrl ?? fallbackImageUrl;
+  if (src) {
     // eslint-disable-next-line @next/next/no-img-element
     return (
       <img
         className="pcard__photo"
-        src={imageUrl}
-        alt={alt}
+        src={src}
+        alt={imageUrl ? alt : ""}
         width={180}
         height={150}
       />
@@ -62,25 +68,29 @@ function CardImage({
   );
 }
 
-/** Colonne badge : OVR + abrégé ville + drapeau (à la place du poste). */
+/** Colonne badge : OVR + abrégé ville + drapeau + division. */
 function CardBadge({
   ovr,
   tag,
   cityText,
   country,
+  division,
 }: {
   ovr: number;
   tag?: string;
   cityText: string;
   country: string;
+  division?: string | null;
 }) {
   return (
     <div className="pcard__badge">
       <span className="pcard__ovr">{ovr}</span>
-      <span className="pcard__ovrlabel">{tag ?? "OVR"}</span>
+      {tag ? <span className="pcard__ovrlabel">{tag}</span> : null}
       <span className="pcard__pos">{cityText}</span>
-      <span className="pcard__rule" />
-      <Flag country={country} className="pcard__flag" />
+      <span className="pcard__flag">
+        <Flag country={country} />
+      </span>
+      {division ? <span className="pcard__division">{division}</span> : null}
     </div>
   );
 }
@@ -93,8 +103,14 @@ export interface PlayerCardProps {
   gameSlug?: string;
   gameName?: string;
   stats?: Record<string, number> | null;
+  /** Stats configurées par le back-office (prioritaires sur les catégories internes). */
+  statDefs?: StatDef[];
+  /** Division du joueur (Elite, Challenger…), affichée sous le drapeau. */
+  division?: string | null;
   skin?: CardSkin;
   imageUrl?: string | null;
+  /** PNG silhouette affiché quand le joueur n'a pas encore d'avatar. */
+  fallbackImageUrl?: string | null;
   country?: string;
   className?: string;
   /** Styles inline (ex. surcharge des variables --pc-* pour l'éditeur de skins). */
@@ -104,8 +120,10 @@ export interface PlayerCardProps {
 }
 
 /**
- * Carte joueur façon FUT (un même template pour tous les jeux) : OVR + ville +
- * drapeau, nom surmonté des victoires, stats du bas selon la catégorie du jeu.
+ * Carte joueur FUT « Founders » (forme bouclier crénelée, un même template
+ * pour tous les jeux) : plaque jeu sur le liseré, OVR + ville + drapeau +
+ * division en colonne, portrait (ou fallback IA), nom + victoires, stats de
+ * la catégorie du jeu (séparateur porté par les cellules), marque en pied.
  */
 export function PlayerCard({
   username,
@@ -115,8 +133,11 @@ export function PlayerCard({
   gameSlug,
   gameName,
   stats,
+  statDefs,
+  division,
   skin = "signature",
   imageUrl,
+  fallbackImageUrl = "/cards/player-fallback.png",
   country = "CM",
   className = "",
   style,
@@ -124,27 +145,31 @@ export function PlayerCard({
 }: PlayerCardProps) {
   const skinClass = skin === "gold" ? "" : `pcard--${skin}`;
   const premium = PREMIUM_SKINS.includes(skin) || animated;
-  const rows = cardStats({ gameSlug, rating, stats, seed: username });
+  const rows = cardStats({ gameSlug, rating, stats, seed: username, statDefs });
 
   return (
     <div
       className={`pcard ${skinClass} ${premium ? "pcard--animated" : ""} ${className}`}
       style={style}
     >
-      <div className="pcard__head">
-        <CardBadge ovr={rating} cityText={cityAbbr(city)} country={country} />
-        <div className="pcard__img">
-          <CardImage imageUrl={imageUrl} alt={username} />
-        </div>
+      {gameName ? <span className="pcard__crest">{gameName}</span> : null}
+      <CardBadge
+        ovr={rating}
+        cityText={cityAbbr(city)}
+        country={country}
+        division={division}
+      />
+      <div className="pcard__img">
+        <CardImage
+          imageUrl={imageUrl}
+          fallbackImageUrl={fallbackImageUrl}
+          alt={username}
+        />
       </div>
 
-      <div className="pcard__name-wrap">
-        <div>
-          <span className="pcard__wins">{wins}</span>
-          <span className="pcard__wins-lbl">VICT.</span>
-        </div>
+      <div className="pcard__identity">
         <div className="pcard__name">{username}</div>
-        {gameName ? <div className="pcard__meta">{gameName}</div> : null}
+        <div className="pcard__meta">{wins} VICT.</div>
       </div>
 
       <div className="pcard__stats">
@@ -154,6 +179,10 @@ export function PlayerCard({
             <span>{s.abbr}</span>
           </div>
         ))}
+      </div>
+
+      <div className="pcard__footer">
+        <span className="pcard__chip">ESPORT 237</span>
       </div>
 
       {premium ? <span className="pcard__sheen" aria-hidden /> : null}
@@ -188,7 +217,10 @@ export interface GlobalCardProps {
   losses: number;
   platform?: string | null;
   city?: string | null;
+  /** Division globale (Elite, Challenger…) sous le drapeau. */
+  division?: string | null;
   imageUrl?: string | null;
+  fallbackImageUrl?: string | null;
   country?: string;
   /** Défaut = global ; "champion" pour le n°1 du classement global. */
   skin?: "global" | "champion";
@@ -196,9 +228,9 @@ export interface GlobalCardProps {
 }
 
 /**
- * Carte globale (identité tous jeux) — même template/hauteur que la carte FUT.
- * OVR = MOYENNE des notes de toutes les disciplines ; les stats du bas listent
- * les jeux joués et leur note. Points, plateforme et V/D sous le nom.
+ * Carte globale (identité tous jeux) — même template/forme que la carte de
+ * jeu, plaque « GLOBALE » (pas de badge jeu). OVR = MEILLEURE note ; les
+ * stats du bas listent les jeux joués et leur note.
  */
 export function GlobalCard({
   username,
@@ -208,7 +240,9 @@ export function GlobalCard({
   losses,
   platform,
   city,
+  division,
   imageUrl,
+  fallbackImageUrl = "/cards/player-fallback.png",
   country = "CM",
   skin = "global",
   className = "",
@@ -219,23 +253,23 @@ export function GlobalCard({
 
   return (
     <div className={`pcard pcard--${skin} ${className}`}>
-      <div className="pcard__head">
-        <CardBadge
-          ovr={overall}
-          tag="GLB"
-          cityText={cityAbbr(city)}
-          country={country}
+      <span className="pcard__crest">Globale</span>
+      <CardBadge
+        ovr={overall}
+        tag="GLB"
+        cityText={cityAbbr(city)}
+        country={country}
+        division={division}
+      />
+      <div className="pcard__img">
+        <CardImage
+          imageUrl={imageUrl}
+          fallbackImageUrl={fallbackImageUrl}
+          alt={username}
         />
-        <div className="pcard__img">
-          <CardImage imageUrl={imageUrl} alt={username} />
-        </div>
       </div>
 
-      <div className="pcard__name-wrap">
-        <div>
-          <span className="pcard__wins">{wins}</span>
-          <span className="pcard__wins-lbl">VICT.</span>
-        </div>
+      <div className="pcard__identity">
         <div className="pcard__name">{username}</div>
         <div className="pcard__meta">
           {points} pts
@@ -254,6 +288,10 @@ export function GlobalCard({
         ) : (
           <span className="text-xs opacity-70">Aucune discipline active.</span>
         )}
+      </div>
+
+      <div className="pcard__footer">
+        <span className="pcard__chip">ESPORT 237</span>
       </div>
     </div>
   );

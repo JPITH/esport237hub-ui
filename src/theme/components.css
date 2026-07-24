@@ -177,7 +177,9 @@
 }
 
 
-/* Overlay (modales, drawers). */
+/* Overlay (modales, drawers).
+ * Positions en CSS pur (pas en utilitaires Tailwind) : le DS est hors de
+ * apps/web, et un @source manquant ne doit jamais casser les popups. */
 .ui-overlay {
   position: fixed;
   inset: 0;
@@ -185,6 +187,56 @@
   background: color-mix(in srgb, #01040a 62%, transparent);
   backdrop-filter: blur(2px);
   animation: ui-fade-in 160ms ease-out;
+}
+.ui-modal-root {
+  position: fixed;
+  inset: 0;
+  z-index: 61;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+.ui-modal {
+  width: 100%;
+  border-radius: 1rem;
+  border: 1px solid var(--e237-border);
+  background: var(--e237-surface);
+  padding: 1.25rem;
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.35);
+  outline: none;
+}
+.ui-modal--sm {
+  max-width: 24rem;
+}
+.ui-modal--md {
+  max-width: 28rem;
+}
+.ui-modal--lg {
+  max-width: 42rem;
+}
+.ui-drawer {
+  position: fixed;
+  inset-block: 0;
+  right: 0;
+  z-index: 61;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  border-left: 1px solid var(--e237-border);
+  background: var(--e237-surface);
+}
+/* Panneau flottant sous un déclencheur (Select, DatePicker, Combobox…). */
+.ui-popover {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 6px);
+  z-index: 50;
+  min-width: 100%;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  border: 1px solid var(--e237-border);
+  background: var(--e237-surface);
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.35);
 }
 
 /* ---------------------------------------------------------------- */
@@ -424,111 +476,122 @@
 /* Carte joueur façon FUT — skins cosmétiques, stats par catégorie   */
 /* ================================================================ */
 .pcard {
-  --pc-ink: #0b1220;
-  --pc-line: rgba(11, 18, 32, 0.16);
-  --pc-frame1: #eab308;
-  --pc-frame2: #fde68a;
-  --pc-bg1: #fef3c7;
-  --pc-bg2: #fbbf24;
-  --pc-accent: #b45309;
+  /* Palette bas niveau (défaut = or) — pilotable par l'éditeur de skins. */
+  --pc-ink: #241702;
+  --pc-line: rgba(36, 23, 2, 0.22);
+  --pc-frame1: #c89119;
+  --pc-frame2: #7a5a0e;
+  --pc-bg1: rgba(255, 240, 168, 0.9);
+  --pc-bg2: #e9bc3f;
+  --pc-accent: #8a5a12;
+  /* Dérivés (surchargables par skin) */
+  --pc-frame-hi: color-mix(in srgb, var(--pc-frame1) 35%, #fff);
+  --pc-bg3: color-mix(in srgb, var(--pc-bg2) 45%, #000);
+  /* Forme « Founders » (bouclier crénelé, pointe basse). */
+  --pc-shape: polygon(
+    16% 3%, 38% 1%, 50% 4%, 62% 1%, 84% 3%,
+    96% 11%, 98% 73%, 90% 88%, 50% 100%,
+    10% 88%, 2% 73%, 4% 11%
+  );
+  /* Fonds composés (surchargés par les skins à motifs). */
+  --pc-frame-bg: linear-gradient(
+    132deg,
+    var(--pc-frame-hi) 0 8%,
+    var(--pc-frame1) 22% 55%,
+    color-mix(in srgb, var(--pc-frame2) 80%, #000) 82%
+  );
+  --pc-surface-bg:
+    radial-gradient(75% 42% at 72% 18%, var(--pc-bg1), transparent 72%),
+    linear-gradient(165deg, var(--pc-bg2), var(--pc-bg3));
+  container-type: inline-size;
   position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
   width: 100%;
-  /* Ratio de carte fixe → toutes les cartes ont la même hauteur (photo). */
+  /* Ratio fixe → toutes les cartes ont la même hauteur. */
   aspect-ratio: 63 / 88;
-  border-radius: 20px;
-  padding: 16px 16px 14px;
   color: var(--pc-ink);
-  background:
-    radial-gradient(120% 80% at 50% -10%, var(--pc-bg1), transparent 60%),
-    linear-gradient(170deg, var(--pc-bg2), var(--pc-frame1) 55%, var(--pc-frame2));
-  border: 1px solid color-mix(in srgb, var(--pc-frame1) 70%, #000 5%);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.4) inset,
-    0 18px 40px -18px rgba(2, 6, 12, 0.7);
   isolation: isolate;
+  filter: drop-shadow(0 18px 20px rgba(2, 6, 12, 0.55));
 }
-/* Liseré intérieur brillant. */
+/* Liseré extérieur (cadre métal). */
 .pcard::before {
   content: "";
   position: absolute;
-  inset: 6px;
-  border-radius: 15px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  pointer-events: none;
-  z-index: 3;
+  inset: 0;
+  z-index: 0;
+  clip-path: var(--pc-shape);
+  background: var(--pc-frame-bg);
+}
+/* Surface intérieure. */
+.pcard::after {
+  content: "";
+  position: absolute;
+  inset: 2.8%;
+  z-index: 1;
+  clip-path: var(--pc-shape);
+  background: var(--pc-surface-bg);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.13);
 }
 
-/* Skin « signature » (marque : bleu nuit + trim vert/or) — défaut du hub. */
+/* Skin « signature » — VERT (couleur principale du hub + vert FC 27).
+   Défaut des cartes de jeu FC 27. */
 .pcard--signature {
-  --pc-ink: #eaf2ff;
-  --pc-line: rgba(255, 255, 255, 0.14);
-  --pc-frame1: #1b3a63;
-  --pc-frame2: #0d1f38;
-  --pc-bg1: rgba(34, 211, 238, 0.28);
-  --pc-bg2: #12294a;
-  --pc-accent: #22c55e;
-}
-.pcard--signature {
-  background:
-    radial-gradient(120% 80% at 78% -6%, rgba(34, 211, 238, 0.35), transparent 55%),
-    radial-gradient(90% 70% at 10% 110%, rgba(34, 197, 94, 0.28), transparent 55%),
-    linear-gradient(165deg, #163055, #0b1a30 60%, #0a1526);
-  border-color: rgba(250, 204, 21, 0.5);
-}
-.pcard--signature::before {
-  border-color: rgba(250, 204, 21, 0.35);
+  --pc-ink: #eafff3;
+  --pc-line: rgba(255, 255, 255, 0.16);
+  --pc-frame1: #1d9e58;
+  --pc-frame2: #0a3d22;
+  --pc-frame-hi: #b9f7d0;
+  --pc-bg1: rgba(74, 222, 128, 0.32);
+  --pc-bg2: #0e4f2c;
+  --pc-bg3: #052a16;
+  --pc-accent: #4ade80;
 }
 
-/* Skin « global » (carte d'identité tous jeux) — bleu nuit + or prestige. */
+/* Skin « global » (carte identité tous jeux) — bleu nuit + or prestige. */
 .pcard--global {
   --pc-ink: #fff7e6;
   --pc-line: rgba(255, 255, 255, 0.16);
   --pc-frame1: #b58a2b;
+  --pc-frame2: #6b4e0e;
+  --pc-frame-hi: #ffe9a0;
+  --pc-bg1: rgba(250, 204, 21, 0.3);
+  --pc-bg2: #1b2c4d;
+  --pc-bg3: #0a1424;
   --pc-accent: #fde68a;
-  background:
-    radial-gradient(120% 80% at 78% -6%, rgba(250, 204, 21, 0.3), transparent 55%),
-    radial-gradient(90% 70% at 12% 112%, rgba(34, 211, 238, 0.22), transparent 55%),
-    linear-gradient(165deg, #1b2c4d, #0c1930 62%, #0a1424);
-  border-color: rgba(250, 204, 21, 0.6);
-}
-.pcard--global::before {
-  border-color: rgba(250, 204, 21, 0.4);
 }
 
-/* Skin « champion » — carte spéciale du n°1 du classement (or prestige). */
+/* Skin « champion » — n°1 du classement : or « braise » derrière le joueur
+   (fond nuit charbon + rayons d'or), cadre or vif. */
 .pcard--champion {
-  --pc-ink: #2a1e00;
-  --pc-line: rgba(42, 30, 0, 0.22);
-  --pc-frame1: #a97400;
-  --pc-accent: #7a5200;
-  background:
-    radial-gradient(120% 80% at 50% -12%, #fff3c4, transparent 55%),
-    linear-gradient(165deg, #f6cc4b, #c9930f 58%, #7a5200);
-  border-color: #ffd970;
-  box-shadow:
-    0 0 0 1px rgba(255, 215, 80, 0.55) inset,
-    0 0 26px -4px rgba(255, 200, 60, 0.55),
-    0 20px 46px -18px rgba(120, 80, 0, 0.7);
-}
-.pcard--champion::before {
-  border-color: rgba(255, 255, 255, 0.55);
+  --pc-ink: #f8f2df;
+  --pc-line: rgba(244, 204, 101, 0.25);
+  --pc-frame1: #f4cc65;
+  --pc-frame2: #8a5a12;
+  --pc-frame-hi: #fff0ad;
+  --pc-accent: #ffd970;
+  --pc-sheenc: rgba(255, 224, 138, 0.2);
+  --pc-glowc: rgba(255, 200, 60, 0.55);
+  --pc-surface-bg:
+    repeating-linear-gradient(
+      -50deg,
+      transparent 0 12px,
+      rgba(244, 204, 101, 0.07) 12px 14px
+    ),
+    radial-gradient(95% 60% at 68% 4%, rgba(255, 204, 92, 0.5), transparent 62%),
+    radial-gradient(70% 40% at 22% 30%, rgba(255, 176, 32, 0.18), transparent 60%),
+    linear-gradient(170deg, #2b1c04, #140c02 55%, #241503);
 }
 
-/* Skin « émeraude » (vert du hub). */
+/* Skin « émeraude » (vert profond, variante boutique). */
 .pcard--emerald {
   --pc-ink: #eafff3;
+  --pc-line: rgba(255, 255, 255, 0.16);
   --pc-frame1: #16794a;
+  --pc-frame2: #06301d;
+  --pc-frame-hi: #a9f0c8;
+  --pc-bg1: rgba(74, 222, 128, 0.3);
+  --pc-bg2: #0f5f3c;
+  --pc-bg3: #062d1c;
   --pc-accent: #4ade80;
-  background:
-    radial-gradient(120% 80% at 50% -10%, rgba(74, 222, 128, 0.3), transparent 60%),
-    linear-gradient(165deg, #0f5f3c, #07301f 70%);
-  border-color: rgba(74, 222, 128, 0.5);
-}
-.pcard--emerald::before {
-  border-color: rgba(255, 255, 255, 0.18);
 }
 
 /* ---------------------------------------------------------------- */
@@ -541,10 +604,12 @@
   --pc-ink: #f7ecca;
   --pc-line: rgba(240, 205, 110, 0.22);
   --pc-frame1: #8a6a1f;
+  --pc-frame2: #3d2e0a;
+  --pc-frame-hi: #f0cd6e;
   --pc-accent: #f0cd6e;
   --pc-sheenc: rgba(240, 205, 110, 0.17);
   --pc-glowc: rgba(240, 205, 110, 0.4);
-  background:
+  --pc-surface-bg:
     repeating-linear-gradient(
       -55deg,
       transparent 0 14px,
@@ -552,10 +617,6 @@
     ),
     radial-gradient(120% 80% at 50% -10%, #3b2a0a, transparent 60%),
     linear-gradient(170deg, #241905, #150e03 55%, #2b1f08);
-  border-color: rgba(240, 205, 110, 0.55);
-}
-.pcard--indomptable::before {
-  border-color: rgba(240, 205, 110, 0.38);
 }
 
 /* « 237 Héritage » — vert forêt, chevrons toghu jaune/rouge. */
@@ -563,10 +624,12 @@
   --pc-ink: #eef7e9;
   --pc-line: rgba(252, 209, 22, 0.22);
   --pc-frame1: #007a5e;
+  --pc-frame2: #033325;
+  --pc-frame-hi: #fcd116;
   --pc-accent: #fcd116;
   --pc-sheenc: rgba(252, 209, 22, 0.14);
   --pc-glowc: rgba(0, 122, 94, 0.55);
-  background:
+  --pc-surface-bg:
     repeating-linear-gradient(
       115deg,
       transparent 0 18px,
@@ -581,10 +644,6 @@
     ),
     radial-gradient(130% 90% at 50% 110%, #123b24, transparent 55%),
     linear-gradient(170deg, #0b2e1b, #071f12 60%, #0e3520);
-  border-color: rgba(252, 209, 22, 0.55);
-}
-.pcard--heritage237::before {
-  border-color: rgba(252, 209, 22, 0.32);
 }
 
 /* « Nuit de Douala » — bleu nuit, scanlines cyan, touche magenta. */
@@ -592,10 +651,12 @@
   --pc-ink: #e4f6ff;
   --pc-line: rgba(53, 225, 225, 0.25);
   --pc-frame1: #1b6ea8;
+  --pc-frame2: #0a2c46;
+  --pc-frame-hi: #7fe8f5;
   --pc-accent: #35e1e1;
   --pc-sheenc: rgba(53, 225, 225, 0.15);
   --pc-glowc: rgba(53, 225, 225, 0.42);
-  background:
+  --pc-surface-bg:
     repeating-linear-gradient(
       0deg,
       transparent 0 5px,
@@ -603,10 +664,6 @@
     ),
     radial-gradient(120% 70% at 85% -10%, rgba(193, 59, 255, 0.16), transparent 55%),
     linear-gradient(170deg, #071226, #050b18 55%, #0b1e33);
-  border-color: rgba(53, 225, 225, 0.55);
-}
-.pcard--nuit-douala::before {
-  border-color: rgba(53, 225, 225, 0.3);
 }
 
 /* Effets animés des skins premium — transform/opacity uniquement. */
@@ -616,7 +673,7 @@
   z-index: 4;
   pointer-events: none;
   overflow: hidden;
-  border-radius: inherit;
+  clip-path: var(--pc-shape);
 }
 .pcard__sheen::before {
   content: "";
@@ -643,17 +700,20 @@
     transform: translateX(330%) skewX(-18deg);
   }
 }
-/* Halo extérieur qui « respire » (braise, néon…). */
+/* Halo extérieur qui « respire » (braise, néon…) — drop-shadow pour
+   épouser la forme crénelée (box-shadow resterait rectangulaire). */
 .pcard--animated {
   animation: pc-glow 3.2s ease-in-out infinite;
 }
 @keyframes pc-glow {
   0%,
   100% {
-    box-shadow: 0 0 10px var(--pc-glowc, transparent);
+    filter: drop-shadow(0 18px 20px rgba(2, 6, 12, 0.55))
+      drop-shadow(0 0 8px var(--pc-glowc, transparent));
   }
   50% {
-    box-shadow: 0 0 26px var(--pc-glowc, transparent);
+    filter: drop-shadow(0 18px 20px rgba(2, 6, 12, 0.55))
+      drop-shadow(0 0 22px var(--pc-glowc, transparent));
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -663,41 +723,70 @@
   }
 }
 
-/* En-tête : colonne badge (OVR/poste/drapeau) + zone image. */
-.pcard__head {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
+/* Plaque jeu — posée SUR le liseré (badge TOTY), jamais coupée par la forme.
+   Cartes de jeu : nom du jeu ; carte globale : « GLOBALE ». */
+.pcard__crest {
+  position: absolute;
+  z-index: 10;
+  top: 1.2%;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 60%;
+  overflow: hidden;
+  padding: clamp(3px, 1.4cqw, 5px) clamp(8px, 3.4cqw, 14px);
+  color: var(--pc-ink);
+  background: linear-gradient(
+    170deg,
+    color-mix(in srgb, var(--pc-bg2) 88%, #fff),
+    var(--pc-bg3, var(--pc-frame2))
+  );
+  border: 1px solid var(--pc-frame-hi);
+  border-radius: 999px;
+  box-shadow:
+    0 3px 9px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  font-family: var(--e237-font-display);
+  font-weight: 800;
+  font-size: clamp(7px, 3.1cqw, 11px);
+  line-height: 1;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
+
+/* Colonne badge : OVR / ville / drapeau / division. */
 .pcard__badge {
+  position: absolute;
+  z-index: 6;
+  top: 12.5%;
+  left: 12%;
+  width: 23%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  padding-top: 2px;
-  min-width: 46px;
+  text-align: center;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.28);
 }
 .pcard__ovr {
   font-family: var(--e237-font-display);
-  font-weight: 700;
-  font-size: 34px;
-  line-height: 0.9;
-  letter-spacing: -0.03em;
+  font-weight: 900;
+  font-size: clamp(28px, 16.4cqw, 52px);
+  line-height: 0.88;
+  letter-spacing: -0.07em;
 }
 .pcard__ovrlabel {
-  font-size: 10px;
+  font-size: clamp(6px, 2.6cqw, 9px);
   font-weight: 700;
   letter-spacing: 0.18em;
   opacity: 0.75;
 }
 .pcard__pos {
-  margin-top: 3px;
+  margin-top: 4%;
   font-family: var(--e237-font-display);
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.06em;
+  font-weight: 850;
+  font-size: clamp(8px, 4.2cqw, 14px);
+  letter-spacing: 0.09em;
 }
 .pcard__rule {
   width: 26px;
@@ -707,22 +796,60 @@
   margin: 3px 0;
 }
 .pcard__flag {
-  width: 26px;
-  height: 17px;
+  width: 52%;
+  aspect-ratio: 3 / 2;
+  margin-top: 13%;
   border-radius: 2px;
   overflow: hidden;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.45),
+    0 2px 5px rgba(0, 0, 0, 0.3);
+}
+.pcard__flag svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* Division du joueur (Elite, Challenger…) sous le drapeau. */
+.pcard__division {
+  display: block;
+  max-width: 100%;
+  margin-top: 11%;
+  overflow: hidden;
+  padding: clamp(2px, 1.1cqw, 4px) clamp(4px, 2.4cqw, 9px);
+  border: 1px solid color-mix(in srgb, var(--pc-frame-hi) 75%, transparent);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.28);
+  font-family: var(--e237-font-display);
+  font-weight: 850;
+  font-size: clamp(6px, 2.7cqw, 9px);
+  line-height: 1;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* Zone image (skin / photo) — remplie plus tard par le back. */
+/* Zone portrait : photo détourée ou fallback (PNG IA / silhouette). */
 .pcard__img {
-  position: relative;
-  flex: 1;
-  min-height: 96px;
+  position: absolute;
+  z-index: 4;
+  top: 10.5%;
+  left: 25%;
+  width: 68%;
+  height: 53%;
   display: grid;
   place-items: end center;
 }
-/* Fallback silhouette quand la photo du joueur n'est pas encore fournie. */
+.pcard__photo {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  filter: drop-shadow(0 9px 12px rgba(0, 0, 0, 0.42));
+  mask-image: linear-gradient(#000 0 83%, transparent 100%);
+}
+/* Fallback silhouette (icône) si aucun PNG fourni. */
 .pcard__imgph {
   display: grid;
   place-items: end center;
@@ -730,10 +857,10 @@
   width: 100%;
 }
 .pcard__imgph svg {
-  width: 78%;
+  width: 72%;
   height: auto;
   opacity: 0.2;
-  translate: 0 6%;
+  translate: 0 4%;
 }
 .pcard__badge-tag {
   font-family: var(--e237-font-display);
@@ -742,89 +869,110 @@
   letter-spacing: 0.16em;
   opacity: 0.75;
 }
-.pcard__photo {
-  max-height: 150px;
-  width: auto;
-  object-fit: contain;
-  filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.4));
-}
 
-/* Nom + victoires qui le chevauchent. */
-.pcard__name-wrap {
-  position: relative;
-  z-index: 2;
+/* Bandeau identité : nom + palmarès (pas de bordure basse — décision DA). */
+.pcard__identity {
+  position: absolute;
+  z-index: 7;
+  top: 55.5%;
+  left: 14%;
+  width: 72%;
+  padding: 4.2% 4% 3.6%;
   text-align: center;
-  margin-top: 2px;
-}
-.pcard__wins {
-  font-family: var(--e237-font-display);
-  font-weight: 700;
-  font-size: 40px;
-  line-height: 0.7;
-  letter-spacing: -0.04em;
   background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--pc-accent) 92%, #fff),
-    var(--pc-accent)
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--pc-bg3, #000) 78%, transparent) 18% 82%,
+    transparent
   );
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  text-shadow: 0 6px 16px color-mix(in srgb, var(--pc-accent) 45%, transparent);
-  position: relative;
-  z-index: 1;
-}
-.pcard__wins-lbl {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  opacity: 0.7;
-  vertical-align: super;
-  margin-left: 2px;
+  border-top: 1px solid color-mix(in srgb, var(--pc-frame1) 35%, transparent);
 }
 .pcard__name {
-  position: relative;
-  z-index: 2;
-  margin-top: -12px;
+  overflow: hidden;
   font-family: var(--e237-font-display);
-  font-weight: 700;
-  font-size: 19px;
+  font-weight: 900;
+  font-size: clamp(12px, 6.8cqw, 22px);
+  line-height: 1;
+  letter-spacing: 0.055em;
   text-transform: uppercase;
-  letter-spacing: 0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .pcard__meta {
-  font-size: 11px;
-  opacity: 0.72;
+  overflow: hidden;
+  margin-top: 3%;
+  font-size: clamp(7px, 3.1cqw, 11px);
+  font-weight: 750;
+  letter-spacing: 0.07em;
+  opacity: 0.75;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* Stats bas de carte. */
+/* Stats bas de carte — le séparateur central est porté par les cellules
+   (bordure + padding) : il ne peut jamais chevaucher un texte. */
 .pcard__stats {
-  position: relative;
-  z-index: 2;
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid var(--pc-line);
+  position: absolute;
+  z-index: 7;
+  top: 68.5%;
+  left: 15%;
+  width: 70%;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4px 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  row-gap: clamp(3px, 1.8cqw, 7px);
 }
 .pcard__stat {
   display: flex;
   align-items: baseline;
-  gap: 7px;
+  justify-content: center;
+  gap: clamp(4px, 2.4cqw, 9px);
+  min-width: 0;
   font-variant-numeric: tabular-nums;
+}
+.pcard__stat:nth-child(odd) {
+  border-right: 1px solid color-mix(in srgb, var(--pc-frame1) 45%, transparent);
+  padding-right: 7%;
+}
+.pcard__stat:nth-child(even) {
+  padding-left: 7%;
 }
 .pcard__stat b {
   font-family: var(--e237-font-display);
-  font-weight: 700;
-  font-size: 15px;
-  min-width: 22px;
+  font-weight: 900;
+  font-size: clamp(10px, 5.8cqw, 19px);
+  line-height: 1;
 }
 .pcard__stat span {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
+  font-size: clamp(7px, 3.4cqw, 12px);
+  font-weight: 850;
+  letter-spacing: 0.045em;
   opacity: 0.72;
+}
+
+/* Pied de carte : marque du hub. */
+.pcard__footer {
+  position: absolute;
+  z-index: 7;
+  bottom: 6.8%;
+  left: 25%;
+  width: 50%;
+  display: flex;
+  justify-content: center;
+}
+.pcard__chip {
+  display: grid;
+  place-items: center;
+  min-height: clamp(14px, 5.8cqw, 20px);
+  padding: 0 8%;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid color-mix(in srgb, var(--pc-frame1) 40%, transparent);
+  border-radius: 3px;
+  font-family: var(--e237-font-display);
+  font-weight: 850;
+  font-size: clamp(6px, 2.8cqw, 10px);
+  line-height: 1;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
 }
 
 /* ---------------------------------------------------------------- */
@@ -849,6 +997,212 @@
   line-height: 0.9;
   letter-spacing: -0.03em;
   color: #fde68a;
+}
+
+/* ---------------------------------------------------------------- */
+/* ColorPicker (.cpick*)                                             */
+/* Sélecteur de couleur maison : swatch + hex + popover HSV.        */
+/* ---------------------------------------------------------------- */
+
+.cpick {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cpick__header {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.cpick__label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--e237-text-secondary);
+}
+
+.cpick__hint {
+  font-size: 11px;
+  color: var(--e237-text-muted);
+}
+
+.cpick__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cpick__swatch {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--e237-radius-md);
+  border: 1px solid var(--e237-border);
+  cursor: pointer;
+  padding: 0;
+  transition: box-shadow 150ms ease;
+}
+
+.cpick__swatch:hover {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--e237-accent) 25%, transparent);
+}
+
+.cpick__swatch:focus-visible {
+  outline: 2px solid var(--e237-accent);
+  outline-offset: 2px;
+}
+
+.cpick__hex {
+  flex: 1;
+  min-width: 0;
+  height: 36px;
+  padding: 0 10px;
+  background: var(--e237-surface);
+  border: 1px solid var(--e237-border);
+  border-radius: var(--e237-radius-md);
+  color: var(--e237-text-primary);
+  font-size: 13px;
+  font-family: var(--e237-font-mono);
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.cpick__hex:focus,
+.cpick__hex:focus-visible {
+  outline: none;
+  border-color: var(--e237-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--e237-accent) 18%, transparent);
+}
+
+/* Popover */
+.cpick__popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 220px;
+  padding: 12px;
+  background: var(--e237-surface);
+  border: 1px solid var(--e237-border);
+  border-radius: var(--e237-radius-lg);
+  box-shadow: var(--e237-shadow-card);
+}
+
+/* Zone saturation / valeur */
+.cpick__sv-area {
+  position: relative;
+  width: 100%;
+  height: 140px;
+  border-radius: var(--e237-radius-sm);
+  cursor: crosshair;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+}
+
+.cpick__sv-bg,
+.cpick__sv-white,
+.cpick__sv-black {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.cpick__sv-white {
+  background: linear-gradient(to right, #fff, transparent);
+}
+
+.cpick__sv-black {
+  background: linear-gradient(to bottom, transparent, #000);
+}
+
+/* Curseur rond */
+.cpick__cursor {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* Slider teinte arc-en-ciel */
+.cpick__hue {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 12px;
+  border-radius: var(--e237-radius-full);
+  border: none;
+  outline: none;
+  background: linear-gradient(
+    to right,
+    #f00 0%,
+    #ff0 17%,
+    #0f0 33%,
+    #0ff 50%,
+    #00f 67%,
+    #f0f 83%,
+    #f00 100%
+  );
+  cursor: pointer;
+}
+
+.cpick__hue::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: transparent;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+}
+
+.cpick__hue::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: transparent;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+}
+
+.cpick__hue:focus-visible {
+  outline: 2px solid var(--e237-accent);
+  outline-offset: 2px;
+}
+
+/* Barre inférieure : aperçu + valeur hex */
+.cpick__footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cpick__preview {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--e237-radius-sm);
+  border: 1px solid var(--e237-border);
+}
+
+.cpick__value {
+  font-size: 12px;
+  font-family: var(--e237-font-mono);
+  color: var(--e237-text-secondary);
+  letter-spacing: 0.04em;
 }
 
 /* Reduced-motion : animations décoratives UI (pas le feedback focus). */
