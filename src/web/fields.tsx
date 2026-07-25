@@ -15,6 +15,7 @@ import {
   forwardRef,
   useEffect,
   useId,
+  useRef,
   useState,
   type InputHTMLAttributes,
   type ReactNode,
@@ -434,6 +435,8 @@ export interface SearchFieldProps {
   placeholder?: string;
   loading?: boolean;
   className?: string;
+  /** Prend le focus à l'affichage (panneaux/popups de recherche). */
+  autoFocus?: boolean;
 }
 
 /** Barre de recherche animée : icône, spinner pendant la requête, effacement. */
@@ -444,8 +447,15 @@ export function SearchField({
   placeholder = 'Rechercher…',
   loading = false,
   className,
+  autoFocus = false,
 }: SearchFieldProps) {
   const [focused, setFocused] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (autoFocus) inputRef.current?.focus();
+  }, [autoFocus]);
+
   return (
     <div className={cx('e237-search', className)}>
       <span
@@ -454,6 +464,7 @@ export function SearchField({
         {loading ? <span className="e237-spinner" /> : <IconSearch />}
       </span>
       <input
+        ref={inputRef}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onFocus={() => setFocused(true)}

@@ -3,7 +3,7 @@
  *
  * Source de vérité unique, sans dépendance : consommable par le web (CSS
  * variables via theme.css), React Native (StyleSheet), Tailwind, Astro.
- * Palette extraite des maquettes V1 (univers sombre, accents vert/cyan).
+ * Palette alignée sur le logo ESPORT 237 (vert lime + bleu électrique).
  */
 
 export interface ColorScale {
@@ -41,17 +41,19 @@ export interface ColorScale {
 
 export const color: { light: ColorScale; dark: ColorScale } = {
   dark: {
-    bg: '#0B0F14',
-    surface: '#111826',
-    surfaceRaised: '#1A2332',
-    border: '#1F2A37',
+    bg: '#07080E',
+    surface: '#14141C',
+    surfaceRaised: '#1C1C26',
+    border: '#2A2A36',
     textPrimary: '#F8FAFC',
     textSecondary: '#94A3B8',
     textMuted: '#94A3B8',
-    accent: '#22C55E',
-    accentBright: '#4ADE80',
+    /** Vert lime logo. */
+    accent: '#7CE032',
+    accentBright: '#9AF050',
     onAccent: '#04120A',
-    cyan: '#22D3EE',
+    /** Bleu électrique logo. */
+    cyan: '#00D4F0',
     success: '#34D399',
     danger: '#F87171',
     warning: '#FBBF24',
@@ -65,10 +67,12 @@ export const color: { light: ColorScale; dark: ColorScale } = {
     textPrimary: '#0F172A',
     textSecondary: '#475569',
     textMuted: '#64748B',
-    accent: '#16A34A',
-    accentBright: '#22C55E',
+    /** Vert logo assombri pour contraste AA sur fond clair. */
+    accent: '#3F9A14',
+    accentBright: '#4CA820',
     onAccent: '#FFFFFF',
-    cyan: '#0891B2',
+    /** Bleu logo assombri pour contraste AA. */
+    cyan: '#0088A8',
     success: '#059669',
     danger: '#DC2626',
     warning: '#D97706',

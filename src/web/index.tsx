@@ -32,6 +32,8 @@ export { Table } from './table';
 export type { Column, TableProps } from './table';
 
 export { Tabs, FilterChip, Tooltip, Pagination } from './nav';
+export { Switch } from './switch';
+export type { SwitchProps } from './switch';
 export type { TabDef } from './nav';
 
 export { Select, Combobox, DatePicker, TimePicker } from './pickers';
@@ -99,6 +101,40 @@ export type {
 
 export { ColorPicker } from './color-picker';
 export type { ColorPickerProps } from './color-picker';
+
+export {
+  GameRail,
+  GamePicker,
+  GAME_RAIL_MAX_VISIBLE,
+  DashboardHeader,
+  DashboardNavLink,
+  FeaturedHero,
+  MatchRow,
+  MatchList,
+  EventRow,
+  RankRow,
+  ContextPanel,
+} from './dashboard';
+export type {
+  GameRailItem,
+  GameRailProps,
+  GamePickerProps,
+  DashboardHeaderProps,
+  DashboardNavLinkProps,
+  FeaturedHeroProps,
+  MatchSide,
+  MatchRowProps,
+  MatchListProps,
+  EventRowProps,
+  RankRowProps,
+  ContextPanelProps,
+} from './dashboard';
+
+export { DropdownMenu, MenuItem, MenuHeader, MenuSeparator } from './menu';
+export type { DropdownMenuProps, MenuItemProps } from './menu';
+
+export { GlobalSearch } from './global-search';
+export type { GlobalSearchProps, GlobalSearchItem } from './global-search';
 
 export {
   cardStats,

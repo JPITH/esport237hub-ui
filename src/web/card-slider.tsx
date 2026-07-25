@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export interface Slide {
@@ -15,17 +15,30 @@ export interface Slide {
 export function CardSlider({
   slides,
   className = "",
+  initialIndex = 0,
+  onIndexChange,
 }: {
   slides: Slide[];
   className?: string;
+  /** Diapo initiale (ex. skin équipé). */
+  initialIndex?: number;
+  /** Notifié à chaque changement de diapo (aperçu skins, etc.). */
+  onIndexChange?: (index: number) => void;
 }) {
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(initialIndex);
   const startX = useRef<number | null>(null);
+
+  useEffect(() => {
+    setIndex(initialIndex);
+  }, [initialIndex]);
 
   if (slides.length === 0) return null;
 
-  const go = (i: number) =>
-    setIndex(Math.max(0, Math.min(slides.length - 1, i)));
+  const go = (i: number) => {
+    const next = Math.max(0, Math.min(slides.length - 1, i));
+    setIndex(next);
+    onIndexChange?.(next);
+  };
 
   return (
     <div className={className}>

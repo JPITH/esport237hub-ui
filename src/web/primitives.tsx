@@ -126,11 +126,26 @@ export function VerifiedMark({ className = "" }: { className?: string }) {
 export function Avatar({
   name,
   size = 36,
+  src,
 }: {
   name: string | null | undefined;
   size?: number;
+  /** Photo de profil (sinon initiale). */
+  src?: string | null;
 }) {
   const initial = (name ?? "?").charAt(0).toUpperCase();
+  if (src) {
+    return (
+      <img
+        src={src}
+        alt=""
+        width={size}
+        height={size}
+        className="shrink-0 rounded-full object-cover"
+        style={{ width: size, height: size }}
+      />
+    );
+  }
   return (
     <span
       className="grid shrink-0 place-items-center rounded-full bg-accent/20 font-display font-bold text-accent"

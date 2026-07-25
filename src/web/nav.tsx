@@ -149,7 +149,7 @@ export function Pagination({
   }
 
   const navBtn =
-    "grid size-9 place-items-center rounded-md border border-edge text-secondary transition-colors hover:border-accent hover:text-accent disabled:opacity-40 disabled:pointer-events-none";
+    "grid size-9 place-items-center rounded-full border border-edge bg-surface text-secondary shadow-[var(--e237-neu-raised-sm)] transition-colors hover:border-accent hover:text-accent disabled:opacity-40 disabled:pointer-events-none";
 
   return (
     <nav className="flex items-center justify-center gap-1.5" aria-label="Pagination">
@@ -174,10 +174,10 @@ export function Pagination({
             type="button"
             onClick={() => onChange(p)}
             aria-current={p === page}
-            className={`grid size-9 place-items-center rounded-md border text-sm font-medium tabular-nums transition-colors ${
+            className={`grid size-9 place-items-center rounded-full border text-sm font-medium tabular-nums transition-colors ${
               p === page
-                ? "border-accent bg-accent/12 text-accent"
-                : "border-edge text-secondary hover:border-accent hover:text-accent"
+                ? "border-accent/45 bg-accent/12 text-accent shadow-[var(--e237-neu-pressed-sm)]"
+                : "border-edge bg-surface text-secondary shadow-[var(--e237-neu-raised-sm)] hover:border-accent hover:text-accent"
             }`}
           >
             {p}

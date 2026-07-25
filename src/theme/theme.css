@@ -11,18 +11,19 @@
   color-scheme: light dark;
 
   /* Couleurs sémantiques */
-  --e237-bg: light-dark(#f7f9fb, #0b0f14);
-  --e237-surface: light-dark(#ffffff, #111826);
-  --e237-surface-raised: light-dark(#ffffff, #1a2332);
-  --e237-border: light-dark(#e2e8f0, #1f2a37);
+  --e237-bg: light-dark(#f7f9fb, #07080e);
+  --e237-surface: light-dark(#ffffff, #14141c);
+  --e237-surface-raised: light-dark(#ffffff, #1c1c26);
+  --e237-border: light-dark(#e2e8f0, #2a2a36);
   --e237-text-primary: light-dark(#0f172a, #f8fafc);
   --e237-text-secondary: light-dark(#475569, #94a3b8);
   /* Light #64748b ≈4.6:1 sur blanc ; dark #94a3b8 ≈5:1 sur surface — AA. */
   --e237-text-muted: light-dark(#64748b, #94a3b8);
-  --e237-accent: light-dark(#16a34a, #22c55e);
-  --e237-accent-bright: light-dark(#22c55e, #4ade80);
+  /* Vert lime + bleu électrique (logo) — light assombri pour AA. */
+  --e237-accent: light-dark(#3f9a14, #7ce032);
+  --e237-accent-bright: light-dark(#4ca820, #9af050);
   --e237-on-accent: light-dark(#ffffff, #04120a);
-  --e237-cyan: light-dark(#0891b2, #22d3ee);
+  --e237-cyan: light-dark(#0088a8, #00d4f0);
   --e237-success: light-dark(#059669, #34d399);
   --e237-danger: light-dark(#dc2626, #f87171);
   --e237-warning: light-dark(#d97706, #fbbf24);
@@ -51,10 +52,30 @@
   --e237-font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
 
   /* Alignement avec les tokens Astryx (surcharge du thème neutral) */
-  --color-accent: light-dark(#16a34a, #22c55e);
+  --color-accent: light-dark(#3f9a14, #7ce032);
+
+  /* Neumorphisme : deux sources de lumière (haut-gauche claire, bas-droite sombre).
+     Toute surface en relief compose ces recettes — jamais d'ombre ad hoc. */
+  --e237-neu-hi: light-dark(rgb(255 255 255 / 0.92), rgb(255 255 255 / 0.05));
+  --e237-neu-lo: light-dark(rgb(15 23 42 / 0.13), rgb(0 0 0 / 0.6));
+  --e237-neu-raised: -5px -5px 14px var(--e237-neu-hi), 7px 7px 20px var(--e237-neu-lo);
+  --e237-neu-raised-sm: -2px -2px 6px var(--e237-neu-hi), 3px 4px 10px var(--e237-neu-lo);
+  --e237-neu-pressed: inset 3px 3px 8px var(--e237-neu-lo),
+    inset -3px -3px 8px var(--e237-neu-hi);
+  --e237-neu-pressed-sm: inset 2px 2px 5px var(--e237-neu-lo),
+    inset -1px -1px 3px var(--e237-neu-hi);
+  --e237-neu-edge: inset 0 1px 0
+    light-dark(rgb(255 255 255 / 0.7), rgb(255 255 255 / 0.06));
 
   /* Ombres */
-  --e237-shadow-card: 0 1px 2px rgb(2 8 20 / 0.06), 0 4px 16px rgb(2 8 20 / 0.08);
+  --e237-shadow-card: var(--e237-neu-edge), var(--e237-neu-raised);
+  /* Carte joueur (.pcard) — ombre atténuée en light pour éviter un halo rectangulaire sur fond clair. */
+  --e237-pcard-shadow: light-dark(
+    0 6px 14px rgb(15 23 42 / 0.1),
+    0 18px 20px rgba(2, 6, 12, 0.55)
+  );
+  --e237-pcard-glow-sm: light-dark(4px, 8px);
+  --e237-pcard-glow-lg: light-dark(12px, 22px);
   --e237-glow-accent: 0 0 0 1px color-mix(in srgb, var(--e237-accent) 45%, transparent),
     0 8px 30px -8px color-mix(in srgb, var(--e237-accent) 55%, transparent);
   --e237-ring: 0 0 0 2px var(--e237-bg), 0 0 0 4px var(--e237-accent);
@@ -155,32 +176,38 @@
   font-size: 12px;
   font-weight: 600;
   line-height: 1.4;
-  background: color-mix(in srgb, var(--e237-accent) 14%, transparent);
+  /* Fond opaque (surface + teinte) — lisible sur photo comme sur page. */
+  background: color-mix(in srgb, var(--e237-accent) 22%, var(--e237-surface));
   color: var(--e237-accent);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.28);
 }
 
 .e237-badge--cyan {
-  background: color-mix(in srgb, var(--e237-cyan) 14%, transparent);
+  background: color-mix(in srgb, var(--e237-cyan) 22%, var(--e237-surface));
   color: var(--e237-cyan);
 }
 
 .e237-badge--gold {
-  background: color-mix(in srgb, var(--e237-gold) 16%, transparent);
+  background: color-mix(in srgb, var(--e237-gold) 24%, var(--e237-surface));
   color: var(--e237-gold);
 }
 
 .e237-badge--danger {
-  background: color-mix(in srgb, var(--e237-danger) 14%, transparent);
+  background: color-mix(in srgb, var(--e237-danger) 22%, var(--e237-surface));
   color: var(--e237-danger);
 }
 
 .e237-badge--warning {
-  background: color-mix(in srgb, var(--e237-warning) 16%, transparent);
+  background: color-mix(in srgb, var(--e237-warning) 24%, var(--e237-surface));
   color: var(--e237-warning);
 }
 
 .e237-badge--neutral {
-  background: color-mix(in srgb, var(--e237-text-secondary) 14%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--e237-text-secondary) 18%,
+    var(--e237-surface)
+  );
   color: var(--e237-text-secondary);
 }
 
@@ -457,6 +484,8 @@
 .e237-search .e237-field {
   padding-left: 40px;
   padding-right: 40px;
+  /* Recherche = pilule (langage « rond » de l'app). */
+  border-radius: var(--e237-radius-full);
 }
 .e237-search-icon {
   position: absolute;
