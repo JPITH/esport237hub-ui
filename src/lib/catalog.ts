@@ -123,3 +123,26 @@ export function subscriptionStatusLabel(
   if (!status) return '—';
   return SUBSCRIPTION_STATUS_LABEL[status] ?? status;
 }
+
+/* ------------------------------------------------------------------ */
+/* Plateformes de jeu                                                  */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Plateformes déclarées par une discipline (`games.platforms`).
+ * La table était recopiée mot pour mot dans les deux écrans « Duels »
+ * (web et natif) : une seule source ici, comme le reste du vocabulaire.
+ */
+export const PLATFORM_LABEL: Record<string, string> = {
+  ps5: 'PS5',
+  ps4: 'PS4',
+  xbox: 'Xbox',
+  pc: 'PC',
+  mobile: 'Mobile',
+};
+
+/** Plateforme en clair ; on retombe sur l'identifiant si elle est inconnue. */
+export function platformLabel(platform: string | null | undefined): string {
+  if (!platform) return '—';
+  return PLATFORM_LABEL[platform] ?? platform;
+}
