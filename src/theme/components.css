@@ -810,7 +810,12 @@
   width: 100%;
   height: 100%;
 }
-/* Division du joueur (Elite, Challenger…) sous le drapeau. */
+/* Division du joueur (« DIV 3 ») sous le drapeau — rendue par
+   <DivisionBadge className="pcard__division">. components.css étant chargée
+   APRÈS theme.css, ces règles écrasent celles de `.e237-divbadge` : le cadre
+   et les dimensions de la carte restent strictement identiques.
+   `color: inherit` garde l'encre du skin, sauf couleur de division explicite
+   (posée en inline par le composant, qui gagne alors). */
 .pcard__division {
   display: block;
   max-width: 100%;
@@ -820,6 +825,7 @@
   border: 1px solid color-mix(in srgb, var(--pc-frame-hi) 75%, transparent);
   border-radius: 4px;
   background: rgba(0, 0, 0, 0.28);
+  color: inherit;
   font-family: var(--e237-font-display);
   font-weight: 850;
   font-size: clamp(6px, 2.7cqw, 9px);

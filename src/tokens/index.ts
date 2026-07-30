@@ -125,7 +125,53 @@ export const font = {
 
 export type ThemeMode = 'light' | 'dark';
 
+/**
+ * Applique un canal alpha à une couleur hexadécimale (`#RGB` ou `#RRGGBB`).
+ * Renvoie une chaîne `rgba(…)` comprise par le web ET React Native — c'est
+ * l'équivalent natif du `color-mix(in srgb, … %, transparent)` des feuilles
+ * CSS. Toute autre notation (rgb(), nom CSS, dégradé) est renvoyée telle
+ * quelle : on ne fabrique jamais une couleur qui n'est pas dans les tokens.
+ */
+export function withAlpha(input: string, alpha: number): string {
+  const a = Math.min(1, Math.max(0, alpha));
+  const hex = input.trim();
+  const short = /^#([0-9a-f])([0-9a-f])([0-9a-f])$/i.exec(hex);
+  const long = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex);
+  const channels = short
+    ? short.slice(1).map((d) => Number.parseInt(`${d}${d}`, 16))
+    : long
+      ? long.slice(1).map((d) => Number.parseInt(d, 16))
+      : null;
+  if (!channels) return hex;
+  return `rgba(${channels[0]}, ${channels[1]}, ${channels[2]}, ${a})`;
+}
+
+/**
+ * Opacités des pilules (badges, puces, onglets) côté NATIF.
+ *
+ * Le web pose ses `.e237-badge` / `.chip` sur une page nette, avec un liseré
+ * `--e237-border` et un fond `--e237-surface` : la forme se lit toujours.
+ * Sur téléphone un simple voile à 14 % disparaît — d'où un fond plus appuyé
+ * ET un liseré de la même teinte qui dessine la pilule. Valeurs partagées par
+ * tous les composants natifs pour rester cohérents d'un écran à l'autre.
+ *
+ * Dosage : en CLAIR on reste au niveau du web (16 %) — au-delà, le fond
+ * remonte et le texte teinté perd du contraste — et c'est le liseré, plus
+ * marqué, qui fait le travail de lisibilité. En SOMBRE le fond peut monter à
+ * 26 % : le texte accent conserve ~4,8:1 sur la surface (AA) tout en rendant
+ * la pilule franchement visible en plein jour.
+ */
+export const pill: {
+  /** Opacité du fond teinté d'une pilule active/tonale. */
+  fill: Record<ThemeMode, number>;
+  /** Opacité du liseré de la même teinte. */
+  stroke: Record<ThemeMode, number>;
+} = {
+  fill: { light: 0.16, dark: 0.26 },
+  stroke: { light: 0.55, dark: 0.45 },
+};
+
 /** Regroupement pratique pour un accès unique. */
-export const tokens = { color, spacing, radius, font } as const;
+export const tokens = { color, spacing, radius, font, pill } as const;
 
 export default tokens;

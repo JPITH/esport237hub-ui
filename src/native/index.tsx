@@ -6,9 +6,14 @@
 export {
   color,
   font,
+  pill,
   radius,
   spacing,
+  withAlpha,
   useE237Colors,
+  useE237Mode,
+  useToneColor,
+  useToneSurface,
   Button,
   Card,
   Badge,
@@ -19,6 +24,7 @@ export type {
   ColorScale,
   ThemeMode,
   ButtonProps,
+  BadgeTone,
   CardProps,
   BadgeProps,
   StatProps,
@@ -36,6 +42,22 @@ export {
   Avatar,
   SegmentedTabs,
 } from './primitives';
+
+export { FilterChip } from './filter-chip';
+export type { FilterChipProps } from './filter-chip';
+
+export {
+  DivisionBadge,
+  divisionLabel,
+  divisionAccessibleLabel,
+} from './division-badge';
+export type { DivisionBadgeProps } from './division-badge';
+
+export { TrendArrow, formatDelta } from './trend-arrow';
+export type { TrendArrowProps, TrendMovement } from './trend-arrow';
+
+export { MediaImage } from './media-image';
+export type { MediaImageProps, MediaRounded } from './media-image';
 
 export { StatTile, QuickAction } from './dashboard';
 export type { StatTileProps, StatTileTrend, QuickActionProps } from './dashboard';
@@ -55,7 +77,7 @@ export {
   useCardScale,
 } from './card-skins';
 export type { CardSkin, SkinSpec } from './card-skins';
-export { PlayerCard } from './player-card';
+export { PlayerCard, DivisionChip } from './player-card';
 export type { PlayerCardProps } from './player-card';
 export { GlobalCard } from './global-card';
 export type { GlobalCardProps } from './global-card';

@@ -5,7 +5,7 @@
  * - plus de 3    → liste déroulante en feuille (SelectSheet).
  * EA Sports FC est toujours en tête et sert de choix par défaut.
  */
-import { radius, spacing, useE237Colors } from './core';
+import { pill, radius, spacing, useE237Colors, useE237Mode, withAlpha } from './core';
 import { Check } from 'lucide-react-native';
 import { useEffect } from 'react';
 import { Pressable, Text, View } from 'react-native';
@@ -34,6 +34,7 @@ export function GameSelect({
   label?: string;
 }) {
   const c = useE237Colors();
+  const mode = useE237Mode();
   const sorted = sortGamesFcFirst(options);
   const first = sorted[0]?.value;
 
@@ -87,8 +88,12 @@ export function GameSelect({
                   alignItems: 'center',
                   gap: spacing['1'],
                   borderWidth: 1,
-                  borderColor: active ? c.accent : c.border,
-                  backgroundColor: active ? `${c.accent}1A` : c.surface,
+                  borderColor: active
+                    ? withAlpha(c.accent, pill.stroke[mode])
+                    : c.border,
+                  backgroundColor: active
+                    ? withAlpha(c.accent, pill.fill[mode])
+                    : c.surface,
                   borderRadius: radius.full,
                   paddingHorizontal: spacing['3'],
                 }}>

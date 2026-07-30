@@ -8,7 +8,7 @@
  *
  * Les ré-exports Astryx bruts vivent dans '@esport237hub/ui/web/astryx'.
  */
-export { color, font, radius, spacing, tokens } from '../tokens';
+export { color, font, pill, radius, spacing, tokens, withAlpha } from '../tokens';
 export type { ColorScale, ThemeMode } from '../tokens';
 
 export {
@@ -54,6 +54,19 @@ export type { GameSelectProps } from './game-select';
 
 export { VenueCard } from './venue-card';
 export type { VenueCardProps } from './venue-card';
+
+export {
+  DivisionBadge,
+  divisionLabel,
+  divisionAccessibleLabel,
+} from './division-badge';
+export type { DivisionBadgeProps } from './division-badge';
+
+export { TrendArrow, formatDelta } from './trend-arrow';
+export type { TrendArrowProps, TrendMovement } from './trend-arrow';
+
+export { MediaImage } from './media-image';
+export type { MediaImageProps, MediaRounded } from './media-image';
 
 export {
   PlayerCard,

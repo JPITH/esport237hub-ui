@@ -184,6 +184,86 @@
   color: var(--e237-text-secondary);
 }
 
+/* Pilule de division — affiche « DIV 1 » ; le nom reste dans aria-label.
+   La teinte vient de --e237-div-tone (posée en inline par le composant quand
+   le back-office fournit une couleur), sinon du cyan des tokens. */
+.e237-divbadge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--e237-radius-full);
+  padding: 2px 9px;
+  border: 1px solid
+    color-mix(in srgb, var(--e237-div-tone, var(--e237-cyan)) 50%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--e237-div-tone, var(--e237-cyan)) 14%,
+    transparent
+  );
+  color: var(--e237-div-tone, var(--e237-cyan));
+  font-family: var(--e237-font-display, var(--e237-font-body));
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.45;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+/* Flèche de mouvement au classement (haute verte / basse rouge / neutre). */
+.e237-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  line-height: 1;
+  color: var(--e237-text-muted);
+}
+.e237-trend--up {
+  color: var(--e237-accent);
+}
+.e237-trend--down {
+  color: var(--e237-danger);
+}
+.e237-trend__delta {
+  font-family: var(--e237-font-display, var(--e237-font-body));
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Image distante (produits, événements, salles) + repli propre. */
+.e237-media {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  width: 100%;
+  background: var(--e237-surface-raised);
+  border: 1px solid var(--e237-border);
+}
+.e237-media__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transition: opacity 200ms ease;
+}
+.e237-media__ph {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 4px;
+  padding: 8px;
+  color: var(--e237-text-muted);
+  text-align: center;
+}
+.e237-media__ph svg {
+  width: 26px;
+  height: 26px;
+  opacity: 0.7;
+}
+.e237-media__phlabel {
+  font-size: 11px;
+}
+
 .e237-stat {
   display: flex;
   flex-direction: column;
