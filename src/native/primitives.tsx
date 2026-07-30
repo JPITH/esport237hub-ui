@@ -2,7 +2,7 @@
  * Primitives d'interface native (sans composites API).
  * Couleurs via useE237Colors() — light et dark (DESIGN.md).
  */
-import { AlertCircle, Inbox } from 'lucide-react-native';
+import { AlertCircle, BadgeCheck, Inbox } from 'lucide-react-native';
 import { useState, type ReactNode } from 'react';
 import {
   Pressable,
@@ -102,6 +102,41 @@ export function Avatar({ name, size = 44 }: { name: string; size?: number }) {
       </Text>
     </View>
   );
+}
+
+/**
+ * Marque « joueur vérifié » (icône Lucide BadgeCheck) — jumelle du web.
+ * Elle manquait au natif : les écrans posaient l'icône à la main.
+ */
+export function VerifiedMark({ size = 14 }: { size?: number }) {
+  const c = useE237Colors();
+  return (
+    <BadgeCheck
+      color={c.cyan}
+      size={size}
+      accessibilityLabel="Joueur vérifié"
+    />
+  );
+}
+
+/**
+ * Date courte en français — jumelle de `formatDate` du web (même sortie).
+ * Elle manquait au natif : chaque application refaisait la sienne.
+ */
+export function formatDate(value: string | null | undefined): string {
+  if (!value) return '—';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '—';
+  try {
+    return date.toLocaleString('fr-FR', {
+      day: '2-digit',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  } catch {
+    return value;
+  }
 }
 
 /**

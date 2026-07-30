@@ -1225,3 +1225,65 @@
     animation: none !important;
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Chrome applicatif monté dans le design system                       */
+/* (RankMedal, SidebarNavLink, AuthBrandPanel)                         */
+/* ------------------------------------------------------------------ */
+
+/* Ligne de terrain fine — séparateur/atmosphère. */
+.pitch-line {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--e237-accent) 40%, transparent),
+    transparent
+  );
+}
+
+/* Rail vertical d'onglet actif dans la navigation latérale. */
+.nav-active {
+  position: relative;
+}
+.nav-active::before {
+  content: "";
+  position: absolute;
+  left: -16px;
+  top: 50%;
+  translate: 0 -50%;
+  width: 3px;
+  height: 18px;
+  border-radius: 9999px;
+  background: var(--e237-accent);
+  box-shadow: 0 0 10px var(--e237-accent);
+}
+
+/* Médaillon de rang pour le podium du classement. */
+.rank-medal {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9999px;
+  font-family: var(--e237-font-display);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--e237-bg);
+}
+.rank-medal--1 {
+  background: linear-gradient(180deg, #fde68a, var(--e237-gold));
+  box-shadow: 0 0 18px -2px color-mix(in srgb, var(--e237-gold) 70%, transparent);
+}
+.rank-medal--2 {
+  background: linear-gradient(180deg, #e2e8f0, #94a3b8);
+}
+.rank-medal--3 {
+  background: linear-gradient(180deg, #fbbf77, #b45309);
+  color: #fff;
+}
+.rank-medal--n {
+  background: transparent;
+  color: var(--e237-text-muted);
+  border: 1px solid var(--e237-border);
+}
