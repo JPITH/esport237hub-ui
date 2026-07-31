@@ -47,8 +47,9 @@
   --e237-radius-xl: 20px;
   --e237-radius-full: 9999px;
 
-  /* Typographie */
-  --e237-font-body: 'Inter', -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  /* Typographie — display Space Grotesk, corps Chivo (surcharge app web via next/font). */
+  --e237-font-body: 'Chivo', ui-sans-serif, system-ui, sans-serif;
+  --e237-font-display: 'Space Grotesk', 'Chivo', ui-sans-serif, system-ui, sans-serif;
   --e237-font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
 
   /* Alignement avec les tokens Astryx (surcharge du thème neutral) */
@@ -79,6 +80,13 @@
   --e237-glow-accent: 0 0 0 1px color-mix(in srgb, var(--e237-accent) 45%, transparent),
     0 8px 30px -8px color-mix(in srgb, var(--e237-accent) 55%, transparent);
   --e237-ring: 0 0 0 2px var(--e237-bg), 0 0 0 4px var(--e237-accent);
+
+  /* Mouvement — micro-interactions (transform / opacity / box-shadow uniquement). */
+  --e237-ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --e237-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --e237-dur-fast: 120ms;
+  --e237-dur: 180ms;
+  --e237-dur-slow: 280ms;
 }
 
 /* Bascule explicite par attribut (posée par next-themes / script Astro / app) */

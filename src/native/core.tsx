@@ -27,9 +27,15 @@ import {
   type ColorScale,
   type ThemeMode,
 } from '../tokens';
+import { haptic } from './haptics';
+import { useNeu } from './neu';
+import { fontFamily } from './typography';
 
 export { color, font, pill, radius, spacing, withAlpha };
 export type { ColorScale, ThemeMode };
+export { useNeu, createNeu } from './neu';
+export type { NeuShadows, NeuMode, NeuStyle } from './neu';
+export { fontFamily } from './typography';
 
 /** Mode actif (dark par défaut, ADN de la marque). */
 export function useE237Mode(): ThemeMode {
@@ -77,6 +83,7 @@ export function Button({
   style,
 }: ButtonProps) {
   const c = useE237Colors();
+  const neu = useNeu();
   const containerStyle: ViewStyle[] = [styles.btn];
   const labelStyle: TextStyle[] = [styles.btnLabel];
 
@@ -84,7 +91,7 @@ export function Button({
     containerStyle.push({ backgroundColor: c.accent });
     labelStyle.push({ color: c.onAccent });
   } else if (variant === 'secondary') {
-    containerStyle.push({ borderWidth: 1, borderColor: c.border });
+    containerStyle.push({ backgroundColor: c.surfaceRaised });
     labelStyle.push({ color: c.textPrimary });
   } else {
     labelStyle.push({ color: c.accent });
@@ -95,10 +102,22 @@ export function Button({
       accessibilityRole="button"
       accessibilityState={{ disabled }}
       onPress={onPress}
+      onPressIn={() => {
+        if (!disabled) haptic(variant === 'primary' ? 'medium' : 'light');
+      }}
       disabled={disabled}
       style={({ pressed }) => [
         containerStyle,
-        pressed && styles.pressed,
+        variant === 'primary'
+          ? pressed
+            ? neu.pressedSm
+            : neu.primaryGlow(c.accent)
+          : variant === 'secondary'
+            ? pressed
+              ? neu.pressedSm
+              : neu.raisedSm
+            : null,
+        pressed && variant === 'ghost' && styles.pressed,
         disabled && styles.disabled,
         style,
       ]}
@@ -119,11 +138,13 @@ export interface CardProps {
 
 export function Card({ children, style }: CardProps) {
   const c = useE237Colors();
+  const neu = useNeu();
   return (
     <View
       style={[
         styles.card,
-        { backgroundColor: c.surface, borderColor: c.border },
+        { backgroundColor: c.surfaceRaised },
+        neu.card,
         style,
       ]}
     >
@@ -230,13 +251,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexDirection: 'row',
     gap: spacing['2'],
+    minHeight: 44,
     paddingVertical: 10,
     paddingHorizontal: spacing['5'],
-    borderRadius: radius.md,
+    borderRadius: radius.full,
+    borderCurve: 'continuous',
   },
   btnLabel: {
+    fontFamily: fontFamily.displaySemi,
     fontSize: font.size.sm,
-    fontWeight: font.weight.semibold,
   },
   pressed: {
     opacity: 0.85,
@@ -245,9 +268,9 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   card: {
-    borderWidth: 1,
     borderRadius: radius.lg,
     padding: spacing['5'],
+    borderCurve: 'continuous',
   },
   badge: {
     alignSelf: 'flex-start',
@@ -258,19 +281,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 9,
   },
   badgeLabel: {
+    fontFamily: fontFamily.displaySemi,
     fontSize: font.size.xs,
-    fontWeight: font.weight.semibold,
   },
   statValue: {
+    fontFamily: fontFamily.bodyBlack,
     fontSize: font.size.xl,
-    fontWeight: font.weight.bold,
+    fontVariant: ['tabular-nums'],
   },
   statLabel: {
+    fontFamily: fontFamily.body,
     fontSize: font.size.xs,
   },
   sectionLabel: {
+    fontFamily: fontFamily.display,
     fontSize: font.size.xs,
-    fontWeight: font.weight.bold,
     letterSpacing: 1,
     textTransform: 'uppercase',
   },

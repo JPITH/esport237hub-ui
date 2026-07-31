@@ -14,6 +14,7 @@ import {
 import { flushSync } from 'react-dom';
 import { ChevronRight, X } from 'lucide-react';
 
+import { Avatar } from './avatar';
 import { SearchField } from './fields';
 
 function cx(...parts: Array<string | false | null | undefined>): string {
@@ -485,13 +486,9 @@ function MatchSideView({
 }) {
   return (
     <div className={cx('e237-match-side', align === 'end' && 'e237-match-side--end')}>
-      {side.logoUrl ? (
-        <img src={side.logoUrl} alt="" className="e237-match-side__logo" />
-      ) : (
-        <span className="e237-match-side__logo e237-match-side__logo--fallback" aria-hidden>
-          {side.name.slice(0, 1).toUpperCase()}
-        </span>
-      )}
+      <span className="e237-match-side__logo">
+        <Avatar name={side.name} src={side.logoUrl} size="sm" />
+      </span>
       <span className="e237-match-side__name">{side.name}</span>
     </div>
   );
@@ -655,13 +652,17 @@ export function RankRow({
       >
         {rank}
       </span>
-      {avatarUrl ? (
-        <img src={avatarUrl} alt="" className="e237-rank-row__avatar" />
-      ) : (
-        <span className="e237-rank-row__avatar e237-rank-row__avatar--fallback" aria-hidden>
-          {(initial ?? (typeof name === 'string' ? name : '?')).slice(0, 1).toUpperCase()}
-        </span>
-      )}
+      <span className="e237-rank-row__avatar">
+        <Avatar
+          name={
+            initial ??
+            (typeof name === 'string' ? name : undefined) ??
+            '?'
+          }
+          src={avatarUrl}
+          size={32}
+        />
+      </span>
       <span className="e237-rank-row__text">
         <span className="e237-rank-row__name">{name}</span>
         {subtitle ? <span className="e237-rank-row__sub">{subtitle}</span> : null}

@@ -16,20 +16,24 @@
     "./tokens": "./src/tokens/index.ts",
     "./theme": "./src/theme/esport237.ts",
     "./theme.css": "./src/theme/theme.css",
+    "./components.css": "./src/theme/components.css",
     "./css": "./src/css/global.css",
     "./lib": "./src/lib/index.ts",
+    "./skins": "./src/skins/index.ts",
     "./web": "./src/web/index.tsx",
     "./web/astryx": "./src/web/astryx.ts",
     "./web/fields": "./src/web/fields.tsx",
-    "./native": "./src/native/index.tsx"
+    "./native": "./src/native/index.tsx",
+    "./native/expo": "./src/native/expo/index.tsx"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.web.json && tsc -p tsconfig.native.json",
-    "lint": "tsc -p tsconfig.web.json --noEmit"
+    "lint": "tsc -p tsconfig.web.json --noEmit",
+    "test": "bun test src"
   },
   "dependencies": {
-    "@astryxdesign/core": "0.1.7",
-    "@astryxdesign/theme-neutral": "0.1.7",
+    "@astryxdesign/core": "0.1.8",
+    "@astryxdesign/theme-neutral": "0.1.8",
     "@stylexjs/stylex": "^0.19.0"
   },
   "peerDependencies": {
@@ -38,9 +42,13 @@
     "react-native": "*",
     "react-native-svg": "*",
     "react-native-reanimated": "*",
+    "react-native-gesture-handler": "*",
+    "react-native-safe-area-context": "*",
+    "react-native-keyboard-controller": "*",
     "lucide-react": "*",
     "lucide-react-native": "*",
-    "@esport237hub/types": "*"
+    "@esport237hub/types": "*",
+    "@expo/ui": "*"
   },
   "peerDependenciesMeta": {
     "react-dom": {
@@ -55,21 +63,36 @@
     "react-native-reanimated": {
       "optional": true
     },
+    "react-native-gesture-handler": {
+      "optional": true
+    },
+    "react-native-safe-area-context": {
+      "optional": true
+    },
+    "react-native-keyboard-controller": {
+      "optional": true
+    },
     "lucide-react-native": {
       "optional": true
     },
     "@esport237hub/types": {
       "optional": true
+    },
+    "@expo/ui": {
+      "optional": true
     }
   },
   "devDependencies": {
     "@esport237hub/types": "workspace:*",
+    "@expo/ui": "~57.0.7",
+    "@types/bun": "^1.3.14",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "lucide-react": "^0.562.0",
     "lucide-react-native": "^0.562.0",
     "react": "^19.2.0",
-    "react-native": "^0.85.0",
+    "react-native": "^0.86.0",
+    "react-native-gesture-handler": "~2.32.0",
     "react-native-reanimated": "^4.0.0",
     "react-native-svg": "^15.0.0",
     "typescript": "^5.9.2"

@@ -122,39 +122,9 @@ export function VerifiedMark({ className = "" }: { className?: string }) {
   );
 }
 
-/** Avatar à initiale (pas d'upload dans le MVP web). */
-export function Avatar({
-  name,
-  size = 36,
-  src,
-}: {
-  name: string | null | undefined;
-  size?: number;
-  /** Photo de profil (sinon initiale). */
-  src?: string | null;
-}) {
-  const initial = (name ?? "?").charAt(0).toUpperCase();
-  if (src) {
-    return (
-      <img
-        src={src}
-        alt=""
-        width={size}
-        height={size}
-        className="shrink-0 rounded-full object-cover"
-        style={{ width: size, height: size }}
-      />
-    );
-  }
-  return (
-    <span
-      className="grid shrink-0 place-items-center rounded-full bg-accent/20 font-display font-bold text-accent"
-      style={{ width: size, height: size, fontSize: size * 0.42 }}
-    >
-      {initial}
-    </span>
-  );
-}
+/** @deprecated Préférer l'import depuis `./avatar` — ré-export de compat. */
+export { Avatar, AvatarGroup, toAvatarSize } from './avatar';
+export type { AvatarProps, AvatarGroupProps, AvatarPerson, AvatarSize } from './avatar';
 
 export function formatDate(value: string | null): string {
   if (!value) return "—";

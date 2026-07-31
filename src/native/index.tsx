@@ -14,6 +14,9 @@ export {
   useE237Mode,
   useToneColor,
   useToneSurface,
+  useNeu,
+  createNeu,
+  fontFamily,
   Button,
   Card,
   Badge,
@@ -23,6 +26,9 @@ export {
 export type {
   ColorScale,
   ThemeMode,
+  NeuMode,
+  NeuShadows,
+  NeuStyle,
   ButtonProps,
   BadgeTone,
   CardProps,
@@ -32,6 +38,9 @@ export type {
 } from './core';
 
 export * from './fields';
+
+export { Txt, typeStyle } from './text';
+export type { TxtProps, TxtTone, TxtVariant } from './text';
 
 export {
   Screen,
@@ -61,10 +70,38 @@ export type { TrendArrowProps, TrendMovement } from './trend-arrow';
 export { MediaImage } from './media-image';
 export type { MediaImageProps, MediaRounded } from './media-image';
 
+export {
+  BalancePill,
+  HeroBanner,
+  IconButton,
+  ListRow,
+  MetaChip,
+  PillButton,
+  PillTag,
+  Rail,
+  SectionHeader,
+  Tile,
+  TopBar,
+} from './chrome';
+export type {
+  BalancePillProps,
+  HeroBannerProps,
+  IconButtonProps,
+  ListRowProps,
+  MetaChipProps,
+  PillButtonProps,
+  PillTagProps,
+  RailProps,
+  SectionHeaderProps,
+  TileProps,
+  TopBarProps,
+} from './chrome';
+
 export { StatTile, QuickAction } from './dashboard';
 export type { StatTileProps, StatTileTrend, QuickActionProps } from './dashboard';
 
 export { Sheet } from './sheet';
+export type { SheetProps } from './sheet';
 export { SelectSheet } from './select-sheet';
 export type { SelectOption } from './select-sheet';
 export { DateField, TimeField } from './date-time';
@@ -78,14 +115,63 @@ export {
   PREMIUM_SKINS,
   useCardScale,
 } from './card-skins';
-export type { CardSkin, SkinSpec } from './card-skins';
+export type { CardSkin, CardSkinInput, CardChromeProps } from './card-skins';
+
+/**
+ * Socle des skins : mêmes données et même géométrie que le web (voir
+ * `@esport237hub/ui/skins`). Un skin créé dans le dashboard arrive ici via
+ * `SkinCatalogProvider` et s'affiche sans code supplémentaire.
+ */
+export {
+  BUILTIN_SKINS,
+  BUILTIN_SKIN_KEYS,
+  DEFAULT_SKIN_KEY,
+  GLOBAL_SKIN_KEY,
+  SKIN_SPEC_VERSION,
+  isBuiltinSkinKey,
+  parseSkinSpec,
+  resolveSkin,
+  skinFromSeed,
+  seedFromSkin,
+  stopColor,
+  skinAnimated,
+  cardScale,
+  buildSkinDraw,
+} from '../skins';
+export type {
+  SkinSpec,
+  SkinSeed,
+  SkinStripePattern,
+  BuiltinSkinKey,
+  SkinDraw,
+} from '../skins';
+export { SkinCatalogProvider, useSkin, useSkinCatalog, useSkins } from '../skins/context';
+export type { SkinCatalog, SkinCatalogProviderProps } from '../skins/context';
+export { SkinPicker, SkinSwatch } from './skin-picker';
+export type { SkinPickerProps, SkinSwatchProps } from './skin-picker';
 export { PlayerCard, DivisionChip } from './player-card';
 export type { PlayerCardProps } from './player-card';
 export { GlobalCard } from './global-card';
 export type { GlobalCardProps } from './global-card';
 export { DuelStatusBadge } from './duel-status-badge';
 export { ScoreInput } from './score-board';
-
+export { E237TabBar, TAB_BAR_SPACE } from './tab-bar';
+export type { E237TabBarProps } from './tab-bar';
+export { StepperForm } from './stepper-form';
+export type { StepperFormProps } from './stepper-form';
+export { haptic, setNativeHaptics } from './haptics';
+export type { HapticKind } from './haptics';
+export {
+  AuthScreen,
+  AuthHero,
+  AuthGlassCard,
+  AuthDivider,
+  GradientButton,
+  OutlineButton,
+  GoogleButton,
+} from './auth';
+export { SwipeDeck } from './swipe-deck';
+export type { SwipePlayer } from './swipe-deck';
 export { Checkbox, RadioGroup } from './choice';
 export type { CheckboxProps, RadioGroupProps, RadioOption } from './choice';
 
@@ -112,8 +198,8 @@ export type {
   VenuePhotoStripProps,
 } from './cover-image';
 
-export { BrandLockup } from './brand';
-export type { BrandLockupProps } from './brand';
+export { AppLogo, BrandLockup } from './brand';
+export type { AppLogoProps, BrandLockupProps } from './brand';
 
 export {
   ChampionSpotlight,

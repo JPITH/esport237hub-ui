@@ -17,7 +17,8 @@ import {
   type ViewStyle,
 } from 'react-native';
 
-import { Card, font, radius, spacing, useE237Colors } from './core';
+import { Card, font, fontFamily, radius, spacing, useE237Colors } from './core';
+import { haptic } from './haptics';
 
 /* ------------------------------------------------------------------ */
 /* StatTile                                                            */
@@ -100,6 +101,9 @@ export function QuickAction({ icon, label, onPress, disabled, style }: QuickActi
       accessibilityRole="button"
       accessibilityState={{ disabled }}
       onPress={onPress}
+      onPressIn={() => {
+        if (!disabled) haptic('light');
+      }}
       disabled={disabled}
       style={({ pressed }) => [
         styles.quick,
@@ -137,17 +141,17 @@ const styles = StyleSheet.create({
   },
   tileLabel: {
     flexShrink: 1,
+    fontFamily: fontFamily.displaySemi,
     fontSize: font.size.xs,
-    fontWeight: font.weight.semibold,
     textTransform: 'uppercase',
     letterSpacing: 0.6,
   },
   tileValue: {
+    fontFamily: fontFamily.bodyBlack,
     fontSize: font.size.xl,
-    fontWeight: font.weight.bold,
     fontVariant: ['tabular-nums'],
   },
-  tileMeta: { fontSize: font.size.xs, fontWeight: font.weight.medium },
+  tileMeta: { fontFamily: fontFamily.bodyMedium, fontSize: font.size.xs },
   quick: {
     alignItems: 'center',
     gap: spacing['1'],
@@ -164,5 +168,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  quickLabel: { fontSize: font.size.xs, fontWeight: font.weight.semibold },
+  quickLabel: { fontFamily: fontFamily.displaySemi, fontSize: font.size.xs },
 });

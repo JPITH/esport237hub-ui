@@ -1,9 +1,10 @@
 import { radius, spacing, useE237Colors } from './core';
 import { Check, ChevronDown } from 'lucide-react-native';
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { Sheet } from './sheet';
+import { Txt } from './text';
 
 export interface SelectOption {
   value: string;
@@ -34,18 +35,23 @@ export function SelectSheet({
   return (
     <View style={{ gap: spacing['1'] }}>
       {label ? (
-        <Text style={{ color: c.textSecondary, fontSize: 12, fontWeight: '500' }}>{label}</Text>
+        <Txt variant="subtitle" size={12} tone="secondary">
+          {label}
+        </Txt>
       ) : null}
 
       <Pressable
         accessibilityRole="button"
         onPress={() => setOpen(true)}
         style={[styles.trigger, { backgroundColor: c.surface, borderColor: c.border }]}>
-        <Text
+        <Txt
           numberOfLines={1}
-          style={{ color: selected ? c.textPrimary : c.textMuted, fontSize: 15, flex: 1 }}>
+          variant="body"
+          size={15}
+          tone={selected ? 'primary' : 'muted'}
+          style={{ flex: 1 }}>
           {selected?.label ?? placeholder}
-        </Text>
+        </Txt>
         <ChevronDown color={c.textSecondary} size={18} />
       </Pressable>
 
@@ -63,15 +69,13 @@ export function SelectSheet({
                   setOpen(false);
                 }}
                 style={[styles.option, { borderBottomColor: c.border }]}>
-                <Text
-                  style={{
-                    color: active ? c.accent : c.textPrimary,
-                    fontWeight: active ? '700' : '400',
-                    fontSize: 15,
-                    flex: 1,
-                  }}>
+                <Txt
+                  variant={active ? 'label' : 'body'}
+                  size={15}
+                  tone={active ? 'accent' : 'primary'}
+                  style={{ flex: 1 }}>
                   {o.label}
-                </Text>
+                </Txt>
                 {active ? <Check color={c.accent} size={18} /> : null}
               </Pressable>
             );

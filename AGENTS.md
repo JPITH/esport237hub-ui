@@ -29,9 +29,13 @@ monorepo where this repo is mounted as a git submodule at `packages/ui`.
 4. **Both modes always**: every visual change must work in light AND dark mode.
    Never hardcode a hex value in a component — use CSS variables (web) or
    `useE237Colors()` (native).
-5. **No new runtime dependencies** without strong justification — this package
+5. **Neumorphism**: surfaces use `useNeu()` / `--e237-neu-*` recipes only
+   (raised / pressed / card / primaryGlow). No ad-hoc `boxShadow` in components
+   or apps (see DESIGN.md). Fields = pressed (creux), buttons = raised / glow,
+   `:active` = pressed.
+6. **No new runtime dependencies** without strong justification — this package
    must stay light for low-end Android devices (core product constraint).
-6. UI copy in examples/docs is **French** (product language).
+7. UI copy in examples/docs is **French** (product language).
 
 ## Structure
 
@@ -46,4 +50,16 @@ src/native/    React Native : core, fields, cards/skins, sheets, pickers, ScoreI
 ```
 
 Peers optionnels : `lucide-react`, `lucide-react-native`, `react-native-reanimated`,
-`@esport237hub/types`. Pas de `next` / `expo-router` dans le package.
+`react-native-gesture-handler`, `@expo/ui`, `@esport237hub/types`. Pas de `next` /
+`expo-router` dans le package.
+
+## Expo UI vs RN (native)
+
+- **`@esport237hub/ui/native`** — RN + tokens E237 (marque) : `Button`, `Card`,
+  `GradientButton`, `PlayerCard`, `E237TabBar`, auth chrome, etc. Zéro import Expo.
+- **`@esport237hub/ui/native/expo`** — bridge `@expo/ui` (SwiftUI / Compose / web)
+  pour les **contrôles** : `Sheet`, `SelectSheet`, `DateField`/`TimeField`,
+  `SwitchRow`, `SettingsList`. Même API de props que les équivalents RN quand
+  ils existent → swap = changer la ligne d'import.
+- Ne jamais importer `@expo/ui` depuis le barrel `./native` (garde le package
+  light et optionnel).

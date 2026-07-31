@@ -11,8 +11,9 @@ import { Text, View } from 'react-native';
 
 import { buildGlobalCard, type GameCardLike } from '../lib/global-card';
 import { cityAbbr } from '../lib/player-stats';
+import { useSkin } from '../skins/context';
 
-import { CARD_SKINS, CardChrome } from './card-skins';
+import { CardChrome, type CardSkinInput } from './card-skins';
 import { Flag } from './flag';
 import {
   CardCrest,
@@ -50,8 +51,8 @@ export interface GlobalCardProps {
   divisionColor?: string | null;
   /** Photo détourée du joueur ; silhouette IA de repli sinon. */
   imageUrl?: string | null;
-  /** « champion » pour le n°1 du classement global. */
-  skin?: 'global' | 'champion';
+  /** « champion » pour le n°1 du classement global ; tout skin est accepté. */
+  skin?: CardSkinInput;
 }
 
 export function GlobalCard({ skin = 'global', ...props }: GlobalCardProps) {
@@ -73,7 +74,7 @@ function GlobalCardBody({
   imageUrl,
   skin = 'global',
 }: GlobalCardProps) {
-  const spec = CARD_SKINS[skin];
+  const spec = useSkin(skin, 'global');
   const s = useCardStyles();
   const g = buildGlobalCard(cards);
 
@@ -81,28 +82,26 @@ function GlobalCardBody({
     <>
       <CardCrest spec={spec} label="Globale" />
 
-      <View style={s.head}>
-        <View style={s.badge}>
-          <Text
-            numberOfLines={1}
-            adjustsFontSizeToFit
-            minimumFontScale={0.7}
-            style={[s.ovr, { color: spec.ink }]}>
-            {g.overall}
-          </Text>
-          <Text style={[s.pos, { color: spec.ink }]}>{cityAbbr(city)}</Text>
-          <View style={s.flag}>
-            <Flag />
-          </View>
-          <DivisionChip
-            spec={spec}
-            rank={divisionRank}
-            name={division}
-            color={divisionColor}
-          />
+      <View style={s.badge}>
+        <Text
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.7}
+          style={[s.ovr, { color: spec.ink }]}>
+          {g.overall}
+        </Text>
+        <Text style={[s.pos, { color: spec.ink }]}>{cityAbbr(city)}</Text>
+        <View style={s.flag}>
+          <Flag />
         </View>
-        <CardPortrait imageUrl={imageUrl} />
+        <DivisionChip
+          spec={spec}
+          rank={divisionRank}
+          name={division}
+          color={divisionColor}
+        />
       </View>
+      <CardPortrait imageUrl={imageUrl} />
 
       <View style={[s.identity, { borderTopColor: spec.line }]}>
         <Text

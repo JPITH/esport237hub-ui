@@ -12,3 +12,13 @@
 
 export { Button as AstryxButton } from '@astryxdesign/core/Button';
 export { VStack, HStack } from '@astryxdesign/core/Layout';
+export {
+  Avatar as AstryxAvatar,
+  type AvatarSize as AstryxAvatarSize,
+  type AvatarProps as AstryxAvatarProps,
+} from '@astryxdesign/core/Avatar';
+export {
+  AvatarGroup as AstryxAvatarGroup,
+  AvatarGroupOverflow as AstryxAvatarGroupOverflow,
+  type AvatarGroupProps as AstryxAvatarGroupProps,
+} from '@astryxdesign/core/AvatarGroup';

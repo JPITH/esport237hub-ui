@@ -106,8 +106,11 @@ export const radius = {
 
 export const font = {
   family: {
-    body: "'Inter', -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif",
-    heading: "'Inter', -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif",
+    /** Corps — Chivo (web + mobile). */
+    body: "'Chivo', ui-sans-serif, system-ui, sans-serif",
+    /** Titres / marque — Space Grotesk. */
+    heading: "'Space Grotesk', 'Chivo', ui-sans-serif, system-ui, sans-serif",
+    display: "'Space Grotesk', 'Chivo', ui-sans-serif, system-ui, sans-serif",
     mono: "'JetBrains Mono', ui-monospace, 'Cascadia Code', Consolas, monospace",
   },
   size: {

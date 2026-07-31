@@ -6,9 +6,10 @@
 import { radius, spacing, useE237Colors } from './core';
 import { CalendarDays, ChevronLeft, ChevronRight, Clock } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { Sheet } from './sheet';
+import { Txt } from './text';
 
 const MONTHS = [
   'Janvier',
@@ -48,18 +49,23 @@ function Trigger({
   return (
     <View style={{ gap: spacing['1'] }}>
       {label ? (
-        <Text style={{ color: c.textSecondary, fontSize: 12, fontWeight: '500' }}>{label}</Text>
+        <Txt variant="subtitle" size={12} tone="secondary">
+          {label}
+        </Txt>
       ) : null}
       <Pressable
         accessibilityRole="button"
         onPress={onPress}
         style={[styles.trigger, { backgroundColor: c.surface, borderColor: c.border }]}>
         <Icon color={c.textSecondary} size={18} />
-        <Text
+        <Txt
           numberOfLines={1}
-          style={{ color: filled ? c.textPrimary : c.textMuted, fontSize: 15, flex: 1 }}>
+          variant="body"
+          size={15}
+          tone={filled ? 'primary' : 'muted'}
+          style={{ flex: 1 }}>
           {text}
-        </Text>
+        </Txt>
       </Pressable>
     </View>
   );
@@ -129,9 +135,9 @@ export function DateField({
             style={styles.monthBtn}>
             <ChevronLeft color={c.textSecondary} size={20} />
           </Pressable>
-          <Text style={{ color: c.textPrimary, fontWeight: '700', fontSize: 15 }}>
+          <Txt variant="label" size={15}>
             {MONTHS[view.m]} {view.y}
-          </Text>
+          </Txt>
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Mois suivant"
@@ -144,7 +150,9 @@ export function DateField({
         <View style={styles.grid}>
           {WEEKDAYS.map((d, i) => (
             <View key={`w${i}`} style={styles.cell}>
-              <Text style={{ color: c.textMuted, fontSize: 11, fontWeight: '700' }}>{d}</Text>
+              <Txt variant="overline" size={11} tone="muted">
+                {d}
+              </Txt>
             </View>
           ))}
           {cells.map((day, i) => {
@@ -165,14 +173,12 @@ export function DateField({
                     isSelected && { backgroundColor: c.accent },
                     !isSelected && isToday && { borderWidth: 1, borderColor: c.accent },
                   ]}>
-                  <Text
-                    style={{
-                      color: isSelected ? c.bg : isToday ? c.accent : c.textPrimary,
-                      fontWeight: isSelected ? '700' : '400',
-                      fontSize: 14,
-                    }}>
+                  <Txt
+                    variant={isSelected ? 'label' : 'body'}
+                    size={14}
+                    color={isSelected ? c.bg : isToday ? c.accent : c.textPrimary}>
                     {day}
-                  </Text>
+                  </Txt>
                 </Pressable>
               </View>
             );
@@ -188,9 +194,9 @@ export function DateField({
               setOpen(false);
             }}
             style={styles.footerBtn}>
-            <Text style={{ color: c.accent, fontWeight: '600', fontSize: 13 }}>
+            <Txt variant="label" size={13} tone="accent">
               Aujourd&rsquo;hui
-            </Text>
+            </Txt>
           </Pressable>
           <Pressable
             accessibilityRole="button"
@@ -199,7 +205,9 @@ export function DateField({
               setOpen(false);
             }}
             style={styles.footerBtn}>
-            <Text style={{ color: c.textMuted, fontSize: 13 }}>Effacer</Text>
+            <Txt variant="body" size={13} tone="muted">
+              Effacer
+            </Txt>
           </Pressable>
         </View>
       </Sheet>
@@ -291,16 +299,9 @@ function TimeColumn({
 
   return (
     <View style={{ flex: 1, gap: spacing['1'] }}>
-      <Text
-        style={{
-          color: c.textMuted,
-          fontSize: 11,
-          fontWeight: '700',
-          textAlign: 'center',
-          textTransform: 'uppercase',
-        }}>
+      <Txt variant="overline" size={11} tone="muted" align="center">
         {heading}
-      </Text>
+      </Txt>
       <ScrollView ref={ref} style={{ maxHeight: 260 }}>
         {items.map((n) => {
           const isActive = n === active;
@@ -310,14 +311,12 @@ function TimeColumn({
               accessibilityRole="button"
               onPress={() => onPick(n)}
               style={[styles.timeItem, isActive && { backgroundColor: c.accent }]}>
-              <Text
-                style={{
-                  color: isActive ? c.bg : c.textPrimary,
-                  fontWeight: isActive ? '700' : '400',
-                  fontSize: 15,
-                }}>
+              <Txt
+                variant={isActive ? 'label' : 'body'}
+                size={15}
+                color={isActive ? c.bg : c.textPrimary}>
                 {String(n).padStart(2, '0')}
-              </Text>
+              </Txt>
             </Pressable>
           );
         })}

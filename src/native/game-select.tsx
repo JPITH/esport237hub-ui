@@ -8,9 +8,10 @@
 import { pill, radius, spacing, useE237Colors, useE237Mode, withAlpha } from './core';
 import { Check } from 'lucide-react-native';
 import { useEffect } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { SelectSheet, type SelectOption } from './select-sheet';
+import { Txt } from './text';
 
 const FC_FIRST = ['fc27', 'ea-sports-fc', 'easportsfc', 'fc26', 'fifa'];
 
@@ -49,7 +50,9 @@ export function GameSelect({
   if (sorted.length === 1) {
     return (
       <View style={{ gap: spacing['1'] }}>
-        <Text style={{ color: c.textSecondary, fontSize: 12, fontWeight: '500' }}>{label}</Text>
+        <Txt variant="subtitle" size={12} tone="secondary">
+          {label}
+        </Txt>
         <View
           style={{
             alignSelf: 'flex-start',
@@ -60,9 +63,7 @@ export function GameSelect({
             paddingHorizontal: spacing['3'],
             paddingVertical: spacing['2'],
           }}>
-          <Text style={{ color: c.textPrimary, fontSize: 14, fontWeight: '600' }}>
-            {sorted[0].label}
-          </Text>
+          <Txt variant="label">{sorted[0].label}</Txt>
         </View>
       </View>
     );
@@ -72,7 +73,9 @@ export function GameSelect({
     const selected = value ?? first;
     return (
       <View style={{ gap: spacing['1'] }}>
-        <Text style={{ color: c.textSecondary, fontSize: 12, fontWeight: '500' }}>{label}</Text>
+        <Txt variant="subtitle" size={12} tone="secondary">
+          {label}
+        </Txt>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing['2'] }}>
           {sorted.map((o) => {
             const active = o.value === selected;
@@ -98,14 +101,12 @@ export function GameSelect({
                   paddingHorizontal: spacing['3'],
                 }}>
                 {active ? <Check color={c.accent} size={16} /> : null}
-                <Text
-                  style={{
-                    color: active ? c.accent : c.textSecondary,
-                    fontSize: 13,
-                    fontWeight: active ? '700' : '500',
-                  }}>
+                <Txt
+                  variant={active ? 'label' : 'subtitle'}
+                  size={13}
+                  tone={active ? 'accent' : 'secondary'}>
                   {o.label}
-                </Text>
+                </Txt>
               </Pressable>
             );
           })}

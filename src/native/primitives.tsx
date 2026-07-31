@@ -3,15 +3,25 @@
  * Couleurs via useE237Colors() — light et dark (DESIGN.md).
  */
 import { AlertCircle, BadgeCheck, Inbox } from 'lucide-react-native';
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ComponentType, type ReactNode } from 'react';
 import {
+  Image,
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
+  type StyleProp,
+  type ViewStyle,
 } from 'react-native';
-import Animated, { Easing, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
 import {
   pill,
@@ -22,27 +32,72 @@ import {
   useToneSurface,
   withAlpha,
 } from './core';
+import { haptic } from './haptics';
+import { Txt } from './text';
 
 export { Field, Textarea, PhoneField, Stepper, SearchField } from './fields';
 
-/** Fond de page + défilement + marges cohérentes sur tous les écrans. */
-export function Screen({ children }: { children: ReactNode }) {
+type ScreenScrollProps = {
+  style?: StyleProp<ViewStyle>;
+  contentContainerStyle?: StyleProp<ViewStyle>;
+  contentInsetAdjustmentBehavior?: 'automatic' | 'never' | 'scrollableAxes' | 'always';
+  keyboardShouldPersistTaps?: boolean | 'handled' | 'always' | 'never';
+  showsVerticalScrollIndicator?: boolean;
+  bottomOffset?: number;
+  extraKeyboardSpace?: number;
+  children?: ReactNode;
+};
+
+/** Fond de page + défilement. Passe `ScrollComponent` pour le clavier-aware. */
+export function Screen({
+  children,
+  ScrollComponent = ScrollView,
+  padBottom,
+  contentStyle,
+  safeTop = true,
+}: {
+  children: ReactNode;
+  ScrollComponent?: ComponentType<ScreenScrollProps>;
+  /** Réserve sous le contenu — à régler sur la hauteur de la tab bar flottante. */
+  padBottom?: number;
+  contentStyle?: StyleProp<ViewStyle>;
+  /**
+   * Décale le contenu sous l’encoche / status bar (TopBar uniforme).
+   * Défaut `true` ; les onglets (`TabScreen`) et les écrans déjà dans un
+   * `SafeAreaView` passent `false`.
+   */
+  safeTop?: boolean;
+}) {
   const c = useE237Colors();
+  const insets = useSafeAreaInsets();
+  const Scroll = ScrollComponent;
   return (
-    <ScrollView
-      style={{ backgroundColor: c.bg }}
-      contentContainerStyle={styles.screen}
+    <Scroll
+      style={{ backgroundColor: c.bg, flex: 1 }}
+      contentContainerStyle={[
+        styles.screen,
+        // Remplace le `paddingTop` du shorthand : encoche + même air que les côtés.
+        safeTop && { paddingTop: insets.top + spacing['4'] },
+        padBottom != null && { paddingBottom: padBottom },
+        contentStyle,
+      ]}
       contentInsetAdjustmentBehavior="automatic"
       keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+      bottomOffset={24}
+      extraKeyboardSpace={12}
     >
       {children}
-    </ScrollView>
+    </Scroll>
   );
 }
 
 export function SectionTitle({ children }: { children: ReactNode }) {
-  const c = useE237Colors();
-  return <Text style={[styles.sectionTitle, { color: c.cyan }]}>{children}</Text>;
+  return (
+    <Txt variant="overline" tone="cyan">
+      {children}
+    </Txt>
+  );
 }
 
 export function ErrorNote({ message }: { message: string }) {
@@ -55,9 +110,9 @@ export function ErrorNote({ message }: { message: string }) {
       ]}
     >
       <AlertCircle color={c.danger} size={16} />
-      <Text selectable style={{ color: c.danger, fontSize: 13, flex: 1 }}>
+      <Txt selectable variant="body" tone="danger" style={{ flex: 1 }}>
         {message}
-      </Text>
+      </Txt>
     </View>
   );
 }
@@ -67,22 +122,96 @@ export function EmptyState({ children }: { children: ReactNode }) {
   return (
     <View style={[styles.empty, { borderColor: c.border }]}>
       <Inbox color={c.textMuted} size={22} />
-      <Text style={{ color: c.textSecondary, fontSize: 13, textAlign: 'center' }}>
+      <Txt variant="body" tone="secondary" align="center">
         {children}
-      </Text>
+      </Txt>
     </View>
   );
 }
 
+/**
+ * Bloc fantôme AVEC balayage lumineux (« shimmer »).
+ *
+ * Le shimmer n'est pas décoratif : il distingue « ça charge » de « c'est vide
+ * et ça restera vide ». Un bloc figé ressemble à une carte cassée ; un bloc qui
+ * respire annonce une arrivée. C'est aussi ce qui couvre les BASCULES de
+ * contenu (changement de discipline sur le classement) : la liste ne saute pas
+ * d'un état à l'autre, elle passe par un état de chargement lisible.
+ *
+ * La bande est en `pointerEvents="none"` et l'animation est purement visuelle :
+ * elle ne retarde ni ne bloque l'affichage des données quand elles arrivent.
+ */
 export function Skeleton({ height = 64 }: { height?: number }) {
   const c = useE237Colors();
+  // Largeur mesurée : la bande se déplace d'une largeur d'écran à l'autre, il
+  // faut donc la connaître. Tant qu'elle vaut 0, seul le fond est peint.
+  const [width, setWidth] = useState(0);
+  const progress = useSharedValue(0);
+
+  useEffect(() => {
+    if (width === 0) return;
+    progress.value = 0;
+    progress.value = withRepeat(
+      withTiming(1, { duration: 1400, easing: Easing.linear }),
+      -1,
+      false,
+    );
+  }, [width, progress]);
+
+  const bandStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: -width + progress.value * 2 * width }],
+  }));
+
   return (
-    <View style={{ height, borderRadius: radius.lg, backgroundColor: c.surface }} />
+    <View
+      onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
+      style={{
+        height,
+        borderRadius: radius.lg,
+        backgroundColor: c.surface,
+        overflow: 'hidden',
+      }}
+    >
+      {width > 0 ? (
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            {
+              position: 'absolute',
+              top: 0,
+              bottom: 0,
+              width: width * 0.6,
+            },
+            bandStyle,
+          ]}
+        >
+          <Svg width="100%" height="100%">
+            <Defs>
+              <LinearGradient id="e237Shimmer" x1="0" y1="0" x2="1" y2="0">
+                <Stop offset="0" stopColor={c.textPrimary} stopOpacity={0} />
+                <Stop offset="0.5" stopColor={c.textPrimary} stopOpacity={0.07} />
+                <Stop offset="1" stopColor={c.textPrimary} stopOpacity={0} />
+              </LinearGradient>
+            </Defs>
+            <Rect x="0" y="0" width="100%" height="100%" fill="url(#e237Shimmer)" />
+          </Svg>
+        </Animated.View>
+      ) : null}
+    </View>
   );
 }
 
-/** Avatar à initiale — même dosage de fond que les autres pilules natives. */
-export function Avatar({ name, size = 44 }: { name: string; size?: number }) {
+/** Avatar à initiale ou photo — même dosage de fond que les autres pilules natives. */
+export function Avatar({
+  name,
+  size = 44,
+  src,
+}: {
+  name: string;
+  size?: number;
+  /** URI locale ou URL distante (sinon initiale). */
+  src?: string | null;
+}) {
   const c = useE237Colors();
   const surface = useToneSurface(c.accent);
   return (
@@ -94,12 +223,21 @@ export function Avatar({ name, size = 44 }: { name: string; size?: number }) {
         borderWidth: 1,
         alignItems: 'center',
         justifyContent: 'center',
+        overflow: 'hidden',
         ...surface,
       }}
     >
-      <Text style={{ color: c.accent, fontWeight: '700', fontSize: size * 0.4 }}>
-        {name.charAt(0).toUpperCase()}
-      </Text>
+      {src ? (
+        <Image
+          source={{ uri: src }}
+          style={{ width: size, height: size }}
+          accessibilityLabel={name}
+        />
+      ) : (
+        <Txt variant="title" tone="accent" size={size * 0.4}>
+          {name.charAt(0).toUpperCase()}
+        </Txt>
+      )}
     </View>
   );
 }
@@ -208,19 +346,20 @@ export function SegmentedTabs<T extends string>({
             accessibilityRole="tab"
             accessibilityState={{ selected: active }}
             hitSlop={{ top: 3, bottom: 3 }}
-            onPress={() => onChange(t.value)}
+            onPress={() => {
+              haptic('selection');
+              onChange(t.value);
+            }}
             style={styles.segmentItem}
           >
-            <Text
+            <Txt
               numberOfLines={1}
-              style={{
-                color: active ? c.accent : c.textSecondary,
-                fontWeight: active ? '700' : '500',
-                fontSize: 13,
-              }}
+              variant={active ? 'label' : 'subtitle'}
+              tone={active ? 'accent' : 'secondary'}
+              size={13}
             >
               {t.label}
-            </Text>
+            </Txt>
           </Pressable>
         );
       })}
@@ -230,12 +369,6 @@ export function SegmentedTabs<T extends string>({
 
 const styles = StyleSheet.create({
   screen: { padding: spacing['4'], gap: spacing['3'], paddingBottom: spacing['12'] },
-  sectionTitle: {
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-  },
   note: {
     flexDirection: 'row',
     alignItems: 'center',

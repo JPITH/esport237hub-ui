@@ -4,15 +4,23 @@
  * `onPress` : le design system ne connaît pas le routeur).
  */
 import {
+  Image,
   Pressable,
   StyleSheet,
   Text,
   View,
+  type ImageSourcePropType,
+  type ImageStyle,
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
 
 import { font, radius, spacing, useE237Colors } from './core';
+
+const LOGO = require('./assets/logo.png') as ImageSourcePropType;
+
+/** Ratio du fichier (manettes) — la largeur suit la hauteur demandée. */
+const LOGO_RATIO = 4 / 3;
 
 export interface BrandLockupProps {
   /** `sm` (32 px) pour les en-têtes, `md` (36 px) pour les écrans d'accueil. */
@@ -68,6 +76,46 @@ export function BrandLockup({
       style={({ pressed }) => (pressed ? styles.pressed : undefined)}
     >
       {content}
+    </Pressable>
+  );
+}
+
+export interface AppLogoProps {
+  /** Hauteur du visuel ; la largeur suit le ratio du fichier. */
+  size?: number;
+  onPress?: () => void;
+  style?: StyleProp<ImageStyle>;
+}
+
+/**
+ * Le logo SEUL, sans mot-symbole. Réservé aux en-têtes d'écran où le nom du
+ * produit ferait doublon avec le contenu : sur l'accueil, l'utilisateur sait
+ * dans quelle application il est, la place vaut mieux au solde et au profil.
+ * `BrandLockup` reste le bloc complet (pastille + nom) partout ailleurs.
+ */
+export function AppLogo({ size = 32, onPress, style }: AppLogoProps) {
+  const image = (
+    <Image
+      source={LOGO}
+      resizeMode="contain"
+      style={[{ height: size, width: size * LOGO_RATIO }, style]}
+      // Décoratif quand rien ne se passe au tap : le nom du produit est déjà
+      // annoncé par l'écran, un lecteur d'écran n'a pas à le répéter.
+      accessible={false}
+    />
+  );
+
+  if (!onPress) return image;
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel="ESPORT 237 HUB — accueil"
+      onPress={onPress}
+      hitSlop={8}
+      style={({ pressed }) => (pressed ? styles.pressed : undefined)}
+    >
+      {image}
     </Pressable>
   );
 }

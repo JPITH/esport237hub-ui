@@ -7,20 +7,21 @@
  * par les cellules, marque en pied.
  *
  * Tailles pilotées par l'échelle de CardChrome (équivalent natif des `cqw`
- * du web) ; police Inter (chargée par l'app via @expo-google-fonts/inter).
+ * du web) ; polices Space Grotesk / Chivo (comme le web).
  */
 import { useMemo } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 
 import { cardStats, cityAbbr, type StatDef } from '../lib/player-stats';
+import { CARD_LAYOUT, FLAG_RADIUS, pct } from '../skins/geometry';
+import { stopColor, type SkinSpec } from '../skins/spec';
+import { useSkin } from '../skins/context';
 
 import {
   CARD_FONTS,
-  CARD_SKINS,
   CardChrome,
   useCardScale,
-  type CardSkin,
-  type SkinSpec,
+  type CardSkinInput,
 } from './card-skins';
 import { DivisionBadge } from './division-badge';
 import { Flag } from './flag';
@@ -45,7 +46,10 @@ export function CardCrest({ spec, label }: { spec: SkinSpec; label: string }) {
       <View
         style={[
           s.crest,
-          { borderColor: spec.frame[0], backgroundColor: spec.linear[2] },
+          {
+            borderColor: stopColor(spec.frame, 0),
+            backgroundColor: stopColor(spec.surface, 2),
+          },
         ]}>
         <Text
           numberOfLines={1}
@@ -96,7 +100,7 @@ export function DivisionChip({
   if (!name) return null;
 
   return (
-    <View style={[s.division, { borderColor: spec.frame[0] }]}>
+    <View style={[s.division, { borderColor: stopColor(spec.frame, 0) }]}>
       <Text
         numberOfLines={1}
         adjustsFontSizeToFit
@@ -128,7 +132,7 @@ export function CardFooter({ spec }: { spec: SkinSpec }) {
   const s = useCardStyles();
   return (
     <View style={s.footer} pointerEvents="none">
-      <View style={[s.chip, { borderColor: spec.frame[1] }]}>
+      <View style={[s.chip, { borderColor: stopColor(spec.frame, 1) }]}>
         <Text style={[s.chipText, { color: spec.ink }]}>ESPORT 237</Text>
       </View>
     </View>
@@ -153,13 +157,16 @@ export interface PlayerCardProps {
   divisionColor?: string | null;
   /** Photo détourée du joueur ; silhouette IA de repli sinon. */
   imageUrl?: string | null;
-  skin?: CardSkin;
+  /** Clé de skin (intégrée ou boutique) ou `SkinSpec` complet. */
+  skin?: CardSkinInput;
   country?: string;
+  /** Force le foil même sur un skin non premium (aperçu de l'éditeur de skins). */
+  animated?: boolean;
 }
 
-export function PlayerCard({ skin = 'signature', ...props }: PlayerCardProps) {
+export function PlayerCard({ skin = 'signature', animated, ...props }: PlayerCardProps) {
   return (
-    <CardChrome skin={skin}>
+    <CardChrome skin={skin} animated={animated}>
       <PlayerCardBody skin={skin} {...props} />
     </CardChrome>
   );
@@ -182,7 +189,7 @@ function PlayerCardBody({
   skin = 'signature',
   country = 'CM',
 }: PlayerCardProps) {
-  const spec = CARD_SKINS[skin];
+  const spec = useSkin(skin);
   const s = useCardStyles();
   const rows = cardStats({ gameSlug, rating, stats, seed: username, statDefs });
 
@@ -190,28 +197,26 @@ function PlayerCardBody({
     <>
       {gameName ? <CardCrest spec={spec} label={gameName} /> : null}
 
-      <View style={s.head}>
-        <View style={s.badge}>
-          <Text
-            numberOfLines={1}
-            adjustsFontSizeToFit
-            minimumFontScale={0.7}
-            style={[s.ovr, { color: spec.ink }]}>
-            {rating}
-          </Text>
-          <Text style={[s.pos, { color: spec.ink }]}>{cityAbbr(city)}</Text>
-          <View style={s.flag}>
-            <Flag country={country} />
-          </View>
-          <DivisionChip
-            spec={spec}
-            rank={divisionRank}
-            name={division}
-            color={divisionColor}
-          />
+      <View style={s.badge}>
+        <Text
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.7}
+          style={[s.ovr, { color: spec.ink }]}>
+          {rating}
+        </Text>
+        <Text style={[s.pos, { color: spec.ink }]}>{cityAbbr(city)}</Text>
+        <View style={s.flag}>
+          <Flag country={country} />
         </View>
-        <CardPortrait imageUrl={imageUrl} />
+        <DivisionChip
+          spec={spec}
+          rank={divisionRank}
+          name={division}
+          color={divisionColor}
+        />
       </View>
+      <CardPortrait imageUrl={imageUrl} />
 
       <View style={[s.identity, { borderTopColor: spec.line }]}>
         <Text
@@ -253,28 +258,43 @@ function PlayerCardBody({
 
 /**
  * Fabrique des styles à l'échelle k (1 = carte de 300 px de large).
- * Inter encode la graisse dans le nom de famille — pas de fontWeight cumulé.
+ *
+ * Les POSITIONS viennent de `CARD_LAYOUT` (socle partagé) et sont exprimées en
+ * pourcentages, exactement comme les règles `.pcard__*` du web : c'est ce qui
+ * garantit que l'OVR tombe au même endroit sur les trois plateformes. Seules
+ * les TAILLES de texte restent propres au mobile (retour porteur du 24/07 :
+ * « diminuer la taille des textes sur mobile »).
+ *
+ * Chivo/Space Grotesk encodent la graisse dans le nom de famille — ne jamais
+ * cumuler avec `fontWeight` (conflit Android).
  */
 function makeStyles(k: number) {
+  const L = CARD_LAYOUT;
   return StyleSheet.create({
     crestWrap: {
       position: 'absolute',
-      top: '1%',
+      top: pct(L.crest.top),
       left: 0,
       right: 0,
       alignItems: 'center',
       zIndex: 10,
     },
     crest: {
-      maxWidth: '60%',
+      maxWidth: pct(L.crest.maxWidth),
       borderWidth: 1,
       borderRadius: 999,
       paddingVertical: 4 * k,
       paddingHorizontal: 12 * k,
     },
     crestText: { fontFamily: CARD_FONTS.extraBold, fontSize: 9 * k, letterSpacing: 1.2 * k },
-    head: { flex: 1, flexDirection: 'row', justifyContent: 'space-between', gap: 8 * k },
-    badge: { alignItems: 'center', gap: 2 * k, paddingTop: 2 * k, minWidth: 56 * k, maxWidth: '28%' },
+    badge: {
+      position: 'absolute',
+      top: pct(L.badge.top),
+      left: pct(L.badge.left),
+      width: pct(L.badge.width),
+      alignItems: 'center',
+      zIndex: 6,
+    },
     /* Tailles volontairement PLUS PETITES que le web (retour porteur 24/07 :
        « diminuer la taille des textes sur mobile ») tout en gardant la
        hiérarchie FUT : OVR dominant, nom net, stats lisibles. */
@@ -290,14 +310,14 @@ function makeStyles(k: number) {
       fontSize: 12 * k,
       letterSpacing: 1 * k,
     },
+    /* Drapeau nu : ni liseré, ni ombre — seuls les coins sont arrondis.
+       `overflow: hidden` est ce qui rogne effectivement le SVG. */
     flag: {
-      width: 27 * k,
-      height: 18 * k,
-      marginTop: 6 * k,
-      borderRadius: 2,
+      width: pct(L.flag.width),
+      aspectRatio: 3 / 2,
+      marginTop: pct(L.flag.marginTop),
+      borderRadius: FLAG_RADIUS * k,
       overflow: 'hidden',
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: 'rgba(255,255,255,0.45)',
     },
     division: {
       marginTop: 6 * k,
@@ -309,17 +329,28 @@ function makeStyles(k: number) {
       backgroundColor: 'rgba(0,0,0,0.28)',
     },
     divisionText: { fontFamily: CARD_FONTS.extraBold, fontSize: 8 * k, letterSpacing: 0.8 * k },
-    img: { flex: 1, alignItems: 'center', justifyContent: 'flex-end' },
-    portrait: { width: '96%', height: '96%' },
+    img: {
+      position: 'absolute',
+      top: pct(L.portrait.top),
+      left: pct(L.portrait.left),
+      width: pct(L.portrait.width),
+      height: pct(L.portrait.height),
+      alignItems: 'center',
+      justifyContent: 'flex-end',
+      zIndex: 4,
+    },
+    portrait: { width: '100%', height: '100%' },
     /* Bandeau identité — bordure haute seulement (pas de bordure basse). */
     identity: {
+      position: 'absolute',
+      top: pct(L.identity.top),
+      left: pct(L.identity.left),
+      width: pct(L.identity.width),
       alignItems: 'center',
-      alignSelf: 'center',
-      width: '86%',
-      marginTop: 4 * k,
       paddingTop: 7 * k,
       paddingBottom: 2 * k,
       borderTopWidth: 1,
+      zIndex: 7,
     },
     /* Largeur bornée + centrage : indispensable pour qu'adjustsFontSizeToFit
        ait une boîte de référence — le texte rétrécit au lieu de déborder. */
@@ -341,12 +372,14 @@ function makeStyles(k: number) {
       opacity: 0.75,
     },
     stats: {
-      alignSelf: 'center',
-      width: '82%',
-      marginTop: 8 * k,
+      position: 'absolute',
+      top: pct(L.stats.top),
+      left: pct(L.stats.left),
+      width: pct(L.stats.width),
       flexDirection: 'row',
       flexWrap: 'wrap',
       rowGap: 5 * k,
+      zIndex: 7,
     },
     stat: {
       width: '50%',
@@ -368,7 +401,14 @@ function makeStyles(k: number) {
       letterSpacing: 0.5 * k,
       opacity: 0.72,
     },
-    footer: { position: 'absolute', left: 0, right: 0, bottom: '7%', alignItems: 'center' },
+    footer: {
+      position: 'absolute',
+      bottom: pct(L.footer.bottom),
+      left: pct(L.footer.left),
+      width: pct(L.footer.width),
+      alignItems: 'center',
+      zIndex: 7,
+    },
     chip: {
       borderWidth: 1,
       borderRadius: 3,

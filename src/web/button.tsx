@@ -2,6 +2,7 @@
 
 import {
   forwardRef,
+  type AnchorHTMLAttributes,
   type ButtonHTMLAttributes,
   type ReactNode,
 } from "react";
@@ -65,6 +66,61 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   },
 );
 Button.displayName = "Button";
+
+export interface LinkButtonProps
+  extends AnchorHTMLAttributes<HTMLAnchorElement> {
+  variant?: Variant;
+  size?: Size;
+  block?: boolean;
+  icon?: ReactNode;
+  iconRight?: ReactNode;
+}
+
+/**
+ * Même habillage que `Button`, rendu en `<a>`.
+ *
+ * Un CTA qui navigue est un lien, pas un bouton : indispensable pour les pages
+ * statiques (site vitrine) où l'on veut le style du DS sans embarquer de JS.
+ * Pas de `next/link` / `expo-router` ici — le DS reste agnostique du routeur.
+ */
+export const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
+  (
+    {
+      variant = "primary",
+      size = "md",
+      block = false,
+      icon,
+      iconRight,
+      className = "",
+      children,
+      ...rest
+    },
+    ref,
+  ) => {
+    return (
+      <a
+        ref={ref}
+        className={`btn btn--${variant} btn--${size} ${
+          block ? "btn--block" : ""
+        } ${className}`}
+        {...rest}
+      >
+        {icon ? (
+          <span className="grid place-items-center [&>svg]:size-[18px]">
+            {icon}
+          </span>
+        ) : null}
+        {children}
+        {iconRight ? (
+          <span className="grid place-items-center [&>svg]:size-[18px]">
+            {iconRight}
+          </span>
+        ) : null}
+      </a>
+    );
+  },
+);
+LinkButton.displayName = "LinkButton";
 
 export interface IconButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement> {

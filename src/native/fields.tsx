@@ -23,14 +23,30 @@ import {
   type TextStyle,
   type ViewStyle,
 } from 'react-native';
+
+import { haptic } from './haptics';
+import { useNeu } from './neu';
 import Svg, { Circle, Path } from 'react-native-svg';
 
 import { color, radius, spacing, type ColorScale } from '../tokens';
+import { Txt } from './text';
+import { fontFamily } from './typography';
 
 /** Palette active selon le mode système (dark par défaut, ADN de la marque). */
 function useColors(): ColorScale {
   const scheme = useColorScheme();
   return scheme === 'light' ? color.light : color.dark;
+}
+
+/** Champ = creux neu (`pressed-sm`) ; focus = liseré accent. */
+/** Surface creusée d'un champ — compatible `View` comme `TextInput`. */
+function fieldSurface(c: ColorScale, neu: ReturnType<typeof useNeu>, focused: boolean) {
+  return {
+    backgroundColor: c.surface,
+    borderWidth: focused ? 1 : 0,
+    borderColor: focused ? c.accent : 'transparent',
+    ...neu.pressedSm,
+  };
 }
 
 /**
@@ -145,6 +161,7 @@ export function Field({ label, style, secureTextEntry, ...props }: FieldProps) {
   const c = useColors();
   const isPassword = !!secureTextEntry;
   // Le mot de passe démarre masqué ; l'œil bascule l'affichage.
+  const neu = useNeu();
   const [hidden, setHidden] = useState(true);
   const [focused, setFocused] = useState(false);
 
@@ -169,11 +186,8 @@ export function Field({ label, style, secureTextEntry, ...props }: FieldProps) {
           style={[
             styles.field,
             NO_WEB_OUTLINE,
-            {
-              backgroundColor: c.surface,
-              borderColor: focused ? c.accent : c.border,
-              color: c.textPrimary,
-            },
+            fieldSurface(c, neu, focused),
+            { color: c.textPrimary },
             isPassword && { paddingRight: 44 },
           ]}
         />
@@ -206,6 +220,7 @@ export function Field({ label, style, secureTextEntry, ...props }: FieldProps) {
 /** Zone de texte multiligne — même identité que Field. */
 export function Textarea({ label, style, ...props }: FieldProps) {
   const c = useColors();
+  const neu = useNeu();
   const [focused, setFocused] = useState(false);
   return (
     <View style={[{ gap: spacing['1'] }, style]}>
@@ -229,11 +244,8 @@ export function Textarea({ label, style, ...props }: FieldProps) {
           styles.field,
           styles.textarea,
           NO_WEB_OUTLINE,
-          {
-            backgroundColor: c.surface,
-            borderColor: focused ? c.accent : c.border,
-            color: c.textPrimary,
-          },
+          fieldSurface(c, neu, focused),
+          { color: c.textPrimary },
         ]}
       />
     </View>
@@ -266,6 +278,7 @@ export function Stepper({
   style?: StyleProp<ViewStyle>;
 }) {
   const c = useColors();
+  const neu = useNeu();
   const [focused, setFocused] = useState(false);
 
   const clamp = (n: number) => Math.min(max, Math.max(min, n));
@@ -281,7 +294,10 @@ export function Stepper({
         accessibilityRole="button"
         accessibilityLabel={dir === 1 ? 'Augmenter' : 'Diminuer'}
         disabled={disabled}
-        onPress={() => onChange(clamp(value + dir * step))}
+        onPress={() => {
+          haptic('selection');
+          onChange(clamp(value + dir * step));
+        }}
         style={({ pressed }) => [
           styles.stepperBtn,
           dir === 1
@@ -305,12 +321,7 @@ export function Stepper({
       {label ? (
         <Text style={[styles.fieldLabel, { color: c.textSecondary }]}>{label}</Text>
       ) : null}
-      <View
-        style={[
-          styles.stepper,
-          { backgroundColor: c.surface, borderColor: focused ? c.accent : c.border },
-        ]}
-      >
+      <View style={[styles.stepper, fieldSurface(c, neu, focused)]}>
         {side(-1)}
         <TextInput
           keyboardType="number-pad"
@@ -358,18 +369,14 @@ export function PhoneField({
   style?: StyleProp<ViewStyle>;
 }) {
   const c = useColors();
+  const neu = useNeu();
   const [focused, setFocused] = useState(false);
   return (
     <View style={[{ gap: spacing['1'] }, style]}>
       {label ? (
         <Text style={[styles.fieldLabel, { color: c.textSecondary }]}>{label}</Text>
       ) : null}
-      <View
-        style={[
-          styles.phoneWrap,
-          { backgroundColor: c.surface, borderColor: focused ? c.accent : c.border },
-        ]}
-      >
+      <View style={[styles.phoneWrap, fieldSurface(c, neu, focused)]}>
         <View
           style={[
             styles.phonePrefix,
@@ -377,9 +384,9 @@ export function PhoneField({
           ]}
         >
           <CameroonFlagMini />
-          <Text style={{ color: c.textSecondary, fontSize: 14, fontWeight: '600' }}>
+          <Txt variant="label" tone="secondary">
             +237
-          </Text>
+          </Txt>
         </View>
         <TextInput
           keyboardType="phone-pad"
@@ -418,15 +425,10 @@ export function SearchField({
   style?: StyleProp<ViewStyle>;
 }) {
   const c = useColors();
+  const neu = useNeu();
   const [focused, setFocused] = useState(false);
   return (
-    <View
-      style={[
-        styles.searchWrap,
-        { backgroundColor: c.surface, borderColor: focused ? c.accent : c.border },
-        style,
-      ]}
-    >
+    <View style={[styles.searchWrap, fieldSurface(c, neu, focused), style]}>
       <View style={styles.searchIcon}>
         {loading ? (
           <ActivityIndicator size="small" color={c.accent} />
@@ -461,13 +463,16 @@ export function SearchField({
 }
 
 const styles = StyleSheet.create({
-  fieldLabel: { fontSize: 12, fontWeight: '500' },
+  fieldLabel: {
+    fontFamily: fontFamily.bodyMedium,
+    fontSize: 12,
+  },
   fieldRow: { position: 'relative', justifyContent: 'center' },
   field: {
-    minHeight: 44,
-    borderWidth: 1,
-    borderRadius: radius.md,
-    paddingHorizontal: spacing['3'],
+    minHeight: 48,
+    borderRadius: radius.full,
+    borderCurve: 'continuous',
+    paddingHorizontal: spacing['4'],
     // Android ajoute un padding vertical par défaut qui décentre le
     // placeholder ; on le neutralise et on centre nous-mêmes.
     paddingVertical: 0,
@@ -476,7 +481,8 @@ const styles = StyleSheet.create({
   },
   textarea: {
     minHeight: 88,
-    paddingVertical: spacing['2'],
+    borderRadius: radius.xl,
+    paddingVertical: spacing['3'],
     textAlignVertical: 'top',
   },
   eyeBtn: {
@@ -492,9 +498,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'stretch',
     minHeight: 44,
-    borderWidth: 1,
     borderRadius: radius.md,
     overflow: 'hidden',
+    borderCurve: 'continuous',
   },
   stepperBtn: {
     width: 44,
@@ -507,16 +513,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     textAlignVertical: 'center',
     paddingVertical: 0,
+    fontFamily: fontFamily.bodyBold,
     fontSize: 16,
-    fontWeight: '700',
   },
   phoneWrap: {
     flexDirection: 'row',
     alignItems: 'stretch',
     minHeight: 44,
-    borderWidth: 1,
     borderRadius: radius.md,
     overflow: 'hidden',
+    borderCurve: 'continuous',
   },
   phonePrefix: {
     flexDirection: 'row',
@@ -536,10 +542,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     minHeight: 44,
-    borderWidth: 1,
     borderRadius: radius.md,
     paddingHorizontal: spacing['2'],
     gap: spacing['1'],
+    borderCurve: 'continuous',
   },
   searchIcon: {
     width: 24,

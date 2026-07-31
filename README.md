@@ -22,7 +22,8 @@ Basé sur **[Astryx](https://astryx.atmeta.com/)**, le design system open-source
 | `@esport237hub/ui/theme.css` | Variables `--e237-*` seules (Astro/marketing léger) |
 | `@esport237hub/ui/theme` | Thème Astryx `esport237` (`defineTheme`) |
 | `@esport237hub/ui/web` | Composants React web + ré-exports Astryx |
-| `@esport237hub/ui/native` | Composants React Native (Expo) |
+| `@esport237hub/ui/native` | Composants React Native (marque E237, zéro dep Expo) |
+| `@esport237hub/ui/native/expo` | Bridge `@expo/ui` — contrôles natifs (sheet, picker, switch, date) |
 
 ## Utilisation
 
@@ -44,12 +45,18 @@ import { Button, Card, PlayerCard, SectionLabel } from '@esport237hub/ui/web';
 
 ```tsx
 import { Button, Card, Stat, useE237Colors } from '@esport237hub/ui/native';
+// Contrôles natifs (optionnel) — même API que les équivalents RN
+import { SelectSheet, SwitchRow } from '@esport237hub/ui/native/expo';
 
 <Card>
   <Stat value="32" label="Victoires" />
   <Button label="Trouver un duel" onPress={findDuel} />
+  <SelectSheet label="Jeu" value={game} onChange={setGame} options={games} />
 </Card>;
 ```
+
+**Règle** : Expo UI pour les contrôles système ; RN + tokens pour tout ce qui
+porte la marque (boutons dégradés, cartes joueur, tab bar).
 
 ### Astro (site marketing)
 

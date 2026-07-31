@@ -24,8 +24,50 @@ export type {
   SectionLabelProps,
 } from './foundation';
 
-export { Button, IconButton } from './button';
-export type { ButtonProps, IconButtonProps } from './button';
+export { Button, IconButton, LinkButton } from './button';
+export type { ButtonProps, IconButtonProps, LinkButtonProps } from './button';
+
+export {
+  AudienceCard,
+  BrandLogo,
+  CircuitTrack,
+  CtaBand,
+  FaqAccordion,
+  FeatureCard,
+  Glyph,
+  MarketingFooter,
+  MarketingHeader,
+  NoteCard,
+  ProofLevel,
+  RankPreview,
+  SectionHead,
+  StatBand,
+  StepCard,
+} from './marketing';
+export type {
+  AudienceCardProps,
+  BrandLogoProps,
+  CircuitStep,
+  CircuitTrackProps,
+  CtaBandProps,
+  FaqAccordionProps,
+  FaqEntry,
+  FeatureCardProps,
+  GlyphProps,
+  IconName,
+  MarketingFooterColumn,
+  MarketingFooterProps,
+  MarketingHeaderProps,
+  MarketingNavItem,
+  NoteCardProps,
+  ProofLevelProps,
+  RankLine,
+  RankPreviewProps,
+  SectionHeadProps,
+  StatBandItem,
+  StatBandProps,
+  StepCardProps,
+} from './marketing';
 
 export { Flag, CameroonFlag } from './flag';
 export { Table } from './table';
@@ -83,6 +125,42 @@ export type {
   GlobalCardCard,
 } from './player-card';
 
+export { CardChrome } from './card-chrome';
+export type { CardChromeProps, CardSkinInput } from './card-chrome';
+
+/**
+ * Socle des skins : mêmes données et même géométrie que le mobile (voir
+ * `@esport237hub/ui/skins`). Un skin créé dans le dashboard arrive via
+ * `SkinCatalogProvider` et s'affiche sans code supplémentaire.
+ */
+export {
+  BUILTIN_SKINS,
+  BUILTIN_SKIN_KEYS,
+  DEFAULT_SKIN_KEY,
+  GLOBAL_SKIN_KEY,
+  SKIN_SPEC_VERSION,
+  isBuiltinSkinKey,
+  isLegacyDesign,
+  parseSkinSpec,
+  resolveSkin,
+  skinFromSeed,
+  seedFromSkin,
+  skinFromLegacyDesign,
+  skinCssVars,
+  stopColor,
+  skinAnimated,
+  buildSkinDraw,
+} from '../skins';
+export type {
+  SkinSpec,
+  SkinSeed,
+  SkinStripePattern,
+  BuiltinSkinKey,
+  SkinDraw,
+} from '../skins';
+export { SkinCatalogProvider, useSkin, useSkinCatalog, useSkins } from '../skins/context';
+export type { SkinCatalog, SkinCatalogProviderProps } from '../skins/context';
+
 export {
   BackLink,
   PageHeader,
@@ -94,7 +172,15 @@ export {
   ErrorNote,
   VerifiedMark,
   Avatar,
+  AvatarGroup,
+  toAvatarSize,
   formatDate,
+} from './primitives';
+export type {
+  AvatarProps,
+  AvatarGroupProps,
+  AvatarPerson,
+  AvatarSize,
 } from './primitives';
 
 export {
@@ -209,6 +295,9 @@ export type { TierOption, TierPickerProps } from './tier-picker';
 
 export { OrderStatusBadge } from './order-status-badge';
 export type { OrderStatusBadgeProps } from './order-status-badge';
+
+export { Stepper } from './stepper';
+export type { StepperProps, StepperStep } from './stepper';
 
 export {
   GameRail,

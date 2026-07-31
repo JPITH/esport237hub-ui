@@ -3,38 +3,33 @@ import { UserRound } from "lucide-react";
 
 import { cardStats, cityAbbr, type StatDef } from "../lib/player-stats";
 import { DivisionBadge } from "./division-badge";
+import {
+  BUILTIN_SKINS,
+  BUILTIN_SKIN_KEYS,
+  type BuiltinSkinKey,
+} from "../skins/spec";
+import { CardChrome, type CardSkinInput } from "./card-chrome";
 import { Flag } from "./flag";
 
-/** Skins cosmétiques de la carte (achetables plus tard sur le store). */
-export type CardSkin =
-  | "signature"
-  | "emerald"
-  | "gold"
-  | "champion"
-  | "indomptable"
-  | "heritage237"
-  | "nuit-douala";
+/**
+ * Clé de skin : les skins intégrés sont autocomplétés, mais toute chaîne est
+ * acceptée — un skin créé dans le dashboard est une clé arbitraire, résolue
+ * par le catalogue (`SkinCatalogProvider`).
+ */
+export type CardSkin = BuiltinSkinKey | (string & {});
 
 /**
- * Skins PREMIUM vendables : fond exclusif + balayage « foil » et halo animés
- * (transform/opacity uniquement — quasi gratuit, coupé par
- * prefers-reduced-motion). Mêmes palettes que le mobile (`card-skins.tsx`).
+ * Skins PREMIUM vendables (fond exclusif + foil et halo animés) — DÉRIVÉS du
+ * socle partagé, plus recopiés à la main de part et d'autre.
  */
-export const PREMIUM_SKINS: CardSkin[] = [
-  "indomptable",
-  "heritage237",
-  "nuit-douala",
-];
+export const PREMIUM_SKINS: BuiltinSkinKey[] = BUILTIN_SKIN_KEYS.filter(
+  (k) => BUILTIN_SKINS[k].premium,
+);
 
-export const SKIN_LABELS: Record<CardSkin, string> = {
-  signature: "Signature",
-  emerald: "Émeraude",
-  gold: "Or",
-  champion: "Champion",
-  indomptable: "Indomptable",
-  heritage237: "237 Héritage",
-  "nuit-douala": "Nuit de Douala",
-};
+/** Libellés des skins intégrés — une seule table, celle du socle. */
+export const SKIN_LABELS: Record<BuiltinSkinKey, string> = Object.fromEntries(
+  BUILTIN_SKIN_KEYS.map((k) => [k, BUILTIN_SKINS[k].label]),
+) as Record<BuiltinSkinKey, string>;
 
 /**
  * Photo du joueur ; sinon PNG de fallback (silhouette IA fournie par l'app) ;
@@ -130,7 +125,8 @@ export interface PlayerCardProps {
   divisionRank?: number | null;
   /** Couleur de la division fournie par le back-office (hex). */
   divisionColor?: string | null;
-  skin?: CardSkin;
+  /** Clé de skin (intégrée ou boutique) ou `SkinSpec` complet. */
+  skin?: CardSkinInput;
   imageUrl?: string | null;
   /** PNG silhouette affiché quand le joueur n'a pas encore d'avatar. */
   fallbackImageUrl?: string | null;
@@ -168,15 +164,10 @@ export function PlayerCard({
   style,
   animated = false,
 }: PlayerCardProps) {
-  const skinClass = skin === "gold" ? "" : `pcard--${skin}`;
-  const premium = PREMIUM_SKINS.includes(skin) || animated;
   const rows = cardStats({ gameSlug, rating, stats, seed: username, statDefs });
 
   return (
-    <div
-      className={`pcard ${skinClass} ${premium ? "pcard--animated" : ""} ${className}`}
-      style={style}
-    >
+    <CardChrome skin={skin} animated={animated} className={className} style={style}>
       {gameName ? <span className="pcard__crest">{gameName}</span> : null}
       <CardBadge
         ovr={rating}
@@ -211,9 +202,7 @@ export function PlayerCard({
       <div className="pcard__footer">
         <span className="pcard__chip">ESPORT 237</span>
       </div>
-
-      {premium ? <span className="pcard__sheen" aria-hidden /> : null}
-    </div>
+    </CardChrome>
   );
 }
 
@@ -254,7 +243,7 @@ export interface GlobalCardProps {
   fallbackImageUrl?: string | null;
   country?: string;
   /** Défaut = global ; "champion" pour le n°1 du classement global. */
-  skin?: "global" | "champion";
+  skin?: CardSkinInput;
   className?: string;
 }
 
@@ -285,7 +274,7 @@ export function GlobalCard({
   const cells = cards.slice(0, 6);
 
   return (
-    <div className={`pcard pcard--${skin} ${className}`}>
+    <CardChrome skin={skin} className={className}>
       <span className="pcard__crest">Globale</span>
       <CardBadge
         ovr={overall}
@@ -328,6 +317,6 @@ export function GlobalCard({
       <div className="pcard__footer">
         <span className="pcard__chip">ESPORT 237</span>
       </div>
-    </div>
+    </CardChrome>
   );
 }
