@@ -364,7 +364,11 @@
   border: 1px solid var(--e237-border);
   border-radius: var(--e237-radius-md);
   color: var(--e237-text-primary);
-  font-size: 14px;
+  /* 16px et pas moins : sous ce seuil, iOS Safari ZOOME la page à chaque prise
+     de focus, et comme aucun `maximum-scale` n'est posé (à raison — le figer
+     casse l'accessibilité), le visiteur reste coincé zoomé au milieu du
+     formulaire. C'est le premier écran de la bêta, /login, qui est concerné. */
+  font-size: 16px;
   font-family: var(--e237-font-body);
   transition:
     border-color 150ms ease,
@@ -484,7 +488,9 @@
   background: transparent;
   outline: none;
   color: var(--e237-text-primary);
-  font-size: 14px;
+  /* Même seuil que `.e237-field` : ce champ-ci est celui du téléphone
+     (PhoneInput) et du NumberInput — ceux qu'on saisit justement au doigt. */
+  font-size: 16px;
   font-family: var(--e237-font-body);
 }
 .e237-field-inner::placeholder {

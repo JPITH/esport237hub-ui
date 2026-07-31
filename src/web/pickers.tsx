@@ -186,7 +186,7 @@ export function Select({
           aria-expanded={open}
           onClick={() => (open ? setOpen(false) : openAt())}
           onKeyDown={onKeyDown}
-          className="ui-field flex h-11 w-full cursor-pointer items-center justify-between gap-2 px-3.5 text-left text-sm"
+          className="ui-field flex h-11 w-full cursor-pointer items-center justify-between gap-2 px-3.5 text-left text-base"
         >
           <span className={`truncate ${selected ? "" : "text-muted"}`}>
             {selected?.label ?? placeholder}
@@ -298,7 +298,7 @@ export function Combobox({
           aria-haspopup="listbox"
           aria-expanded={open}
           onClick={() => setOpen((o) => !o)}
-          className="ui-field flex h-11 w-full cursor-pointer items-center justify-between gap-2 px-3.5 text-left text-sm"
+          className="ui-field flex h-11 w-full cursor-pointer items-center justify-between gap-2 px-3.5 text-left text-base"
         >
           <span className={`truncate ${selected ? "" : "text-muted"}`}>
             {selected?.label ?? placeholder}
@@ -448,7 +448,7 @@ export function DatePicker({
           aria-haspopup="dialog"
           aria-expanded={open}
           onClick={() => setOpen((o) => !o)}
-          className="ui-field flex h-11 w-full cursor-pointer items-center gap-2.5 px-3.5 text-left text-sm"
+          className="ui-field flex h-11 w-full cursor-pointer items-center gap-2.5 px-3.5 text-left text-base"
         >
           <CalendarDays className="size-[18px] shrink-0 text-muted" />
           <span className={`truncate ${display ? "" : "text-muted"}`}>
@@ -610,7 +610,7 @@ export function TimePicker({
           aria-haspopup="dialog"
           aria-expanded={open}
           onClick={() => setOpen((o) => !o)}
-          className="ui-field flex h-11 w-full cursor-pointer items-center gap-2.5 px-3.5 text-left text-sm"
+          className="ui-field flex h-11 w-full cursor-pointer items-center gap-2.5 px-3.5 text-left text-base"
         >
           <Clock className="size-[18px] shrink-0 text-muted" />
           <span className={`scoreboard truncate ${value ? "" : "text-muted"}`}>
