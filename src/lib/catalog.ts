@@ -111,6 +111,7 @@ export function ticketStatusMeta(status: string): { label: string; tone: Tone } 
 /* ------------------------------------------------------------------ */
 
 export const SUBSCRIPTION_STATUS_LABEL: Record<string, string> = {
+  pending_payment: 'En attente d’encaissement',
   active: 'Active',
   exhausted: 'Épuisé',
   expired: 'Expiré',
