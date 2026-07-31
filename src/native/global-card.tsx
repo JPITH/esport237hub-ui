@@ -42,8 +42,12 @@ export interface GlobalCardProps {
   username: string;
   city?: string | null;
   cards: GameCardLike[];
-  /** Division globale (Elite, Challenger…) sous le drapeau. */
+  /** Nom de la division globale — `accessibilityLabel` et repli. */
   division?: string | null;
+  /** Rang de la division globale : affiche « DIV 3 » sous le drapeau. */
+  divisionRank?: number | null;
+  /** Couleur de la division fournie par le back-office (hex). */
+  divisionColor?: string | null;
   /** Photo détourée du joueur ; silhouette IA de repli sinon. */
   imageUrl?: string | null;
   /** « champion » pour le n°1 du classement global. */
@@ -64,6 +68,8 @@ function GlobalCardBody({
   city,
   cards,
   division,
+  divisionRank,
+  divisionColor,
   imageUrl,
   skin = 'global',
 }: GlobalCardProps) {
@@ -88,7 +94,12 @@ function GlobalCardBody({
           <View style={s.flag}>
             <Flag />
           </View>
-          {division ? <DivisionChip spec={spec} label={division} /> : null}
+          <DivisionChip
+            spec={spec}
+            rank={divisionRank}
+            name={division}
+            color={divisionColor}
+          />
         </View>
         <CardPortrait imageUrl={imageUrl} />
       </View>

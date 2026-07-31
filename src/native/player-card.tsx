@@ -22,6 +22,7 @@ import {
   type CardSkin,
   type SkinSpec,
 } from './card-skins';
+import { DivisionBadge } from './division-badge';
 import { Flag } from './flag';
 
 /** Silhouette IA de repli (PNG léger bundlé — 28 Ko). */
@@ -58,9 +59,42 @@ export function CardCrest({ spec, label }: { spec: SkinSpec; label: string }) {
   );
 }
 
-/** Chip division (Elite, Challenger…) sous le drapeau. */
-export function DivisionChip({ spec, label }: { spec: SkinSpec; label: string }) {
+/**
+ * Chip division sous le drapeau.
+ *
+ * Avec un rang connu on affiche « DIV 3 » via `DivisionBadge` (le nom de la
+ * division reste dans `accessibilityLabel`) ; sinon on retombe sur l'ancien
+ * libellé texte. Dans les deux cas le cadre garde EXACTEMENT les styles de la
+ * carte (`s.division` / `s.divisionText`) : ni les dimensions ni l'encre du
+ * skin ne bougent.
+ */
+export function DivisionChip({
+  spec,
+  rank,
+  name,
+  color,
+}: {
+  spec: SkinSpec;
+  rank?: number | null;
+  name?: string | null;
+  color?: string | null;
+}) {
   const s = useCardStyles();
+
+  if (rank != null) {
+    return (
+      <DivisionBadge
+        rank={rank}
+        name={name ?? undefined}
+        style={[s.division, { alignSelf: 'auto', borderColor: spec.frame[0] }]}
+        // Inter encode la graisse dans le nom de famille : pas de fontWeight cumulé.
+        textStyle={[s.divisionText, { color: color ?? spec.ink, fontWeight: 'normal' }]}
+      />
+    );
+  }
+
+  if (!name) return null;
+
   return (
     <View style={[s.division, { borderColor: spec.frame[0] }]}>
       <Text
@@ -68,7 +102,7 @@ export function DivisionChip({ spec, label }: { spec: SkinSpec; label: string })
         adjustsFontSizeToFit
         minimumFontScale={0.7}
         style={[s.divisionText, { color: spec.ink }]}>
-        {label.toUpperCase()}
+        {name.toUpperCase()}
       </Text>
     </View>
   );
@@ -111,8 +145,12 @@ export interface PlayerCardProps {
   stats?: Record<string, number> | null;
   /** Stats configurées par le back-office (prioritaires sur les catégories internes). */
   statDefs?: StatDef[];
-  /** Division du joueur (Elite, Challenger…), affichée sous le drapeau. */
+  /** Nom de la division (Élite, Challenger…) — `accessibilityLabel` et repli. */
   division?: string | null;
+  /** Rang de la division : affiche « DIV 3 » sous le drapeau. */
+  divisionRank?: number | null;
+  /** Couleur de la division fournie par le back-office (hex). */
+  divisionColor?: string | null;
   /** Photo détourée du joueur ; silhouette IA de repli sinon. */
   imageUrl?: string | null;
   skin?: CardSkin;
@@ -138,6 +176,8 @@ function PlayerCardBody({
   stats,
   statDefs,
   division,
+  divisionRank,
+  divisionColor,
   imageUrl,
   skin = 'signature',
   country = 'CM',
@@ -163,7 +203,12 @@ function PlayerCardBody({
           <View style={s.flag}>
             <Flag country={country} />
           </View>
-          {division ? <DivisionChip spec={spec} label={division} /> : null}
+          <DivisionChip
+            spec={spec}
+            rank={divisionRank}
+            name={division}
+            color={divisionColor}
+          />
         </View>
         <CardPortrait imageUrl={imageUrl} />
       </View>

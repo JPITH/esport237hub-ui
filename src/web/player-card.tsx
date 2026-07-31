@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { UserRound } from "lucide-react";
 
 import { cardStats, cityAbbr, type StatDef } from "../lib/player-stats";
+import { DivisionBadge } from "./division-badge";
 import { Flag } from "./flag";
 
 /** Skins cosmétiques de la carte (achetables plus tard sur le store). */
@@ -68,19 +69,28 @@ function CardImage({
   );
 }
 
-/** Colonne badge : OVR + abrégé ville + drapeau + division. */
+/**
+ * Colonne badge : OVR + abrégé ville + drapeau + division.
+ * La division s'affiche en RANG (« DIV 3 ») via `DivisionBadge` ; son nom
+ * (« Challenger ») reste dans l'`aria-label`. Sans rang connu on retombe sur
+ * l'ancien libellé texte — même cadre, mêmes dimensions dans les deux cas.
+ */
 function CardBadge({
   ovr,
   tag,
   cityText,
   country,
   division,
+  divisionRank,
+  divisionColor,
 }: {
   ovr: number;
   tag?: string;
   cityText: string;
   country: string;
   division?: string | null;
+  divisionRank?: number | null;
+  divisionColor?: string | null;
 }) {
   return (
     <div className="pcard__badge">
@@ -90,7 +100,16 @@ function CardBadge({
       <span className="pcard__flag">
         <Flag country={country} />
       </span>
-      {division ? <span className="pcard__division">{division}</span> : null}
+      {divisionRank != null ? (
+        <DivisionBadge
+          className="pcard__division"
+          rank={divisionRank}
+          name={division ?? undefined}
+          color={divisionColor}
+        />
+      ) : division ? (
+        <span className="pcard__division">{division}</span>
+      ) : null}
     </div>
   );
 }
@@ -105,8 +124,12 @@ export interface PlayerCardProps {
   stats?: Record<string, number> | null;
   /** Stats configurées par le back-office (prioritaires sur les catégories internes). */
   statDefs?: StatDef[];
-  /** Division du joueur (Elite, Challenger…), affichée sous le drapeau. */
+  /** Nom de la division (Élite, Challenger…) — sert d'`aria-label` et de repli. */
   division?: string | null;
+  /** Rang de la division : affiche « DIV 3 » sous le drapeau. */
+  divisionRank?: number | null;
+  /** Couleur de la division fournie par le back-office (hex). */
+  divisionColor?: string | null;
   skin?: CardSkin;
   imageUrl?: string | null;
   /** PNG silhouette affiché quand le joueur n'a pas encore d'avatar. */
@@ -135,6 +158,8 @@ export function PlayerCard({
   stats,
   statDefs,
   division,
+  divisionRank,
+  divisionColor,
   skin = "signature",
   imageUrl,
   fallbackImageUrl = "/cards/player-fallback.png",
@@ -158,6 +183,8 @@ export function PlayerCard({
         cityText={cityAbbr(city)}
         country={country}
         division={division}
+        divisionRank={divisionRank}
+        divisionColor={divisionColor}
       />
       <div className="pcard__img">
         <CardImage
@@ -217,8 +244,12 @@ export interface GlobalCardProps {
   losses: number;
   platform?: string | null;
   city?: string | null;
-  /** Division globale (Elite, Challenger…) sous le drapeau. */
+  /** Nom de la division globale — sert d'`aria-label` et de repli. */
   division?: string | null;
+  /** Rang de la division globale : affiche « DIV 3 » sous le drapeau. */
+  divisionRank?: number | null;
+  /** Couleur de la division fournie par le back-office (hex). */
+  divisionColor?: string | null;
   imageUrl?: string | null;
   fallbackImageUrl?: string | null;
   country?: string;
@@ -241,6 +272,8 @@ export function GlobalCard({
   platform,
   city,
   division,
+  divisionRank,
+  divisionColor,
   imageUrl,
   fallbackImageUrl = "/cards/player-fallback.png",
   country = "CM",
@@ -260,6 +293,8 @@ export function GlobalCard({
         cityText={cityAbbr(city)}
         country={country}
         division={division}
+        divisionRank={divisionRank}
+        divisionColor={divisionColor}
       />
       <div className="pcard__img">
         <CardImage

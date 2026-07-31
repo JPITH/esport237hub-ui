@@ -141,7 +141,10 @@
   /* Neumorphisme : les champs sont des creux. */
   box-shadow: var(--e237-neu-pressed-sm);
   color: var(--e237-text-primary);
-  font-size: 14px;
+  /* 16px et pas moins : sous ce seuil, iOS Safari ZOOME la page à chaque prise
+     de focus, et comme aucun `maximum-scale` n'est posé (à raison, ça casse
+     l'accessibilité) le visiteur reste coincé zoomé au milieu du formulaire. */
+  font-size: 16px;
   font-family: var(--e237-font-body);
   transition:
     border-color 150ms ease,
@@ -207,6 +210,15 @@
   padding: 1.25rem;
   box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.35);
   outline: none;
+  /* La modale ne doit JAMAIS dépasser l'écran. `.ui-modal-root` centre son
+     contenu et le `body` est bloqué en `overflow: hidden` pendant l'ouverture :
+     sans ces deux lignes, un formulaire plus haut que la fenêtre déborde en
+     haut ET en bas, la croix de fermeture sort du champ, et plus rien ne
+     défile — l'utilisateur est piégé. Le cas est systématique sur téléphone,
+     où le clavier ne laisse que ~300 px de hauteur utile.
+     `dvh` (et non `vh`) suit la barre d'adresse mobile qui se rétracte. */
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
 }
 .ui-modal--sm {
   max-width: 24rem;
@@ -419,6 +431,20 @@
   background: var(--e237-bg);
   border: 1px solid var(--e237-border);
   box-shadow: var(--e237-neu-pressed-sm);
+  /* Les onglets ne peuvent pas passer à la ligne : la pastille glissante est
+     positionnée en absolu sur l'`offsetLeft` mesuré, ce qui suppose UNE seule
+     rangée. Ils défilent donc horizontalement dans leur propre boîte — sans
+     quoi c'est le DOCUMENT ENTIER qui part en défilement latéral dès qu'une
+     série d'onglets dépasse la largeur du téléphone (« Mes duels / Trouver un
+     adversaire / Duels ouverts » fait ~420 px pour 328 px utiles à 360 px).
+     L'`offsetLeft` reste valide à l'intérieur d'un conteneur défilant. */
+  max-width: 100%;
+  overflow-x: auto;
+  /* Barre masquée : elle traverserait la pilule et gâcherait le rendu. */
+  scrollbar-width: none;
+}
+.seg::-webkit-scrollbar {
+  display: none;
 }
 /* Pastille glissante derrière l'onglet actif. */
 .seg__pill {
@@ -445,6 +471,10 @@
   font-weight: 600;
   color: var(--e237-text-secondary);
   cursor: pointer;
+  /* Dans un conteneur défilant, un onglet ne se comprime pas : il garderait
+     sinon son libellé coupé au lieu de se laisser atteindre par le doigt. */
+  flex: 0 0 auto;
+  white-space: nowrap;
   border: none;
   background: transparent;
   transition: color 150ms ease;
@@ -916,7 +946,12 @@
   width: 100%;
   height: 100%;
 }
-/* Division du joueur (Elite, Challenger…) sous le drapeau. */
+/* Division du joueur (« DIV 3 ») sous le drapeau — rendue par
+   <DivisionBadge className="pcard__division">. components.css étant chargée
+   APRÈS theme.css, ces règles écrasent celles de `.e237-divbadge` : le cadre
+   et les dimensions de la carte restent strictement identiques.
+   `color: inherit` garde l'encre du skin, sauf couleur de division explicite
+   (posée en inline par le composant, qui gagne alors). */
 .pcard__division {
   display: block;
   max-width: 100%;
@@ -926,6 +961,7 @@
   border: 1px solid color-mix(in srgb, var(--pc-frame-hi) 75%, transparent);
   border-radius: 4px;
   background: rgba(0, 0, 0, 0.28);
+  color: inherit;
   font-family: var(--e237-font-display);
   font-weight: 850;
   font-size: clamp(6px, 2.7cqw, 9px);
@@ -2489,4 +2525,66 @@
   .pcard--animated {
     animation: none !important;
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Chrome applicatif monté dans le design system                       */
+/* (RankMedal, SidebarNavLink, AuthBrandPanel)                         */
+/* ------------------------------------------------------------------ */
+
+/* Ligne de terrain fine — séparateur/atmosphère. */
+.pitch-line {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--e237-accent) 40%, transparent),
+    transparent
+  );
+}
+
+/* Rail vertical d'onglet actif dans la navigation latérale. */
+.nav-active {
+  position: relative;
+}
+.nav-active::before {
+  content: "";
+  position: absolute;
+  left: -16px;
+  top: 50%;
+  translate: 0 -50%;
+  width: 3px;
+  height: 18px;
+  border-radius: 9999px;
+  background: var(--e237-accent);
+  box-shadow: 0 0 10px var(--e237-accent);
+}
+
+/* Médaillon de rang pour le podium du classement. */
+.rank-medal {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9999px;
+  font-family: var(--e237-font-display);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--e237-bg);
+}
+.rank-medal--1 {
+  background: linear-gradient(180deg, #fde68a, var(--e237-gold));
+  box-shadow: 0 0 18px -2px color-mix(in srgb, var(--e237-gold) 70%, transparent);
+}
+.rank-medal--2 {
+  background: linear-gradient(180deg, #e2e8f0, #94a3b8);
+}
+.rank-medal--3 {
+  background: linear-gradient(180deg, #fbbf77, #b45309);
+  color: #fff;
+}
+.rank-medal--n {
+  background: transparent;
+  color: var(--e237-text-muted);
+  border: 1px solid var(--e237-border);
 }

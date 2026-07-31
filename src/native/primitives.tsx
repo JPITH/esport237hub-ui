@@ -2,7 +2,7 @@
  * Primitives d'interface native (sans composites API).
  * Couleurs via useE237Colors() — light et dark (DESIGN.md).
  */
-import { AlertCircle, Inbox } from 'lucide-react-native';
+import { AlertCircle, BadgeCheck, Inbox } from 'lucide-react-native';
 import { useState, type ReactNode } from 'react';
 import {
   Pressable,
@@ -13,7 +13,15 @@ import {
 } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 
-import { radius, spacing, useE237Colors } from './core';
+import {
+  pill,
+  radius,
+  spacing,
+  useE237Colors,
+  useE237Mode,
+  useToneSurface,
+  withAlpha,
+} from './core';
 
 export { Field, Textarea, PhoneField, Stepper, SearchField } from './fields';
 
@@ -73,19 +81,20 @@ export function Skeleton({ height = 64 }: { height?: number }) {
   );
 }
 
+/** Avatar à initiale — même dosage de fond que les autres pilules natives. */
 export function Avatar({ name, size = 44 }: { name: string; size?: number }) {
   const c = useE237Colors();
+  const surface = useToneSurface(c.accent);
   return (
     <View
       style={{
         width: size,
         height: size,
         borderRadius: size / 2,
-        backgroundColor: `${c.accent}22`,
         borderWidth: 1,
-        borderColor: `${c.accent}55`,
         alignItems: 'center',
         justifyContent: 'center',
+        ...surface,
       }}
     >
       <Text style={{ color: c.accent, fontWeight: '700', fontSize: size * 0.4 }}>
@@ -96,7 +105,46 @@ export function Avatar({ name, size = 44 }: { name: string; size?: number }) {
 }
 
 /**
+ * Marque « joueur vérifié » (icône Lucide BadgeCheck) — jumelle du web.
+ * Elle manquait au natif : les écrans posaient l'icône à la main.
+ */
+export function VerifiedMark({ size = 14 }: { size?: number }) {
+  const c = useE237Colors();
+  return (
+    <BadgeCheck
+      color={c.cyan}
+      size={size}
+      accessibilityLabel="Joueur vérifié"
+    />
+  );
+}
+
+/**
+ * Date courte en français — jumelle de `formatDate` du web (même sortie).
+ * Elle manquait au natif : chaque application refaisait la sienne.
+ */
+export function formatDate(value: string | null | undefined): string {
+  if (!value) return '—';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '—';
+  try {
+    return date.toLocaleString('fr-FR', {
+      day: '2-digit',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  } catch {
+    return value;
+  }
+}
+
+/**
  * Onglets segmentés — pastille active qui glisse (timing, sans rebond).
+ *
+ * Parité web `.seg` / `.seg__pill` : la gouttière prend `surfaceRaised`, la
+ * pastille active un fond PLEIN (`surface`) bordé, pas un simple voile teinté
+ * — c'est ce qui rend l'onglet actif lisible sur un écran de téléphone.
  */
 export function SegmentedTabs<T extends string>({
   tabs,
@@ -108,6 +156,7 @@ export function SegmentedTabs<T extends string>({
   onChange: (v: T) => void;
 }) {
   const c = useE237Colors();
+  const mode = useE237Mode();
   const [width, setWidth] = useState(0);
   const index = Math.max(
     0,
@@ -132,14 +181,21 @@ export function SegmentedTabs<T extends string>({
   return (
     <View
       onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
-      style={[styles.segment, { backgroundColor: c.surface, borderColor: c.border }]}
+      style={[
+        styles.segment,
+        { backgroundColor: c.surfaceRaised, borderColor: c.border },
+      ]}
     >
       {itemWidth > 0 ? (
         <Animated.View
           pointerEvents="none"
           style={[
             styles.segmentPill,
-            { width: itemWidth, backgroundColor: `${c.accent}22` },
+            {
+              width: itemWidth,
+              backgroundColor: c.surface,
+              borderColor: withAlpha(c.accent, pill.stroke[mode]),
+            },
             pillStyle,
           ]}
         />
@@ -207,6 +263,7 @@ const styles = StyleSheet.create({
     left: 3,
     top: 3,
     bottom: 3,
+    borderWidth: 1,
     borderRadius: radius.full,
   },
   segmentItem: {
