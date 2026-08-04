@@ -459,7 +459,113 @@ export function SubscriptionCard({
   );
 }
 
+/* ------------------------------------------------------------------ */
+/* VenueCard                                                           */
+/* ------------------------------------------------------------------ */
+
+export interface VenueCardProps {
+  onPress?: () => void;
+  name: string;
+  city: string;
+  district?: string | null;
+  /** Tarif « à partir de », en FCFA/heure. */
+  pricePerHour?: number | null;
+  /** Calculé par l'API depuis les horaires ; absent = on n'affiche rien. */
+  isOpen?: boolean;
+  imageUrl?: string | null;
+  /**
+   * Disciplines de la salle. Seuls les noms sont rendus, les trois premiers,
+   * duels ouverts d'abord (l'API trie déjà ainsi) : sur une carte de liste on
+   * répond à « est-ce que mon jeu y est ? », pas au détail de l'inventaire.
+   */
+  games?: readonly { id: string; name: string; duels_open: boolean }[] | null;
+  style?: StyleProp<ViewStyle>;
+}
+
+/**
+ * Carte de salle (natif) — jumelle de `./web/venue-card`.
+ *
+ * Le web tire ses puces d'`equipment.consoles` (les types de postes) ; ici
+ * ce sont les JEUX, parce que sur mobile la liste des salles est le point
+ * d'entrée du parcours « où puis-je jouer à FC 27 ce soir ». Le badge des
+ * duels reste sur la fiche : trois pastilles suffisent à donner l'envie
+ * d'ouvrir, les mentionner toutes ferait un pavé sur une carte de 160 px.
+ */
+export function VenueCard({
+  onPress,
+  name,
+  city,
+  district,
+  pricePerHour,
+  isOpen,
+  imageUrl,
+  games,
+  style,
+}: VenueCardProps) {
+  const c = useE237Colors();
+  const shown = (games ?? []).slice(0, 3);
+  const extra = (games?.length ?? 0) - shown.length;
+
+  return (
+    <Clickable onPress={onPress} style={style}>
+      <Card style={styles.stack}>
+        <View style={styles.venueMedia}>
+          <MediaImage
+            src={imageUrl}
+            alt={`Salle ${name}`}
+            ratio={16 / 10}
+            rounded="lg"
+            fallbackIcon={
+              <Store color={c.textMuted} size={30} strokeWidth={1.25} />
+            }
+          />
+          {isOpen !== undefined ? (
+            <View style={styles.floatBadge}>
+              <Badge tone={isOpen ? 'accent' : 'neutral'}>
+                {isOpen ? 'Ouvert' : 'Fermé'}
+              </Badge>
+            </View>
+          ) : null}
+        </View>
+
+        <View style={styles.headRow}>
+          <View style={styles.headMain}>
+            <Text style={[styles.title, { color: c.textPrimary }]} numberOfLines={1}>
+              {name}
+            </Text>
+            <View style={styles.metaItem}>
+              <MapPin color={c.textMuted} size={14} />
+              <Text style={[styles.meta, { color: c.textMuted }]} numberOfLines={1}>
+                {city}
+                {district ? ` · ${district}` : ''}
+              </Text>
+            </View>
+          </View>
+          {pricePerHour != null ? (
+            <Text style={[styles.price, { color: c.accent }]}>
+              {formatXaf(pricePerHour)}
+              <Text style={[styles.meta, { color: c.textMuted }]}> /h</Text>
+            </Text>
+          ) : null}
+        </View>
+
+        {shown.length ? (
+          <View style={styles.badges}>
+            {shown.map((game) => (
+              <Badge key={game.id} tone={game.duels_open ? 'cyan' : 'neutral'}>
+                {game.name}
+              </Badge>
+            ))}
+            {extra > 0 ? <Badge tone="neutral">+{extra}</Badge> : null}
+          </View>
+        ) : null}
+      </Card>
+    </Clickable>
+  );
+}
+
 const styles = StyleSheet.create({
+  venueMedia: { position: 'relative' },
   stack: { gap: spacing['2'] },
   grow: { flex: 1 },
   headRow: {

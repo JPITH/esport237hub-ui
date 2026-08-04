@@ -9,9 +9,15 @@
  * son pictogramme. Les libellés restent annoncés aux lecteurs d'écran via
  * `accessibilityLabel` : c'est du bruit visuel en moins, pas de l'information
  * en moins.
+ *
+ * Composition revue (04/08/2026), règle « deux clics maximum » : la barre
+ * porte désormais les cinq surfaces où l'on VA — Accueil, Salles, Duels,
+ * Évènements, Boutique. Le Classement et le Profil en sortent : ce sont des
+ * écrans qu'on consulte, pas des lieux où l'on travaille, et l'appbar commune
+ * les tient déjà à un appui (avatar à droite, lien depuis le profil).
  */
 import type { LucideIcon } from 'lucide-react-native';
-import { BarChart3, House, ShoppingBag, Swords, UserRound } from 'lucide-react-native';
+import { CalendarDays, House, ShoppingBag, Store, Swords } from 'lucide-react-native';
 import { useEffect } from 'react';
 import {
   Pressable,
@@ -55,10 +61,10 @@ const TAB_META: Record<
   { label: string; Icon: LucideIcon; fab?: boolean }
 > = {
   index: { label: 'Accueil', Icon: House },
-  classement: { label: 'Classement', Icon: BarChart3 },
+  salles: { label: 'Salles', Icon: Store },
   duels: { label: 'Duels', Icon: Swords, fab: true },
+  evenements: { label: 'Évènements', Icon: CalendarDays },
   boutique: { label: 'Boutique', Icon: ShoppingBag },
-  profil: { label: 'Profil', Icon: UserRound },
 };
 
 export interface E237TabBarProps {

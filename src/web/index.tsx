@@ -99,6 +99,9 @@ export type { GameSelectProps } from './game-select';
 export { VenueCard } from './venue-card';
 export type { VenueCardProps } from './venue-card';
 
+export { VenueGameList } from './venue-games';
+export type { VenueGameItem, VenueGameListProps } from './venue-games';
+
 export {
   DivisionBadge,
   divisionLabel,

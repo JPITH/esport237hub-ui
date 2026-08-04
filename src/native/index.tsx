@@ -236,6 +236,7 @@ export {
   ProductCard,
   SubscriptionCard,
   TicketCard,
+  VenueCard,
 } from './cards';
 export type {
   CompetitionCardProps,
@@ -243,7 +244,11 @@ export type {
   ProductCardProps,
   SubscriptionCardProps,
   TicketCardProps,
+  VenueCardProps,
 } from './cards';
+
+export { VenueGameList } from './venue-games';
+export type { VenueGameItem, VenueGameListProps } from './venue-games';
 
 export { DuelRow, ScoreSide } from './duel';
 export type { DuelRowProps, ScoreSideProps } from './duel';
