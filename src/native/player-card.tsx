@@ -90,7 +90,13 @@ export function DivisionChip({
       <DivisionBadge
         rank={rank}
         name={name ?? undefined}
-        style={[s.division, { alignSelf: 'auto', borderColor: spec.frame[0] }]}
+        // `frame` est un SkinLinear (x1/y1/x2/y2 + stops), pas un tableau de
+        // couleurs : `spec.frame[0]` rendait `undefined`, donc une bordure
+        // sans couleur. Le premier arrêt du dégradé est la teinte haute.
+        style={[
+          s.division,
+          { alignSelf: 'auto', borderColor: spec.frame.stops[0]?.color },
+        ]}
         // Inter encode la graisse dans le nom de famille : pas de fontWeight cumulé.
         textStyle={[s.divisionText, { color: color ?? spec.ink, fontWeight: 'normal' }]}
       />
