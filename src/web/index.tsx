@@ -388,6 +388,7 @@ export {
   formatClock,
   gameIconUrl,
   gameHeroUrl,
+  formatRelativeTime,
 } from '../lib';
 export type {
   GameCategory,
