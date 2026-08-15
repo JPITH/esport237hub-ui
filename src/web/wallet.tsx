@@ -3,6 +3,18 @@
 import type { ReactNode } from "react";
 import { ArrowDownLeft, ArrowUpRight, Wallet as WalletIcon } from "lucide-react";
 
+/*
+ * `formatXaf` — la forme EXACTE — et jamais `formatXafCompact` ici.
+ *
+ * Les cartes d'indicateurs abrègent (« 188 k FCFA ») parce que le chiffre y
+ * est un repère et qu'un montant à sept chiffres déborde. Le portefeuille est
+ * l'endroit opposé : on y lit un solde, on y suit des mouvements, on y retire
+ * de l'argent. Un arrondi n'y est pas une commodité, c'est une faute — on
+ * retire 187 500 FCFA, pas « 188 k ».
+ *
+ * La règle vaut pour tout ce fichier ainsi que pour `payout-card.tsx` et les
+ * formulaires de recharge et de retrait.
+ */
 import { formatXaf } from "../lib/money";
 import { TOPUP_PRESETS } from "../lib/wallet";
 import { Button } from "./button";

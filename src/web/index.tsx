@@ -392,6 +392,7 @@ export {
   auditActionLabel,
   auditObjectLabel,
   auditActorLabel,
+  formatXafCompact,
 } from '../lib';
 export type {
   GameCategory,
