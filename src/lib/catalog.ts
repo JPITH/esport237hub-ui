@@ -49,6 +49,80 @@ export function gameHeroUrl(slug: string | null | undefined): string | undefined
 }
 
 /* ------------------------------------------------------------------ */
+/* Journal d'audit (back-office)                                       */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Actions journalisées → libellé français.
+ *
+ * Le journal d'audit affichait ses identifiants bruts (`duel.validate`,
+ * `points.recompute`) en police à chasse fixe. C'est la règle transverse la
+ * plus simple du produit et la plus souvent oubliée : une valeur venue de la
+ * base n'atteint jamais l'écran telle quelle. Un modérateur qui relit une
+ * décision de la veille ne devrait pas avoir à traduire mentalement un slug.
+ */
+export const AUDIT_ACTION_LABEL: Record<string, string> = {
+  'duel.validate': 'Duel validé',
+  'duel.cancel': 'Duel annulé',
+  'duel.dispute': 'Litige ouvert',
+  'duel.resolve': 'Litige tranché',
+  'venue.verify': 'Salle vérifiée',
+  'venue.reject': 'Salle refusée',
+  'venue.suspend': 'Salle suspendue',
+  'points.recompute': 'Points recalculés',
+  'division.update': 'Division modifiée',
+  'game.update': 'Discipline modifiée',
+  'user.suspend': 'Compte suspendu',
+  'payout.approve': 'Reversement approuvé',
+};
+
+/** Type d'objet concerné par une action d'audit. */
+export const AUDIT_OBJECT_LABEL: Record<string, string> = {
+  duel: 'Duel',
+  venue: 'Salle',
+  season: 'Saison',
+  division: 'Division',
+  game: 'Discipline',
+  user: 'Compte',
+  payout: 'Reversement',
+  event: 'Événement',
+};
+
+/** Auteur d'une action journalisée. */
+export const AUDIT_ACTOR_LABEL: Record<string, string> = {
+  admin: 'Administrateur',
+  system: 'Automatique',
+  venue: 'Salle',
+  player: 'Joueur',
+};
+
+/**
+ * Libellé d'une action d'audit. Tolérant : une action ajoutée côté back-end
+ * sans passer par cette table reste lisible plutôt que d'afficher un slug —
+ * `duel.validate` devient « Duel · validate », pas `duel.validate`.
+ */
+export function auditActionLabel(action: string | null | undefined): string {
+  if (!action) return '—';
+  const known = AUDIT_ACTION_LABEL[action];
+  if (known) return known;
+  const [object, verb] = action.split('.');
+  if (verb && object) {
+    return `${AUDIT_OBJECT_LABEL[object] ?? object} · ${verb}`;
+  }
+  return action;
+}
+
+export function auditObjectLabel(kind: string | null | undefined): string {
+  if (!kind) return '—';
+  return AUDIT_OBJECT_LABEL[kind] ?? kind;
+}
+
+export function auditActorLabel(kind: string | null | undefined): string {
+  if (!kind) return '—';
+  return AUDIT_ACTOR_LABEL[kind] ?? kind;
+}
+
+/* ------------------------------------------------------------------ */
 /* Évènements                                                          */
 /* ------------------------------------------------------------------ */
 

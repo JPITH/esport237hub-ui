@@ -368,6 +368,24 @@
   background: var(--e237-surface-raised);
   color: var(--e237-text-primary);
 }
+
+/*
+ * Fantôme destructeur : le poids d'un fantôme, la couleur du danger.
+ *
+ * Une file de modération a besoin des deux à la fois — « Annuler » ne doit pas
+ * peser autant que « Valider », mais il doit dire qu'il détruit. Ce
+ * modificateur existe parce qu'un simple `text-danger` de Tailwind posé sur le
+ * bouton était SILENCIEUSEMENT ignoré : cette feuille n'est pas dans un
+ * `@layer`, elle l'emporte donc sur `utilities`, et `.btn--ghost { color }`
+ * gagnait.
+ */
+.btn--ghost.btn--tone-danger {
+  color: var(--e237-danger);
+}
+.btn--ghost.btn--tone-danger:hover:not(:disabled) {
+  background: var(--e237-danger-subtle);
+  color: var(--e237-danger);
+}
 /* Danger bouton : rouge assez sombre pour blanc ≥4.5:1 (le token danger
    reste clair en dark pour le texte/badges). */
 .btn--danger {
@@ -375,7 +393,26 @@
   color: #fff;
 }
 .btn--danger:hover:not(:disabled) {
-  filter: brightness(1.08);
+  background: light-dark(#8b302e, #b91c1c);
+  filter: none;
+}
+
+/*
+ * Bouton « approuver » — émeraude, PAS le vert de la marque.
+ *
+ * Une file de modération est faite de lignes répétées : peindre chaque
+ * « Valider » avec l'accent de la marque mettait trois aplats verts identiques
+ * sur le même écran, tous aussi criants que le seul vrai CTA d'une page
+ * joueur. L'émeraude dit « approuvé » (couche 3) et laisse l'accent à
+ * l'interactif.
+ */
+.btn--success {
+  background: light-dark(#007952, #45c99b);
+  color: light-dark(#ffffff, #04120a);
+}
+.btn--success:hover:not(:disabled) {
+  background: light-dark(#006545, #0db485);
+  filter: none;
 }
 /* Bouton icône carré. */
 .icon-btn {

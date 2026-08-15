@@ -389,6 +389,9 @@ export {
   gameIconUrl,
   gameHeroUrl,
   formatRelativeTime,
+  auditActionLabel,
+  auditObjectLabel,
+  auditActorLabel,
 } from '../lib';
 export type {
   GameCategory,
