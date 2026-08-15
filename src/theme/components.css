@@ -1955,20 +1955,20 @@
 
 .e237-dash-nav-link:hover {
   color: var(--e237-text-primary);
-  background: var(--e237-surface);
-  box-shadow: var(--e237-neu-raised-sm);
+  background: var(--e237-surface-raised);
 }
 
 .e237-dash-nav-link:active {
   transform: scale(0.97);
-  box-shadow: var(--e237-neu-pressed-sm);
 }
 
+/* Lien courant : c'est le TEXTE qui porte l'état (couleur + graisse), pas un
+   relief. Une seule entrée de nav est active — elle n'a pas besoin de crier. */
 .e237-dash-nav-link--active {
-  color: var(--e237-text-primary);
+  color: var(--e237-text-strong);
   font-weight: 700;
   background: var(--e237-surface);
-  box-shadow: var(--e237-neu-pressed);
+  box-shadow: inset 0 0 0 1px var(--e237-border);
 }
 
 .e237-featured-hero {

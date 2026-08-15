@@ -10,24 +10,116 @@
 :root {
   color-scheme: light dark;
 
-  /* Couleurs sémantiques */
-  --e237-bg: light-dark(#f7f9fb, #07080e);
-  --e237-surface: light-dark(#ffffff, #14141c);
-  --e237-surface-raised: light-dark(#ffffff, #1c1c26);
-  --e237-border: light-dark(#e2e8f0, #2a2a36);
-  --e237-text-primary: light-dark(#0f172a, #f8fafc);
-  --e237-text-secondary: light-dark(#475569, #94a3b8);
-  /* Light #64748b ≈4.6:1 sur blanc ; dark #94a3b8 ≈5:1 sur surface — AA. */
-  --e237-text-muted: light-dark(#64748b, #94a3b8);
-  /* Vert lime + bleu électrique (logo) — light assombri pour AA. */
-  --e237-accent: light-dark(#3f9a14, #7ce032);
-  --e237-accent-bright: light-dark(#4ca820, #9af050);
-  --e237-on-accent: light-dark(#ffffff, #04120a);
-  --e237-cyan: light-dark(#0088a8, #00d4f0);
-  --e237-success: light-dark(#059669, #34d399);
-  --e237-danger: light-dark(#dc2626, #f87171);
-  --e237-warning: light-dark(#d97706, #fbbf24);
-  --e237-gold: light-dark(#ca8a04, #facc15);
+  /* ================================================================ */
+  /* COUCHE 1 — FONDATION NEUTRE                                      */
+  /* Quatre fonds, deux traits, quatre niveaux de texte.              */
+  /* Écarts de clarté : ~0.025 en clair, ~0.046 en sombre (le DOUBLE) */
+  /* — deux tons sombres se ressemblent bien plus que deux clairs.    */
+  /* ================================================================ */
+
+  /* 1/4 · la page */
+  --e237-bg: light-dark(#f4f6f9, #0e1116);
+  /* 2/4 · le cadre : barre latérale, en-tête. Plus SOMBRE que la page en
+     clair (l'ancre), plus CLAIR qu'elle en sombre (une surface qui s'élève
+     s'éclaircit, toujours). */
+  --e237-frame: light-dark(#ebeef2, #171c21);
+  /* 3/4 · les cartes — blanc pur en clair : c'est ce qui les détache. */
+  --e237-surface: light-dark(#ffffff, #21262d);
+  /* 4/4 · modales, menus, survols de ligne. */
+  --e237-surface-raised: light-dark(#ffffff, #2c323a);
+
+  /* Deux traits : le discret pose un bord, l'affirmé se lit. */
+  --e237-border: light-dark(#dee2e7, #353c45);
+  --e237-border-strong: light-dark(#ccd1d8, #4a525e);
+
+  /* Quatre niveaux de texte — jamais de noir pur ni de blanc pur. */
+  --e237-text-strong: light-dark(#171f28, #f4f7fb);
+  --e237-text-primary: light-dark(#2b343f, #e2e7ec);
+  --e237-text-secondary: light-dark(#515c6a, #b2bbc9);
+  --e237-text-muted: light-dark(#636d7a, #949faf);
+
+  /* ================================================================ */
+  /* COUCHE 2 — ACCENT FONCTIONNEL                                    */
+  /* Les rampes entières sont exposées : on choisit un ÉCHELON, on ne */
+  /* « bricole » jamais une teinte au color-mix ou au filter.         */
+  /* ================================================================ */
+
+  --e237-accent-50: #e7fedd;
+  --e237-accent-100: #d3f7c2;
+  --e237-accent-200: #b7eb9c;
+  --e237-accent-300: #96db70;
+  --e237-accent-400: #78c746;
+  --e237-accent-500: #5fb21f;
+  --e237-accent-600: #479900;
+  --e237-accent-700: #2f7700;
+  --e237-accent-800: #296300;
+  --e237-accent-900: #204f00;
+  --e237-accent-950: #123100;
+
+  --e237-cyan-50: #dcfcff;
+  --e237-cyan-100: #bff5ff;
+  --e237-cyan-200: #96e9f9;
+  --e237-cyan-300: #60d8ee;
+  --e237-cyan-400: #15c3dd;
+  --e237-cyan-500: #00aec9;
+  --e237-cyan-600: #0096b0;
+  --e237-cyan-700: #00748b;
+  --e237-cyan-800: #006173;
+  --e237-cyan-900: #004d5c;
+  --e237-cyan-950: #002f39;
+
+  /* Échelons de service, déjà résolus par mode.
+     Clair : 700 (le 600 ne tient pas le AA sur blanc).
+     Sombre : 400, survol 500. */
+  --e237-accent: light-dark(var(--e237-accent-700), var(--e237-accent-400));
+  --e237-accent-hover: light-dark(var(--e237-accent-800), var(--e237-accent-500));
+  --e237-accent-subtle: light-dark(var(--e237-accent-50), var(--e237-accent-950));
+  --e237-accent-border: light-dark(var(--e237-accent-200), var(--e237-accent-800));
+  --e237-accent-bright: light-dark(var(--e237-accent-500), var(--e237-accent-300));
+  --e237-on-accent: light-dark(#ffffff, #0b1403);
+  --e237-cyan: light-dark(var(--e237-cyan-700), var(--e237-cyan-400));
+  --e237-cyan-subtle: light-dark(var(--e237-cyan-50), var(--e237-cyan-950));
+  --e237-cyan-border: light-dark(var(--e237-cyan-200), var(--e237-cyan-800));
+
+  /* ================================================================ */
+  /* COUCHE 3 — SÉMANTIQUE                                            */
+  /* Ces couleurs VEULENT DIRE quelque chose. Le succès est une       */
+  /* émeraude (teinte 166) et non le lime de la marque (136) : sans   */
+  /* cet écart, « validé » et « bouton » se confondraient.            */
+  /* ================================================================ */
+
+  --e237-success: light-dark(#007952, #45c99b);
+  --e237-success-subtle: light-dark(#e0fef0, #003120);
+  --e237-success-border: light-dark(#a1eccc, #006545);
+
+  --e237-danger: light-dark(#a73735, #ff837b);
+  --e237-danger-subtle: light-dark(#ffebe7, #461514);
+  --e237-danger-border: light-dark(#ffbfb7, #8b302e);
+
+  --e237-warning: light-dark(#925100, #e79d38);
+  --e237-warning-subtle: light-dark(#fff2da, #3d2000);
+  --e237-warning-border: light-dark(#ffcf95, #7a4500);
+
+  --e237-info: light-dark(#2265a8, #6cb3ff);
+  --e237-info-subtle: light-dark(#e4f8ff, #0c2946);
+  --e237-info-border: light-dark(#b0deff, #1f558c);
+
+  --e237-gold: light-dark(#7b6000, #caad34);
+  --e237-gold-subtle: light-dark(#fdf6da, #322700);
+  --e237-gold-border: light-dark(#ecd995, #665100);
+
+  /* Spectre des graphiques : huit teintes de MÊME clarté et MÊME chroma
+     perçus (OKLCH, pas +42° de teinte). Un vert vif paraît bien plus
+     lumineux qu'un bleu vif à valeur égale — sans OKLCH, l'œil lit une
+     hiérarchie qui n'existe pas dans les données. */
+  --e237-chart-1: light-dark(#4e9a52, #7ac67d);
+  --e237-chart-2: light-dark(#009e93, #20cbbf);
+  --e237-chart-3: light-dark(#0093c4, #44c0f2);
+  --e237-chart-4: light-dark(#6a80d4, #93acff);
+  --e237-chart-5: light-dark(#a16dbd, #cd98eb);
+  --e237-chart-6: light-dark(#c1628a, #f08db5);
+  --e237-chart-7: light-dark(#c7674b, #f69376);
+  --e237-chart-8: light-dark(#b07b00, #dca747);
 
   /* Espacement */
   --e237-spacing-1: 4px;
@@ -55,21 +147,37 @@
   /* Alignement avec les tokens Astryx (surcharge du thème neutral) */
   --color-accent: light-dark(#3f9a14, #7ce032);
 
-  /* Neumorphisme : deux sources de lumière (haut-gauche claire, bas-droite sombre).
-     Toute surface en relief compose ces recettes — jamais d'ombre ad hoc. */
-  --e237-neu-hi: light-dark(rgb(255 255 255 / 0.92), rgb(255 255 255 / 0.05));
-  --e237-neu-lo: light-dark(rgb(15 23 42 / 0.13), rgb(0 0 0 / 0.6));
-  --e237-neu-raised: -5px -5px 14px var(--e237-neu-hi), 7px 7px 20px var(--e237-neu-lo);
-  --e237-neu-raised-sm: -2px -2px 6px var(--e237-neu-hi), 3px 4px 10px var(--e237-neu-lo);
-  --e237-neu-pressed: inset 3px 3px 8px var(--e237-neu-lo),
-    inset -3px -3px 8px var(--e237-neu-hi);
-  --e237-neu-pressed-sm: inset 2px 2px 5px var(--e237-neu-lo),
-    inset -1px -1px 3px var(--e237-neu-hi);
-  --e237-neu-edge: inset 0 1px 0
-    light-dark(rgb(255 255 255 / 0.7), rgb(255 255 255 / 0.06));
+  /* ================================================================ */
+  /* PROFONDEUR — le trait d'abord, l'ombre ensuite                   */
+  /* ================================================================ */
+  /* Une carte se définit par son BORD, pas par son ombre. Un halo mou
+     sous chaque carte donne l'impression d'une interface délavée ; un
+     liseré à ~90 % de blanc pose la carte franchement sans l'alourdir.
+     L'ombre ne reste que là où quelque chose flotte VRAIMENT au-dessus du
+     reste : menus, modales, popovers. */
+  --e237-shadow-card: none;
+  /* Élévation réelle (menus, popovers) : courte, franche, jamais diffuse. */
+  --e237-shadow-pop: light-dark(
+    0 1px 2px rgb(23 31 40 / 0.06),
+    0 1px 2px rgb(0 0 0 / 0.4)
+  ),
+    light-dark(0 8px 24px -6px rgb(23 31 40 / 0.14), 0 8px 24px -6px rgb(0 0 0 / 0.6));
+  /* Modale : la seule ombre qui a le droit d'être large. */
+  --e237-shadow-modal: light-dark(
+    0 24px 60px -12px rgb(23 31 40 / 0.25),
+    0 24px 60px -12px rgb(0 0 0 / 0.75)
+  );
 
-  /* Ombres */
-  --e237-shadow-card: var(--e237-neu-edge), var(--e237-neu-raised);
+  /* Anciens jetons de neumorphisme, neutralisés. Ils restent déclarés le
+     temps que les derniers appels disparaissent des applications — les
+     supprimer d'un coup laisserait des `box-shadow: ;` invalides. */
+  --e237-neu-hi: transparent;
+  --e237-neu-lo: transparent;
+  --e237-neu-raised: none;
+  --e237-neu-raised-sm: none;
+  --e237-neu-pressed: none;
+  --e237-neu-pressed-sm: none;
+  --e237-neu-edge: none;
   /* Carte joueur (.pcard) — ombre atténuée en light pour éviter un halo rectangulaire sur fond clair. */
   --e237-pcard-shadow: light-dark(
     0 6px 14px rgb(15 23 42 / 0.1),
@@ -77,8 +185,12 @@
   );
   --e237-pcard-glow-sm: light-dark(4px, 8px);
   --e237-pcard-glow-lg: light-dark(12px, 22px);
-  --e237-glow-accent: 0 0 0 1px color-mix(in srgb, var(--e237-accent) 45%, transparent),
-    0 8px 30px -8px color-mix(in srgb, var(--e237-accent) 55%, transparent);
+  /* Lueur d'accent — resserrée. Elle marquait autrefois le bouton d'un halo
+     large qui débordait de plusieurs dizaines de pixels : à l'écran, chaque
+     bouton vert semblait alors aussi important que le seul qui l'était
+     vraiment. Ici, un simple liseré et une ombre courte. */
+  --e237-glow-accent: 0 0 0 1px color-mix(in srgb, var(--e237-accent) 55%, transparent),
+    0 2px 8px -2px color-mix(in srgb, var(--e237-accent) 35%, transparent);
   --e237-ring: 0 0 0 2px var(--e237-bg), 0 0 0 4px var(--e237-accent);
 
   /* Mouvement — micro-interactions (transform / opacity / box-shadow uniquement). */
@@ -132,33 +244,58 @@
   cursor: not-allowed;
 }
 
+/*
+ * Hiérarchie des boutons — « plus une action est importante, plus son bouton
+ * est appuyé ». Quatre niveaux, du plus fort au plus discret :
+ *
+ *   primary   aplat d'accent      l'action de l'écran, une seule par écran
+ *   secondary surface + trait     les actions courantes
+ *   ghost     texte seul          les actions de service
+ *   danger    aplat rouge         la destruction, jamais d'une autre couleur
+ *
+ * Le survol change d'ÉCHELON dans la rampe (700→800 en clair, 400→500 en
+ * sombre) au lieu d'appliquer un `filter: brightness()` : un filtre déplace
+ * la couleur hors du système et ne garantit plus aucun contraste.
+ */
 .e237-btn--primary {
   background: var(--e237-accent);
   color: var(--e237-on-accent);
 }
 
 .e237-btn--primary:hover:not(:disabled) {
-  filter: brightness(1.08);
+  background: var(--e237-accent-hover);
 }
 
 .e237-btn--secondary {
-  background: transparent;
+  background: var(--e237-surface);
   color: var(--e237-text-primary);
-  border-color: var(--e237-border);
+  border-color: var(--e237-border-strong);
 }
 
 .e237-btn--secondary:hover:not(:disabled) {
-  border-color: var(--e237-accent);
-  color: var(--e237-accent);
+  background: var(--e237-surface-raised);
+  border-color: var(--e237-text-muted);
 }
 
 .e237-btn--ghost {
   background: transparent;
-  color: var(--e237-accent);
+  color: var(--e237-text-secondary);
 }
 
 .e237-btn--ghost:hover:not(:disabled) {
-  text-decoration: underline;
+  background: var(--e237-surface-raised);
+  color: var(--e237-text-primary);
+  text-decoration: none;
+}
+
+.e237-btn--danger {
+  background: var(--e237-danger);
+  color: #ffffff;
+}
+
+.e237-btn--danger:hover:not(:disabled) {
+  filter: none;
+  background: light-dark(#8b302e, #ee6a64);
 }
 
 .e237-btn--sm {
@@ -167,14 +304,31 @@
   border-radius: var(--e237-radius-sm);
 }
 
+/* La carte se définit par son trait. Pas d'ombre : sur une page claire, un
+   halo sous chaque carte délave l'ensemble au lieu de le structurer. */
 .e237-card {
   background: var(--e237-surface);
   border: 1px solid var(--e237-border);
   border-radius: var(--e237-radius-lg);
   padding: var(--e237-spacing-5);
-  box-shadow: var(--e237-shadow-card);
 }
 
+/* Surface réellement flottante (menu, popover) — là, l'ombre est justifiée. */
+.e237-card--pop {
+  background: var(--e237-surface-raised);
+  border-color: var(--e237-border-strong);
+  box-shadow: var(--e237-shadow-pop);
+}
+
+/*
+ * Pastilles — fond teinté du 50 (clair) / 950 (sombre), liseré du 200 / 800,
+ * texte du 700 / 400. Chaque couple est vérifié AA par `contrast.test.ts`.
+ *
+ * L'ancienne recette mélangeait la couleur à 22 % dans la surface : le fond
+ * remontait tellement qu'un statut « en attente » devenait un pavé orange qui
+ * pesait plus lourd que le bouton d'action juste à côté. Une pastille dit un
+ * état ; elle ne réclame pas l'attention.
+ */
 .e237-badge {
   display: inline-flex;
   align-items: center;
@@ -184,38 +338,51 @@
   font-size: 12px;
   font-weight: 600;
   line-height: 1.4;
-  /* Fond opaque (surface + teinte) — lisible sur photo comme sur page. */
-  background: color-mix(in srgb, var(--e237-accent) 22%, var(--e237-surface));
+  white-space: nowrap;
+  background: var(--e237-accent-subtle);
+  border: 1px solid var(--e237-accent-border);
   color: var(--e237-accent);
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.28);
 }
 
 .e237-badge--cyan {
-  background: color-mix(in srgb, var(--e237-cyan) 22%, var(--e237-surface));
+  background: var(--e237-cyan-subtle);
+  border-color: var(--e237-cyan-border);
   color: var(--e237-cyan);
 }
 
+.e237-badge--success {
+  background: var(--e237-success-subtle);
+  border-color: var(--e237-success-border);
+  color: var(--e237-success);
+}
+
 .e237-badge--gold {
-  background: color-mix(in srgb, var(--e237-gold) 24%, var(--e237-surface));
+  background: var(--e237-gold-subtle);
+  border-color: var(--e237-gold-border);
   color: var(--e237-gold);
 }
 
 .e237-badge--danger {
-  background: color-mix(in srgb, var(--e237-danger) 22%, var(--e237-surface));
+  background: var(--e237-danger-subtle);
+  border-color: var(--e237-danger-border);
   color: var(--e237-danger);
 }
 
 .e237-badge--warning {
-  background: color-mix(in srgb, var(--e237-warning) 24%, var(--e237-surface));
+  background: var(--e237-warning-subtle);
+  border-color: var(--e237-warning-border);
   color: var(--e237-warning);
 }
 
+.e237-badge--info {
+  background: var(--e237-info-subtle);
+  border-color: var(--e237-info-border);
+  color: var(--e237-info);
+}
+
 .e237-badge--neutral {
-  background: color-mix(
-    in srgb,
-    var(--e237-text-secondary) 18%,
-    var(--e237-surface)
-  );
+  background: var(--e237-bg);
+  border-color: var(--e237-border);
   color: var(--e237-text-secondary);
 }
 

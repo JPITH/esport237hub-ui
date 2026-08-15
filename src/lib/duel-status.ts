@@ -1,22 +1,37 @@
 import type { DuelStatus } from '@esport237hub/types';
 
-type Tone = 'accent' | 'cyan' | 'gold' | 'danger' | 'warning' | 'neutral';
+import type { Tone } from './tone';
 
-/** Libellé français + ton visuel de chaque statut (cahier §05). */
+/**
+ * Libellé français + ton visuel de chaque statut (cahier §05).
+ *
+ * Trois règles gouvernent cette table, et elles priment sur le goût :
+ *
+ * 1. **L'accent ne dit jamais un état.** Le vert lime de la marque appartient
+ *    aux boutons. Un duel « validé » peint en accent se confondait avec le
+ *    bouton « Lancer le duel » posé juste à côté : deux choses de nature
+ *    opposée, même couleur. « Validé » est donc en `success` (émeraude).
+ * 2. **Une seule famille par intention.** `warning` est réservé aux statuts
+ *    qui attendent quelque chose de l'utilisateur ; ce qui avance tout seul
+ *    est en `info`. Avant, « Check-in ouvert » (agis maintenant) et
+ *    « Résultat soumis » (patiente) portaient le même orange.
+ * 3. **`cyan` = en direct.** Un seul statut l'utilise, et c'est ce qui le rend
+ *    repérable d'un coup d'œil dans une liste.
+ */
 export const DUEL_STATUS_META: Record<
   DuelStatus,
   { label: string; tone: Tone }
 > = {
   draft: { label: 'Brouillon', tone: 'neutral' },
-  sent: { label: 'Envoyée', tone: 'cyan' },
-  accepted: { label: 'Acceptée', tone: 'cyan' },
+  sent: { label: 'Envoyée', tone: 'info' },
+  accepted: { label: 'Acceptée', tone: 'info' },
   venue_pending: { label: 'Salle en attente', tone: 'warning' },
-  scheduled: { label: 'Programmée', tone: 'cyan' },
+  scheduled: { label: 'Programmée', tone: 'info' },
   checkin_open: { label: 'Check-in ouvert', tone: 'warning' },
-  in_progress: { label: 'En cours', tone: 'accent' },
+  in_progress: { label: 'En cours', tone: 'cyan' },
   result_submitted: { label: 'Résultat soumis', tone: 'warning' },
-  under_review: { label: 'En validation', tone: 'warning' },
-  validated: { label: 'Validé', tone: 'accent' },
+  under_review: { label: 'En validation', tone: 'info' },
+  validated: { label: 'Validé', tone: 'success' },
   disputed: { label: 'Contesté', tone: 'danger' },
   cancelled: { label: 'Annulé', tone: 'neutral' },
 };
@@ -43,8 +58,8 @@ export const DISPUTE_STATUS_META: Record<
   { label: string; tone: Tone }
 > = {
   open: { label: 'Ouvert', tone: 'warning' },
-  under_review: { label: 'En examen', tone: 'warning' },
-  resolved: { label: 'Résolu', tone: 'accent' },
+  under_review: { label: 'En examen', tone: 'info' },
+  resolved: { label: 'Résolu', tone: 'success' },
   rejected: { label: 'Rejeté', tone: 'neutral' },
 };
 
