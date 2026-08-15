@@ -19,6 +19,8 @@ import { font, radius, spacing, useE237Colors, useToneColor, useToneSurface } fr
 const DEFAULT_ICON: Record<Tone, LucideIcon> = {
   accent: CheckCircle2,
   cyan: Info,
+  success: CheckCircle2,
+  info: Info,
   gold: Lightbulb,
   danger: AlertTriangle,
   warning: AlertTriangle,

@@ -1428,13 +1428,23 @@
   box-shadow: var(--e237-neu-pressed-sm);
 }
 
-/* Rail contexte : colonne de panneaux flottants (mêmes reliefs que les cartes). */
+/* Rail contexte : colonne de panneaux.
+   La largeur fixe reste ici, mais l'affichage est piloté par la grille du
+   chrome applicatif (`.e237-chrome__cols`) : ce fichier n'étant PAS dans un
+   `@layer`, un `display: flex` posé ici l'emportait sur le `hidden` de
+   Tailwind et le rail de 336 px écrasait la colonne sur téléphone. */
 .e237-context-rail {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
   gap: 16px;
-  width: 336px;
+  width: 100%;
+}
+
+@media (min-width: 1280px) {
+  .e237-context-rail {
+    width: 336px;
+  }
 }
 
 .e237-game-rail__btn {

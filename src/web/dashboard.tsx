@@ -116,6 +116,11 @@ export function GameRail({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expanded]);
 
+  // Images de jeu tombées : une icône cassée dans le rail est plus laide que
+  // pas d'icône du tout, et `onError` est le seul signal fiable — l'URL peut
+  // être parfaitement formée et le fichier absent.
+  const [broken, setBroken] = useState<Record<string, boolean>>({});
+
   const hasMore = games.length > maxVisible;
   const topGames = games.slice(0, maxVisible);
   if (activeId) {
@@ -164,11 +169,14 @@ export function GameRail({
                     disabled={coming}
                     onClick={() => onSelect?.(g.id)}
                   >
-                    {g.iconUrl ? (
+                    {g.iconUrl && !broken[g.id] ? (
                       <img
                         src={g.iconUrl}
                         alt=""
                         className="e237-game-rail__icon"
+                        onError={() =>
+                          setBroken((prev) => ({ ...prev, [g.id]: true }))
+                        }
                       />
                     ) : (
                       <span className="e237-game-rail__fallback" aria-hidden>

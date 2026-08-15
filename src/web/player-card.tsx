@@ -270,8 +270,12 @@ export function GlobalCard({
   className = "",
 }: GlobalCardProps) {
   // OVERALL = MEILLEURE note (décision du porteur — pas la moyenne).
-  const overall = cards.length ? Math.max(...cards.map((c) => c.rating)) : 0;
-  const cells = cards.slice(0, 6);
+  // `cards` vient de l'API et n'est vérifié par personne à l'exécution : une
+  // vue qui n'agrège aucune discipline renvoie le champ absent, et la carte
+  // faisait alors tomber toute la page de classement en écran blanc.
+  const list = cards ?? [];
+  const overall = list.length ? Math.max(...list.map((c) => c.rating)) : 0;
+  const cells = list.slice(0, 6);
 
   return (
     <CardChrome skin={skin} className={className}>

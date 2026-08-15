@@ -9,6 +9,8 @@ import type { Tone } from "../lib/tone";
 const DEFAULT_ICON: Record<Tone, ReactNode> = {
   accent: <CheckCircle2 aria-hidden />,
   cyan: <Info aria-hidden />,
+  success: <CheckCircle2 aria-hidden />,
+  info: <Info aria-hidden />,
   gold: <Lightbulb aria-hidden />,
   danger: <AlertTriangle aria-hidden />,
   warning: <AlertTriangle aria-hidden />,
@@ -19,6 +21,8 @@ const DEFAULT_ICON: Record<Tone, ReactNode> = {
 const TONE_CLASS: Record<Tone, string> = {
   accent: "border-accent/40 bg-accent/10 text-accent",
   cyan: "border-cyan/40 bg-cyan/10 text-cyan",
+  success: "border-success/40 bg-success/10 text-success",
+  info: "border-info/40 bg-info/10 text-info",
   gold: "border-gold/40 bg-gold/10 text-gold",
   danger: "border-danger/40 bg-danger/10 text-danger",
   warning: "border-warning/40 bg-warning/10 text-warning",

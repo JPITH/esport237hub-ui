@@ -386,6 +386,8 @@ export {
   rankMovementLabel,
   divisionMovementLabel,
   formatClock,
+  gameIconUrl,
+  gameHeroUrl,
 } from '../lib';
 export type {
   GameCategory,

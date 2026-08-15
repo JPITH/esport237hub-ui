@@ -11,6 +11,44 @@
 import type { Tone } from './tone';
 
 /* ------------------------------------------------------------------ */
+/* Visuels des disciplines                                             */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Identifiant de discipline → nom court du fichier livré dans `public/media`.
+ *
+ * Les visuels ont été nommés court (`game-clash.png`) alors que les
+ * identifiants produits sont longs (`clash-royale`). Sans cette table, chaque
+ * écran devine — et se trompe : le rail affichait des images cassées pour
+ * trois disciplines sur cinq.
+ */
+const GAME_ASSET: Record<string, string> = {
+  fc27: 'fc27',
+  'clash-royale': 'clash',
+  codm: 'cod',
+  'pubg-mobile': 'pubg',
+  valorant: 'valorant',
+};
+
+/**
+ * Vignette d'une discipline, ou `undefined` si aucun visuel n'est livré.
+ *
+ * Renvoyer `undefined` plutôt qu'une URL improbable est délibéré : les
+ * composants savent afficher un repli propre (initiales), mais seulement si
+ * on ne leur ment pas sur l'existence de l'image.
+ */
+export function gameIconUrl(slug: string | null | undefined): string | undefined {
+  const key = slug ? GAME_ASSET[slug] : undefined;
+  return key ? `/media/game-${key}.png` : undefined;
+}
+
+/** Bandeau large d'une discipline (accueil, en-têtes). */
+export function gameHeroUrl(slug: string | null | undefined): string | undefined {
+  const key = slug ? GAME_ASSET[slug] : undefined;
+  return key ? `/media/hero-${key}.png` : undefined;
+}
+
+/* ------------------------------------------------------------------ */
 /* Évènements                                                          */
 /* ------------------------------------------------------------------ */
 

@@ -5,6 +5,8 @@
  */
 import type { HTMLAttributes, ReactNode } from 'react';
 
+import type { Tone } from '../lib/tone';
+
 function cx(...parts: Array<string | false | null | undefined>): string {
   return parts.filter(Boolean).join(' ');
 }
@@ -16,8 +18,8 @@ export function Card({ className, ...rest }: CardProps) {
 }
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
-  /** accent = vert (défaut), cyan, gold, danger, warning, neutral. */
-  tone?: 'accent' | 'cyan' | 'gold' | 'danger' | 'warning' | 'neutral';
+  /** Ton sémantique — voir `lib/tone.ts`. `accent` par défaut. */
+  tone?: Tone;
 }
 
 export function Badge({ tone = 'accent', className, ...rest }: BadgeProps) {

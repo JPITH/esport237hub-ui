@@ -34,7 +34,7 @@ const TEXTS = ['textStrong', 'textPrimary', 'textSecondary', 'textMuted'] as con
 describe.each(['light', 'dark'] as const)('mode %s', (mode) => {
   const c: ColorScale = color[mode];
 
-  it.each(TEXTS)('le texte %s tient le AA sur les quatre fonds', (textKey) => {
+  it.each([...TEXTS])('le texte %s tient le AA sur les quatre fonds', (textKey) => {
     for (const surfaceKey of SURFACES[mode]) {
       const ratio = contrast(c[textKey], c[surfaceKey]);
       expect(
@@ -44,7 +44,7 @@ describe.each(['light', 'dark'] as const)('mode %s', (mode) => {
     }
   });
 
-  it.each(['accent', 'cyan', 'success', 'danger', 'warning', 'info', 'gold'] as const)(
+  it.each([...(['accent', 'cyan', 'success', 'danger', 'warning', 'info', 'gold'] as const)])(
     'la couleur %s tient le AA en texte sur toutes les surfaces',
     (key) => {
       for (const surfaceKey of SURFACES[mode]) {

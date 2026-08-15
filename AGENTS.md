@@ -16,6 +16,38 @@ monorepo where this repo is mounted as a git submodule at `packages/ui`.
 - `bun run typecheck` — runs `tsc -p tsconfig.web.json` (DOM) and `tsc -p tsconfig.native.json` (React Native)
 - One-off tools: `bunx <tool>` (never `npx`/`pnpm dlx`)
 
+## Before touching a colour — read this
+
+The palette is a **four-layer system**, generated in OKLCH and guarded by a
+test. Full documentation: [`DESIGN.md`](../../DESIGN.md) in the monorepo.
+Parcours rules: [`UX.md`](../../UX.md).
+
+```bash
+bun test src/tokens     # 35 assertions — run after ANY token change
+```
+
+The short version, enough to avoid the four mistakes agents actually make here:
+
+1. **Pick a rung, don't invent a shade.** Colours live as 50→950 ramps
+   (`ramp.accent`, `ramp.success`, …). Which rung to use per mode is in the
+   `ROLE` table: light uses **700** (text and fill) with **800** on hover;
+   dark uses **400** with **500**. Never `filter: brightness()` — a filter
+   moves the colour outside the system and guarantees no contrast.
+2. **Dark mode is not light mode mirrored.** Background steps are ~0.025 of
+   OKLCH lightness in light and ~**0.046** in dark — double. Two dark tones
+   look far more alike than two light tones the same distance apart. The test
+   fails if that ratio drops below 1.5.
+3. **In dark mode, a raised surface is always lighter.**
+   `bg` < `frame` < `surface` < `surfaceRaised`. No exception.
+4. **The accent is interactive; it never states a status.** The brand lime
+   belongs to buttons and active elements. `success` is a deliberately distant
+   emerald (166° vs 136°) so "validated" cannot be mistaken for a button. The
+   test fails if that gap drops below 20°.
+
+Four backgrounds, two strokes, four text levels, per mode. Every text × surface
+pair holds AA (4.5:1) — including on `frame`, the darkest light surface, which
+is what forced ramp step 700 down to lightness 0.50.
+
 ## Hard rules
 
 1. **Only `src/web/astryx.ts` may import `@astryxdesign/*`.** Everything else
@@ -24,18 +56,32 @@ monorepo where this repo is mounted as a git submodule at `packages/ui`.
 2. **Tokens are the single source of truth** (`src/tokens/index.ts`). Any new
    color/spacing/radius must be added there AND mirrored in
    `src/theme/theme.css` (as a `--e237-*` variable using `light-dark()`).
+   Generate values with `oklch.ts` (`buildRamp`, `buildSpectrum`,
+   `tintNeutral`) rather than picking them by eye.
 3. **Web/native parity**: a component added to `./web` should get a `./native`
    sibling with the same name and equivalent props, or a documented reason why not.
+   The tone vocabulary is shared — `lib/tone.ts`, one union for both platforms.
 4. **Both modes always**: every visual change must work in light AND dark mode.
    Never hardcode a hex value in a component — use CSS variables (web) or
    `useE237Colors()` (native).
-5. **Neumorphism**: surfaces use `useNeu()` / `--e237-neu-*` recipes only
-   (raised / pressed / card / primaryGlow). No ad-hoc `boxShadow` in components
-   or apps (see DESIGN.md). Fields = pressed (creux), buttons = raised / glow,
-   `:active` = pressed.
-6. **No new runtime dependencies** without strong justification — this package
+5. **Depth comes from the stroke, not a shadow.** A card is defined by its
+   border. The neumorphism recipes are neutralised (`--e237-neu-*` resolve to
+   `none`): a soft halo under every surface washed the page out instead of
+   structuring it. Shadows survive only where something genuinely floats —
+   `--e237-shadow-pop` for menus and popovers, `--e237-shadow-modal` for
+   modals. No ad-hoc `boxShadow`.
+6. **This stylesheet is NOT in an `@layer`, so it beats Tailwind `utilities`.**
+   A Tailwind utility placed on a DS-classed element in an app is silently
+   ignored. Responsive behaviour of DS components belongs in this package's
+   CSS, with media queries — not in `hidden xl:flex` on the app side. This is
+   what let the 336 px context rail crush the main column on phones.
+7. **No new runtime dependencies** without strong justification — this package
    must stay light for low-end Android devices (core product constraint).
-7. UI copy in examples/docs is **French** (product language).
+8. **An image that can be missing needs a fallback.** `gameIconUrl()` /
+   `gameHeroUrl()` return `undefined` when no asset ships, and components then
+   render initials. Fabricating a plausible-looking URL rendered broken icons
+   for three disciplines out of five.
+9. UI copy in examples/docs is **French** (product language).
 
 ## Structure
 

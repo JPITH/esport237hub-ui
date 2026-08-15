@@ -27,6 +27,7 @@ import {
   type ColorScale,
   type ThemeMode,
 } from '../tokens';
+import type { Tone } from '../lib/tone';
 import { haptic } from './haptics';
 import { useNeu } from './neu';
 import { fontFamily } from './typography';
@@ -157,13 +158,8 @@ export function Card({ children, style }: CardProps) {
 /* Badge                                                               */
 /* ------------------------------------------------------------------ */
 
-export type BadgeTone =
-  | 'accent'
-  | 'cyan'
-  | 'gold'
-  | 'danger'
-  | 'warning'
-  | 'neutral';
+/** Même vocabulaire que le web — voir `lib/tone.ts`. */
+export type BadgeTone = Tone;
 
 export interface BadgeProps {
   children: ReactNode;
@@ -176,17 +172,17 @@ export interface BadgeProps {
 /** Résout un ton sémantique en couleur de la palette active. */
 export function useToneColor(tone: BadgeTone): string {
   const c = useE237Colors();
-  return tone === 'cyan'
-    ? c.cyan
-    : tone === 'gold'
-      ? c.gold
-      : tone === 'danger'
-        ? c.danger
-        : tone === 'warning'
-          ? c.warning
-          : tone === 'neutral'
-            ? c.textSecondary
-            : c.accent;
+  const byTone: Record<BadgeTone, string> = {
+    accent: c.accent,
+    cyan: c.cyan,
+    success: c.success,
+    info: c.info,
+    gold: c.gold,
+    danger: c.danger,
+    warning: c.warning,
+    neutral: c.textSecondary,
+  };
+  return byTone[tone];
 }
 
 /**
