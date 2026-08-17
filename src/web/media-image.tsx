@@ -3,6 +3,8 @@
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { ImageOff } from "lucide-react";
 
+import { Picture } from "./picture";
+
 /** Rayon d'arrondi, pris dans les tokens (`--e237-radius-*`). */
 export type MediaRounded = "none" | "sm" | "md" | "lg" | "xl" | "full";
 
@@ -70,8 +72,7 @@ export function MediaImage({
       style={{ aspectRatio: ratio, borderRadius: RADIUS[rounded], ...style }}
     >
       {src && !failed ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
+        <Picture
           className="e237-media__img"
           src={src}
           alt={alt}

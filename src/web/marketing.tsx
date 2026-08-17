@@ -18,6 +18,8 @@
  * Les classes `.mkt-*` correspondantes vivent dans `src/theme/components.css`.
  */
 import type { HTMLAttributes, ReactNode } from 'react';
+
+import { Picture } from './picture';
 import {
   ArrowRight,
   BadgeCheck,
@@ -173,7 +175,7 @@ export function BrandLogo({
 }: BrandLogoProps) {
   const inner = (
     <>
-      <img
+      <Picture
         src={src}
         alt=""
         width={size}

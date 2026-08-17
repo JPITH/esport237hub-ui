@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { Avatar } from "./primitives";
+import { Picture } from "./picture";
 
 export interface ProfileAvatarProps {
   /** URL résolue par l'API (`profile.avatar_url`) ou aperçu local. */
@@ -38,8 +39,7 @@ export function ProfileAvatar({
   }
 
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
+    <Picture
       src={src}
       alt={`Photo de profil de ${name ?? "joueur"}`}
       width={size}

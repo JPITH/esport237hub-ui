@@ -1,5 +1,7 @@
 import { Building2, Clock, MapPin } from "lucide-react";
 
+import { Picture } from "./picture";
+
 export interface VenueCardProps {
   id: string;
   /** Lien cible — défaut `/salles/${id}` (pas de next/link dans le DS). */
@@ -40,8 +42,7 @@ export function VenueCard({
     >
       <div className="relative aspect-[16/10] overflow-hidden bg-raised">
         {imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Picture
             src={imageUrl}
             alt={name}
             width={640}

@@ -9,3 +9,4 @@ export * from './catalog';
 export * from './wallet';
 export * from './ranking';
 export * from './relative-time';
+export * from './external-url';

@@ -8,6 +8,7 @@ import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'rea
 import { createPortal } from 'react-dom';
 
 import { SearchField } from './fields';
+import { Picture } from './picture';
 
 function cx(...parts: Array<string | false | null | undefined>): string {
   return parts.filter(Boolean).join(' ');
@@ -183,9 +184,11 @@ export function GlobalSearch({
                         }}
                       >
                         {item.imageUrl ? (
-                          <img
+                          <Picture
                             src={item.imageUrl}
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="e237-global-search__thumb"
                           />
                         ) : item.icon ? (

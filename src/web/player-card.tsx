@@ -10,6 +10,7 @@ import {
 } from "../skins/spec";
 import { CardChrome, type CardSkinInput } from "./card-chrome";
 import { Flag } from "./flag";
+import { Picture } from './picture';
 
 /**
  * Clé de skin : les skins intégrés sont autocomplétés, mais toute chaîne est
@@ -46,9 +47,16 @@ function CardImage({
 }) {
   const src = imageUrl ?? fallbackImageUrl;
   if (src) {
-    // eslint-disable-next-line @next/next/no-img-element
+    /*
+     * Décliné en AVIF / WebP quand le fichier est local (`Picture` s'en charge
+     * et laisse passer les URL distantes telles quelles).
+     *
+     * L'enjeu est concret : le repli affiché derrière CHAQUE carte joueur sans
+     * photo pesait 1817 Ko en PNG, contre 53 Ko en AVIF. Sur un rail de six
+     * cartes, c'était 11 Mo au lieu de 320 Ko.
+     */
     return (
-      <img
+      <Picture
         className="pcard__photo"
         src={src}
         alt={imageUrl ? alt : ""}

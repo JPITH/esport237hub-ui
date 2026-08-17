@@ -16,6 +16,7 @@ import { ChevronRight, X } from 'lucide-react';
 
 import { Avatar } from './avatar';
 import { SearchField } from './fields';
+import { Picture, localImageSet } from './picture';
 
 function cx(...parts: Array<string | false | null | undefined>): string {
   return parts.filter(Boolean).join(' ');
@@ -170,7 +171,7 @@ export function GameRail({
                     onClick={() => onSelect?.(g.id)}
                   >
                     {g.iconUrl && !broken[g.id] ? (
-                      <img
+                      <Picture
                         src={g.iconUrl}
                         alt=""
                         className="e237-game-rail__icon"
@@ -282,7 +283,7 @@ export function GamePicker({
                 onClick={() => onSelect?.(g.id)}
               >
                 {g.iconUrl ? (
-                  <img src={g.iconUrl} alt="" className="e237-game-picker__icon" />
+                  <Picture src={g.iconUrl} alt="" className="e237-game-picker__icon" />
                 ) : (
                   <span className="e237-game-picker__icon" aria-hidden />
                 )}
@@ -380,7 +381,9 @@ export function FeaturedHero({
   ...rest
 }: FeaturedHeroProps) {
   const [broken, setBroken] = useState(false);
-  const showImage = Boolean(imageUrl) && !broken;
+  // La source EFFECTIVE, pas un booléen : `showImage ? …` ne rétrécissait pas
+  // `imageUrl` et `Picture` exige une source non nulle.
+  const shownImage = broken ? undefined : imageUrl;
 
   useEffect(() => {
     setBroken(false);
@@ -388,17 +391,23 @@ export function FeaturedHero({
 
   return (
     <section className={cx('e237-featured-hero', className)} {...rest}>
-      {showImage ? (
+      {shownImage ? (
         <>
           <div
             className="e237-featured-hero__media"
-            style={{ backgroundImage: `url(${imageUrl})` }}
+            style={{ backgroundImage: localImageSet(shownImage) }}
             role="img"
             aria-hidden
           />
-          {/* Détection d’échec de chargement (background-image ne fire pas onError). */}
-          <img
-            src={imageUrl}
+          {/*
+            Détection d'échec de chargement (background-image ne déclenche pas
+            onError). La sonde passe par `Picture` et NON par un <img> brut :
+            sinon elle télécharge le PNG d'origine pendant que le fond charge
+            l'AVIF, et le visuel le plus lourd de l'écran serait payé deux fois.
+            Même composant des deux côtés = même URL retenue = une seule requête.
+          */}
+          <Picture
+            src={shownImage}
             alt=""
             hidden
             onError={() => setBroken(true)}
@@ -565,7 +574,9 @@ export function EventRow({
   ...rest
 }: EventRowProps) {
   const [broken, setBroken] = useState(false);
-  const showImage = Boolean(imageUrl) && !broken;
+  // La source EFFECTIVE, pas un booléen : `showImage ? …` ne rétrécissait pas
+  // `imageUrl` et `Picture` exige une source non nulle.
+  const shownImage = broken ? undefined : imageUrl;
 
   useEffect(() => {
     setBroken(false);
@@ -573,10 +584,12 @@ export function EventRow({
 
   const inner = (
     <>
-      {showImage ? (
-        <img
-          src={imageUrl}
+      {shownImage ? (
+        <Picture
+          src={shownImage}
           alt=""
+          loading="lazy"
+          decoding="async"
           className="e237-event-row__thumb"
           onError={() => setBroken(true)}
         />

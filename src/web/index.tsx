@@ -112,6 +112,9 @@ export type { DivisionBadgeProps } from './division-badge';
 export { TrendArrow, formatDelta } from './trend-arrow';
 export type { TrendArrowProps, TrendMovement } from './trend-arrow';
 
+export { Picture, hasLocalVariants, localImageSet } from './picture';
+export type { PictureProps } from './picture';
+
 export { MediaImage } from './media-image';
 export type { MediaImageProps, MediaRounded } from './media-image';
 
@@ -393,6 +396,7 @@ export {
   auditObjectLabel,
   auditActorLabel,
   formatXafCompact,
+  safeExternalUrl,
 } from '../lib';
 export type {
   GameCategory,

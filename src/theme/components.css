@@ -3929,3 +3929,66 @@ a.mkt-brand:active {
   border-radius: var(--e237-radius-lg);
   background: var(--e237-surface);
 }
+
+/* ================================================================== */
+/* CORRECTIFS DE L'AUDIT DU 16/08/2026                                */
+/* ================================================================== */
+
+/*
+ * RESP-1 — les grands nombres poussaient la grille hors de la fenêtre.
+ *
+ * Mesuré : /admin à 320 px rendait un document de 343 px, et 806 px à 768 px,
+ * le coupable étant `.e237-stat__value`. Un nombre à sept chiffres dans une
+ * carte d'un quart de largeur ne rentre pas, et `Stat` n'autorisait aucune
+ * coupure.
+ *
+ * Trois garde-fous : la valeur peut se couper n'importe où, elle se réduit
+ * sous 420 px, et la carte cesse d'imposer sa largeur intrinsèque à la grille
+ * (`min-width: 0`, sans quoi un enfant de grille refuse de rétrécir sous la
+ * taille de son contenu — la cause réelle du débordement).
+ */
+.e237-stat {
+  min-width: 0;
+}
+
+.e237-stat__value {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 420px) {
+  .e237-stat__value {
+    font-size: 20px;
+    letter-spacing: -0.01em;
+  }
+}
+
+/*
+ * RESP-2 — cibles tactiles sous le minimum du cahier (§13 : 44 px).
+ *
+ * Le comptage a trouvé jusqu'à six éléments cliquables sous 32 px sur
+ * l'accueil. Les coupables sont les boutons d'icône et les actions du fil :
+ * leur zone visible est petite par choix graphique, mais la zone TOUCHABLE
+ * doit rester grande. On agrandit donc la surface sans changer l'apparence.
+ */
+@media (pointer: coarse) {
+  .e237-post__action,
+  .e237-icon-btn,
+  .e237-post__more,
+  .e237-search-clear,
+  .e237-field-toggle,
+  .e237-stepper-btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Les liens « Voir tout » des en-têtes de section : on élargit la zone
+     cliquable par le padding, la ligne de texte ne bouge pas. */
+  .e237-match-list__head a,
+  .e237-context-panel__head a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-inline: 4px;
+  }
+}
