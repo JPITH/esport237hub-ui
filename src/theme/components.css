@@ -3992,3 +3992,65 @@ a.mkt-brand:active {
     padding-inline: 4px;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Entrées de fil TOURNOI / ÉVÉNEMENT (web)
+   ══════════════════════════════════════════════════════════════════════════
+   Ajoutées avec le pivot du 17/08/2026 : le fil affiche désormais des tournois
+   et des événements, en plus des publications et de l'éditorial.
+
+   Sur le web, ces entrées restent des LIGNES et non des cartes pleine largeur.
+   La version mobile a le format carte — là le fil EST l'écran d'accueil. Ici il
+   partage un tableau de bord avec les duels et le classement ; une couverture
+   en 16/9 par entrée y noierait tout le reste.
+
+   Le séparateur est porté par l'entrée SUIVANTE (`+ .e237-feed-entry`), donc la
+   première n'en a pas et la dernière ne laisse pas de trait en suspens.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.e237-feed-entry {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--e237-spacing-3);
+  padding: var(--e237-spacing-3) 0;
+}
+
+.e237-feed-entry + .e237-feed-entry {
+  border-top: 1px solid var(--e237-border);
+}
+
+/* Vignette de jeu d'un tournoi : carrée, c'est l'identité de la ligne. */
+.e237-feed-entry__icon {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: var(--e237-radius-md);
+  object-fit: cover;
+  background: var(--e237-surface-raised);
+}
+
+/* Couverture d'un événement : plus large, parce qu'un visuel d'affiche n'est
+   pas carré et que le recadrer en carré le rend illisible. */
+.e237-feed-entry__cover {
+  width: 76px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: var(--e237-radius-md);
+  object-fit: cover;
+  background: var(--e237-surface-raised);
+}
+
+.e237-feed-entry__icon--ph {
+  display: grid;
+  place-items: center;
+  color: var(--e237-text-muted);
+}
+
+/* Sous 480 px, la vignette mange la largeur du titre : on la retire plutôt que
+   de laisser le titre se casser sur quatre lignes. */
+@media (max-width: 480px) {
+  .e237-feed-entry__icon,
+  .e237-feed-entry__cover {
+    display: none;
+  }
+}

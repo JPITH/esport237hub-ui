@@ -149,6 +149,13 @@ export { SkinCatalogProvider, useSkin, useSkinCatalog, useSkins } from '../skins
 export type { SkinCatalog, SkinCatalogProviderProps } from '../skins/context';
 export { SkinPicker, SkinSwatch } from './skin-picker';
 export type { SkinPickerProps, SkinSwatchProps } from './skin-picker';
+export { FeedTournamentCard, FeedEventCard } from './feed-cards';
+export type {
+  FeedCardGame,
+  FeedTournamentCardProps,
+  FeedEventCardProps,
+} from './feed-cards';
+
 export { PlayerCard, DivisionChip } from './player-card';
 export type { PlayerCardProps } from './player-card';
 export { GlobalCard } from './global-card';
