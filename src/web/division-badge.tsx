@@ -7,7 +7,15 @@ import type { CSSProperties } from "react";
  * n'est pas perdue pour les lecteurs d'écran ni au survol.
  */
 export interface DivisionBadgeProps {
-  /** Rang de la division (1 = la plus haute). */
+  /**
+   * PALIER affiché — 1 = la division la plus haute.
+   *
+   * ⚠️ Ce n'est PAS `divisions.rank` en base, qui va dans l'autre sens (le
+   * plus grand est le plus haut, c'est lui qui décide d'une promotion). Le
+   * palier est calculé par l'API, qui seule connaît la liste complète des
+   * divisions d'un jeu ; passer `divisionDisplayRank(division)` plutôt que le
+   * grade brut, sinon la pilule affiche le classement à l'envers.
+   */
   rank: number;
   /** Nom complet de la division (« Élite », « Challenger »…) — accessibilité. */
   name?: string;

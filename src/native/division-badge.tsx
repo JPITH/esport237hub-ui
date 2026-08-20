@@ -9,7 +9,11 @@ import { StyleSheet, Text, View, type StyleProp, type TextStyle, type ViewStyle 
 import { font, radius, useE237Colors, useToneSurface } from './core';
 
 export interface DivisionBadgeProps {
-  /** Rang de la division (1 = la plus haute). */
+  /**
+   * PALIER affiché — 1 = la division la plus haute. Ce n'est pas
+   * `divisions.rank` en base, qui va dans l'autre sens : passer
+   * `divisionDisplayRank(division)`.
+   */
   rank: number;
   /** Nom complet de la division (« Élite », « Challenger »…) — accessibilité. */
   name?: string;

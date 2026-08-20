@@ -207,6 +207,23 @@ export type {
 
 export { AppLogo, BrandLockup } from './brand';
 export type { AppLogoProps, BrandLockupProps } from './brand';
+export {
+  RatingGateNotice,
+  RatingSummary,
+  StarRating,
+  StarRatingInput,
+  VenueReview,
+} from './rating';
+export type {
+  RatingGateNoticeProps,
+  RatingSummaryProps,
+  StarRatingInputProps,
+  StarRatingProps,
+  VenueReviewProps,
+} from './rating';
+
+export { AppMark } from './mark';
+export type { AppMarkProps } from './mark';
 
 export {
   ChampionSpotlight,
