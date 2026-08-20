@@ -1,6 +1,22 @@
 /**
  * Le SIGNE de la marque — hexagone + monogramme « G/H ».
  *
+ * ⚠️ PROVISOIRE, et il faut le savoir avant d'y toucher. Le porteur n'a PAS
+ * validé ce dessin (20/08/2026). La planche de référence est une image tramée,
+ * avec dégradés et facettes 3D ; ce qui suit en est une interprétation
+ * VECTORIELLE À PLAT — même construction, même géométrie, deux encres, mais
+ * pas les facettes.
+ *
+ * La suite est décidée : on attend le fichier vectoriel du graphiste
+ * (.ai / .svg / .eps). Il remplacera les tracés ci-dessous et RIEN D'AUTRE —
+ * composants, icônes des stores et favicons se régénèrent depuis eux
+ * (`bun run brand:icons` dans le monorepo).
+ *
+ * Donc : ne pas relancer d'aller-retour d'affinage sur ces coordonnées. Quatre
+ * itérations à l'aveugle n'ont pas convergé, et c'est normal — on ne retrouve
+ * pas un dégradé au jugé. En attendant le fichier source, ce signe tient sa
+ * place ; il ne prétend pas être l'identité définitive.
+ *
  * Variante retenue par le porteur (20/08/2026) : la planche « Variations du
  * logo — inspiration #1 », proposition **02**, cadre hexagonal. C'est ce signe
  * qui sert d'icône d'application (iOS, Android, favicon) et de pastille dans
