@@ -25,11 +25,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 
 import { font, radius, spacing, useE237Colors } from './core';
+import { AppMark } from './mark';
 import { haptic } from './haptics';
 import { useNeu } from './neu';
 import { fontFamily } from './typography';
 
-const DEFAULT_LOGO = require('./assets/logo.png') as ImageSourcePropType;
 const DEFAULT_AUTH_BG = require('./assets/auth-bg.png') as ImageSourcePropType;
 
 /* ------------------------------------------------------------------ */
@@ -54,7 +54,7 @@ export function AuthScreen({
   children,
   footer,
   background = DEFAULT_AUTH_BG,
-  logo = DEFAULT_LOGO,
+  logo,
   ScrollComponent = ScrollView,
 }: {
   title: string;
@@ -129,7 +129,13 @@ export function AuthScreen({
                 { backgroundColor: `${c.accent}33` },
               ]}
             />
-            <Image source={logo} style={styles.logoTileImg} resizeMode="contain" />
+            {/* Sans image fournie, le SIGNE vectoriel : il suit le thème et
+                reste net à toutes les densités, ce qu'un PNG ne fait pas. */}
+            {logo ? (
+              <Image source={logo} style={styles.logoTileImg} resizeMode="contain" />
+            ) : (
+              <AppMark size={64} />
+            )}
           </View>
 
           <Text style={[styles.screenTitle, { color: c.textPrimary }]}>{title}</Text>
@@ -158,7 +164,7 @@ export function AuthHero({
   title,
   subtitle,
   compact,
-  logo = DEFAULT_LOGO,
+  logo,
 }: {
   title: string;
   subtitle?: string;
@@ -169,7 +175,11 @@ export function AuthHero({
 
   return (
     <View style={[styles.hero, compact && styles.heroCompact]}>
-      <Image source={logo} style={styles.logo} resizeMode="contain" />
+      {logo ? (
+        <Image source={logo} style={styles.logo} resizeMode="contain" />
+      ) : (
+        <AppMark size={48} />
+      )}
       <Text style={[styles.brand, { color: c.textPrimary }]}>
         ESPORT <Text style={{ color: c.accent }}>237</Text> HUB
       </Text>

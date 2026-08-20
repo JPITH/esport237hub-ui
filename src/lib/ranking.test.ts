@@ -6,7 +6,15 @@
  */
 import { describe, expect, it } from 'bun:test';
 
-import { divisionDisplayRank, seasonProgress, seasonRemainingLabel } from './ranking';
+import {
+  MAX_COUNTED_DUELS,
+  countedDuels,
+  divisionDisplayRank,
+  duelsUntilRankedLabel,
+  isRankedForSeason,
+  seasonProgress,
+  seasonRemainingLabel,
+} from './ranking';
 
 const DAY = 86_400_000;
 const START = Date.parse('2026-07-01T00:00:00Z');
@@ -64,5 +72,28 @@ describe('divisionDisplayRank', () => {
     // Affichage à l'envers, et c'est voulu : un défaut qui se voit vaut mieux
     // qu'un palier inventé côté client à partir d'une liste incomplète.
     expect(divisionDisplayRank({ rank: 4, name: 'Élite' })).toBe(4);
+  });
+});
+
+describe('plancher et plafond de duels (§6)', () => {
+  it('classe à partir du cinquième duel, pas avant', () => {
+    expect(isRankedForSeason(4)).toBe(false);
+    expect(isRankedForSeason(5)).toBe(true);
+  });
+
+  it('dit ce qu’il reste à jouer, au singulier comme au pluriel', () => {
+    expect(duelsUntilRankedLabel(0)).toBe('Encore 5 duels pour être classé cette saison');
+    expect(duelsUntilRankedLabel(4)).toBe('Encore 1 duel pour être classé cette saison');
+  });
+
+  it('se tait quand c’est acquis — jamais « 0 duel restant »', () => {
+    expect(duelsUntilRankedLabel(5)).toBeNull();
+    expect(duelsUntilRankedLabel(30)).toBeNull();
+  });
+
+  it('plafonne les duels comptabilisés sans effacer ceux joués', () => {
+    expect(countedDuels(12)).toBe(12);
+    expect(countedDuels(25)).toBe(MAX_COUNTED_DUELS);
+    expect(countedDuels(-3)).toBe(0);
   });
 });

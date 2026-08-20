@@ -78,32 +78,72 @@ export function formatClock(timestamp: number): string {
 /* ------------------------------------------------------------------ */
 
 /**
- * Les deux classements du produit (demande du porteur, 20/08/2026 : « ce sera
- * un système saisonnier pour les divisions, principalement pour le classement,
- * donc le classement saisonnier et le classement général qui lui ne change
- * pas »).
+ * Les deux classements du produit, et il ne faut surtout pas les confondre.
  *
- *  * `season` — remis à zéro à chaque saison. C'est LUI qui porte les
- *    divisions : elles n'ont de sens que sur une période fermée.
- *  * `global` — la carrière, cumulée depuis l'inscription. Il ne se remet
- *    jamais à zéro et ne porte AUCUNE division : un joueur ne peut pas être
- *    rétrogradé de sa propre histoire.
+ * Document « G-Hub — Ranking, Divisions, Duels et Saisons » §4 :
+ *  * `season` — la Division répond à « quel est mon niveau compétitif pendant
+ *    cette saison ? ». Remis à zéro chaque mois, c'est LUI qui porte les
+ *    divisions : un grade n'a de sens que sur une période fermée.
+ *  * `national` — le Ranking national répond à « quelle est ma position
+ *    globale parmi tous les joueurs ? ». Jamais remis à zéro, et INDÉPENDANT
+ *    de la division : §2 le dit noir sur blanc, « un joueur peut être en
+ *    Division 3 et avoir un meilleur Ranking national qu'un joueur d'une
+ *    division supérieure ». Ne jamais y afficher de pilule de division.
  */
-export type RankingScope = 'season' | 'global';
+export type RankingScope = 'season' | 'national';
 
-export const RANKING_SCOPES: readonly RankingScope[] = ['season', 'global'];
+export const RANKING_SCOPES: readonly RankingScope[] = ['season', 'national'];
 
 /** Onglet. Court : il vit dans un sélecteur de deux boutons. */
 export const RANKING_SCOPE_LABEL: Record<RankingScope, string> = {
   season: 'Saison',
-  global: 'Général',
+  national: 'National',
 };
 
 /** Ce que l'onglet promet — affiché sous le sélecteur, une ligne. */
 export const RANKING_SCOPE_HINT: Record<RankingScope, string> = {
-  season: 'Points de la saison en cours. Les divisions se jouent ici.',
-  global: 'Points cumulés depuis ton inscription. Jamais remis à zéro.',
+  season: 'Points du mois en cours. Les divisions se jouent ici.',
+  national: 'Ta position parmi tous les joueurs. Indépendante de ta division.',
 };
+
+/* ------------------------------------------------------------------ */
+/* Le plancher et le plafond de duels d'une saison (§6)                */
+/* ------------------------------------------------------------------ */
+
+/** En dessous, le joueur n'entre pas au classement final de la saison. */
+export const MIN_DUELS_FOR_RANKING = 5;
+
+/** Au-delà, les duels se jouent encore mais ne rapportent plus de points. */
+export const MAX_COUNTED_DUELS = 20;
+
+/** Le joueur sera-t-il classé si la saison se termine maintenant ? */
+export function isRankedForSeason(duelsPlayed: number): boolean {
+  return duelsPlayed >= MIN_DUELS_FOR_RANKING;
+}
+
+/**
+ * Ce qu'il reste à faire pour être classé — la phrase que l'écran de saison
+ * doit montrer. `null` quand c'est acquis : on ne félicite pas à chaque
+ * affichage, et on n'écrit jamais « 0 duel restant ».
+ *
+ * Un joueur qui découvre en fin de mois qu'il n'était pas classé aura joué
+ * pour rien ; c'est la seule information de cet écran qui a une échéance.
+ */
+export function duelsUntilRankedLabel(duelsPlayed: number): string | null {
+  const left = MIN_DUELS_FOR_RANKING - duelsPlayed;
+  if (left <= 0) return null;
+  return left === 1
+    ? 'Encore 1 duel pour être classé cette saison'
+    : `Encore ${left} duels pour être classé cette saison`;
+}
+
+/**
+ * Les duels de la saison qui rapportent encore. Au-delà du plafond, le joueur
+ * continue de jouer — il ne marque plus.
+ */
+export function countedDuels(duelsPlayed: number): number {
+  return Math.min(Math.max(0, duelsPlayed), MAX_COUNTED_DUELS);
+}
 
 /** Une division telle qu'elle s'affiche : le palier compte depuis le HAUT. */
 export interface DivisionView {
