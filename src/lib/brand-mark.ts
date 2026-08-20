@@ -44,29 +44,59 @@ export const MARK_SIZE = 256;
 export const MARK_VIEW_BOX = `0 0 ${MARK_SIZE} ${MARK_SIZE}`;
 
 /**
- * Cadre hexagonal. Contour extérieur horaire (rayon 112), contour intérieur
- * anti-horaire (rayon 100) : le trou est produit par le sens, pas par une
- * règle de remplissage exotique.
+ * Cadre hexagonal. Contour extérieur (rayon 112) puis contour intérieur
+ * (rayon 103) écrit dans l'autre sens : le trou est produit par le SENS, pas
+ * par une règle de remplissage exotique. Le trait fait donc environ 7,8 unités
+ * mesuré perpendiculairement au côté — fin, comme sur la planche : un cadre
+ * épais écrase le monogramme au lieu de le porter.
  */
 export const MARK_RING_PATH =
-  'M 128 16 L 224.99 72 L 224.99 184 L 128 240 L 31.01 184 L 31.01 72 Z M 128 28 L 41.4 78 L 41.4 178 L 128 228 L 214.6 178 L 214.6 78 Z';
+  'M 128 16 L 224.99 72 L 224.99 184 L 128 240 L 31.01 184 L 31.01 72 Z M 128 25 L 38.8 76.5 L 38.8 179.5 L 128 231 L 217.2 179.5 L 217.2 76.5 Z';
 
 /**
- * Le « G » — un C carré ouvert à droite. La barre verticale du « H » vient se
- * poser dans son ouverture et lui tient lieu de retour : c'est le pivot du
- * monogramme, les deux lettres partagent un trait au lieu de se juxtaposer.
+ * Le « G » — d'un seul tenant, et c'est LUI qui porte la moitié haute du « H ».
+ *
+ * Trois choses font tout, et les trois manquaient à la première version :
+ *
+ *  1. LES COUPES À 45°. Tous les angles saillants sont biseautés sur 14 à 16
+ *     unités. C'est ce qui distingue un monogramme PLIÉ d'un empilement de
+ *     rectangles — sans elles le signe se lit comme du pixel art, ce qui était
+ *     exactement le reproche.
+ *
+ *  2. LA LANGUE. Le tracé descend du bras supérieur (x 128→154) au lieu de
+ *     s'arrêter : c'est le retour du G, et c'est aussi la moitié HAUTE du
+ *     montant gauche du « H ». Sans elle, le blanc n'est qu'un « C ».
+ *
+ *  3. LE PLI, deux fois. En haut, la langue se termine sur une diagonale
+ *     (154,90)→(128,116) que le vert reprend cinq unités plus bas : un même
+ *     trait change d'encre en cours de route, et la couture sombre entre les
+ *     deux est le pli de la planche. En bas, le bras s'arrête à x 124 quand le
+ *     vert commence à 128 — quatre unités de fond, la même couture, verticale.
+ *     Sans ces deux coutures, blanc et vert se touchent à plat et l'entrelacs
+ *     disparaît.
+ *
+ * L'ouverture (la bouche du G) reste franche : y poser une coupe la
+ * refermerait à l'œil.
  */
 export const MARK_LETTER_G_PATH =
-  'M 66 70 L 138 70 L 138 88 L 84 88 L 84 168 L 138 168 L 138 186 L 66 186 Z';
+  'M 62 74 L 78 58 L 140 58 L 154 72 L 154 90 L 128 116 L 128 84 L 104 84 L 88 100 L 88 156 L 104 172 L 124 172 L 124 184 L 110 198 L 78 198 L 62 182 Z';
 
 /**
- * Le « H » — montant gauche (plus haut, il traverse le G), montant droit,
- * traverse. Trois rectangles écrits dans le même sens : leur union est le
- * remplissage. Le déséquilibre des deux montants est voulu, c'est ce qui donne
- * au signe son élan sur la planche.
+ * Le « H » — trois traits, tous écrits dans le MÊME sens : leur union est
+ * exactement le remplissage `nonzero`.
+ *
+ *  * le montant gauche REPREND la langue du G sur la même diagonale, cinq
+ *    unités plus bas, et descend plus bas que le G. C'est le pli : un seul
+ *    trait, deux encres ;
+ *  * la traverse, seule partie verte à couper la bouche du G ;
+ *  * le montant droit, qui monte plus haut que le gauche ne descend. Ce
+ *    déséquilibre est voulu — c'est lui qui donne son élan au signe sur la
+ *    planche, et le corriger le rendrait inerte.
+ *
+ * Coupes à 45° à toutes les extrémités libres, comme sur le G.
  */
 export const MARK_LETTER_H_PATH =
-  'M 122 58 L 142 58 L 142 198 L 122 198 Z M 170 74 L 190 74 L 190 182 L 170 182 Z M 122 118 L 190 118 L 190 138 L 122 138 Z';
+  'M 128 122 L 154 96 L 154 196 L 140 210 L 128 210 Z M 190 72 L 202 72 L 202 172 L 188 186 L 176 186 L 176 86 Z M 128 128 L 202 128 L 202 154 L 128 154 Z';
 
 /**
  * Hexagone PLEIN — la variante des toutes petites tailles. En dessous d'une
