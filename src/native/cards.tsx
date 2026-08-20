@@ -9,6 +9,7 @@ import {
   Gift,
   MapPin,
   Shirt,
+  Star,
   Store,
 } from 'lucide-react-native';
 import type { ReactNode } from 'react';
@@ -30,7 +31,8 @@ import {
   ticketStatusMeta,
 } from '../lib/catalog';
 import { formatXaf, priceOrFreeLabel } from '../lib/money';
-import { Badge, Card, font, spacing, useE237Colors } from './core';
+import { formatRatingAverage, ratingCountLabel } from '../lib/rating';
+import { Badge, Card, font, radius, spacing, useE237Colors } from './core';
 import { MediaImage } from './media-image';
 import { PerkList } from './perk-list';
 
@@ -479,6 +481,16 @@ export interface VenueCardProps {
    * répond à « est-ce que mon jeu y est ? », pas au détail de l'inventaire.
    */
   games?: readonly { id: string; name: string; duels_open: boolean }[] | null;
+  /**
+   * Réputation de la salle. Zéro avis n'affiche RIEN plutôt qu'un zéro : une
+   * salle qui vient d'ouvrir n'a pas démérité, et la ranger visuellement au
+   * niveau des plus mauvaises la condamnerait sans qu'un joueur se soit
+   * prononcé.
+   */
+  ratingAvg?: number | null;
+  ratingCount?: number | null;
+  /** Position au classement des salles, si la carte est rendue dans ce contexte. */
+  rank?: number;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -500,11 +512,15 @@ export function VenueCard({
   isOpen,
   imageUrl,
   games,
+  ratingAvg,
+  ratingCount,
+  rank,
   style,
 }: VenueCardProps) {
   const c = useE237Colors();
   const shown = (games ?? []).slice(0, 3);
   const extra = (games?.length ?? 0) - shown.length;
+  const rated = (ratingCount ?? 0) > 0 && ratingAvg != null;
 
   return (
     <Clickable onPress={onPress} style={style}>
@@ -526,6 +542,11 @@ export function VenueCard({
               </Badge>
             </View>
           ) : null}
+          {rank !== undefined ? (
+            <View style={[styles.rankPill, { backgroundColor: c.surfaceRaised }]}>
+              <Text style={[styles.rankText, { color: c.textPrimary }]}>{rank}</Text>
+            </View>
+          ) : null}
         </View>
 
         <View style={styles.headRow}>
@@ -540,6 +561,17 @@ export function VenueCard({
                 {district ? ` · ${district}` : ''}
               </Text>
             </View>
+            {rated ? (
+              <View style={styles.metaItem}>
+                <Star color={c.gold} fill={c.gold} size={13} strokeWidth={1.5} />
+                <Text style={[styles.ratingValue, { color: c.gold }]}>
+                  {formatRatingAverage(ratingAvg)}
+                </Text>
+                <Text style={[styles.meta, { color: c.textMuted }]}>
+                  {ratingCountLabel(ratingCount)}
+                </Text>
+              </View>
+            ) : null}
           </View>
           {pricePerHour != null ? (
             <Text style={[styles.price, { color: c.accent }]}>
@@ -566,6 +598,19 @@ export function VenueCard({
 
 const styles = StyleSheet.create({
   venueMedia: { position: 'relative' },
+  rankPill: {
+    position: 'absolute',
+    top: spacing['2'],
+    right: spacing['2'],
+    minWidth: 24,
+    height: 24,
+    borderRadius: radius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing['1'],
+  },
+  rankText: { fontSize: font.size.xs, fontWeight: font.weight.bold },
+  ratingValue: { fontSize: font.size.xs, fontWeight: font.weight.semibold },
   stack: { gap: spacing['2'] },
   grow: { flex: 1 },
   headRow: {

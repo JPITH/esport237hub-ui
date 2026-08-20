@@ -1,6 +1,7 @@
-import { Building2, Clock, MapPin } from "lucide-react";
+import { Building2, Clock, MapPin, Star } from "lucide-react";
 
 import { Picture } from "./picture";
+import { formatRatingAverage, ratingCountLabel } from "../lib/rating";
 
 export interface VenueCardProps {
   id: string;
@@ -13,6 +14,16 @@ export interface VenueCardProps {
   isOpen?: boolean;
   imageUrl?: string | null;
   equipment?: Record<string, unknown> | null;
+  /**
+   * Réputation de la salle. `ratingCount` à 0 (ou `ratingAvg` nul) n'affiche
+   * RIEN plutôt qu'un zéro : une salle qui vient d'ouvrir n'a pas démérité, et
+   * la ranger visuellement au niveau des plus mauvaises la condamnerait sans
+   * qu'un seul joueur se soit prononcé.
+   */
+  ratingAvg?: number | null;
+  ratingCount?: number | null;
+  /** Position au classement des salles, si la carte est rendue dans ce contexte. */
+  rank?: number;
 }
 
 /**
@@ -29,11 +40,15 @@ export function VenueCard({
   isOpen,
   imageUrl,
   equipment,
+  ratingAvg,
+  ratingCount,
+  rank,
 }: VenueCardProps) {
   const consoles = Array.isArray(equipment?.consoles)
     ? (equipment!.consoles as string[])
     : [];
   const to = href ?? `/salles/${id}`;
+  const rated = (ratingCount ?? 0) > 0 && ratingAvg != null;
 
   return (
     <a
@@ -54,6 +69,12 @@ export function VenueCard({
             <Building2 className="size-12 opacity-30" strokeWidth={1.25} />
           </div>
         )}
+
+        {rank !== undefined ? (
+          <span className="absolute right-2.5 top-2.5 grid size-7 place-items-center rounded-full bg-black/60 text-xs font-bold text-white backdrop-blur">
+            {rank}
+          </span>
+        ) : null}
 
         {isOpen !== undefined ? (
           <span
@@ -76,7 +97,19 @@ export function VenueCard({
       </div>
 
       <div className="flex flex-col gap-1 p-3.5">
-        <span className="font-semibold leading-tight">{name}</span>
+        <div className="flex items-start justify-between gap-2">
+          <span className="font-semibold leading-tight">{name}</span>
+          {rated ? (
+            <span
+              className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-gold"
+              title={`${formatRatingAverage(ratingAvg)} sur 5 — ${ratingCountLabel(ratingCount)}`}
+            >
+              <Star className="size-3.5" fill="currentColor" strokeWidth={1.5} />
+              {formatRatingAverage(ratingAvg)}
+              <span className="font-normal text-muted">({ratingCount})</span>
+            </span>
+          ) : null}
+        </div>
         <span className="inline-flex items-center gap-1 text-xs text-muted">
           <MapPin className="size-3.5" />
           {city}

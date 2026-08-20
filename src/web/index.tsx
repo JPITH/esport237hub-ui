@@ -248,6 +248,9 @@ export type {
   VenueReviewProps,
 } from './rating';
 
+export { SeasonBanner } from './season-banner';
+export type { SeasonBannerProps, SeasonView } from './season-banner';
+
 export { AppMark } from './mark';
 export type { AppMarkProps } from './mark';
 
