@@ -97,3 +97,17 @@ describe('plancher et plafond de duels (§6)', () => {
     expect(countedDuels(-3)).toBe(0);
   });
 });
+
+describe('bornes réglées en back-office', () => {
+  // Le porteur peut déplacer plancher et plafond sans déploiement : l'écran
+  // doit suivre le réglage, pas la constante du document.
+  it('suit le plancher fourni', () => {
+    expect(isRankedForSeason(3, 3)).toBe(true);
+    expect(duelsUntilRankedLabel(1, 3)).toBe('Encore 2 duels pour être classé cette saison');
+    expect(duelsUntilRankedLabel(3, 3)).toBeNull();
+  });
+
+  it('suit le plafond fourni', () => {
+    expect(countedDuels(25, 10)).toBe(10);
+  });
+});

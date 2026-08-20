@@ -110,15 +110,25 @@ export const RANKING_SCOPE_HINT: Record<RankingScope, string> = {
 /* Le plancher et le plafond de duels d'une saison (§6)                */
 /* ------------------------------------------------------------------ */
 
-/** En dessous, le joueur n'entre pas au classement final de la saison. */
+/**
+ * ⚠️ Ces deux bornes sont RÉGLABLES en back-office (table `ranking_rules`) :
+ * l'API les publie sur `GET /rankings/rules`. Les constantes ci-dessous ne
+ * sont que les valeurs du document — le repli quand l'écran n'a pas encore
+ * chargé le barème, jamais la vérité.
+ *
+ * Toutes les fonctions ci-dessous acceptent donc les bornes en paramètre. Un
+ * écran qui afficherait « encore 5 duels » alors que le porteur a réglé le
+ * plancher à 3 mentirait au joueur sur une échéance.
+ */
 export const MIN_DUELS_FOR_RANKING = 5;
-
-/** Au-delà, les duels se jouent encore mais ne rapportent plus de points. */
 export const MAX_COUNTED_DUELS = 20;
 
 /** Le joueur sera-t-il classé si la saison se termine maintenant ? */
-export function isRankedForSeason(duelsPlayed: number): boolean {
-  return duelsPlayed >= MIN_DUELS_FOR_RANKING;
+export function isRankedForSeason(
+  duelsPlayed: number,
+  minDuels: number = MIN_DUELS_FOR_RANKING,
+): boolean {
+  return duelsPlayed >= minDuels;
 }
 
 /**
@@ -129,8 +139,11 @@ export function isRankedForSeason(duelsPlayed: number): boolean {
  * Un joueur qui découvre en fin de mois qu'il n'était pas classé aura joué
  * pour rien ; c'est la seule information de cet écran qui a une échéance.
  */
-export function duelsUntilRankedLabel(duelsPlayed: number): string | null {
-  const left = MIN_DUELS_FOR_RANKING - duelsPlayed;
+export function duelsUntilRankedLabel(
+  duelsPlayed: number,
+  minDuels: number = MIN_DUELS_FOR_RANKING,
+): string | null {
+  const left = minDuels - duelsPlayed;
   if (left <= 0) return null;
   return left === 1
     ? 'Encore 1 duel pour être classé cette saison'
@@ -141,8 +154,11 @@ export function duelsUntilRankedLabel(duelsPlayed: number): string | null {
  * Les duels de la saison qui rapportent encore. Au-delà du plafond, le joueur
  * continue de jouer — il ne marque plus.
  */
-export function countedDuels(duelsPlayed: number): number {
-  return Math.min(Math.max(0, duelsPlayed), MAX_COUNTED_DUELS);
+export function countedDuels(
+  duelsPlayed: number,
+  maxCounted: number = MAX_COUNTED_DUELS,
+): number {
+  return Math.min(Math.max(0, duelsPlayed), maxCounted);
 }
 
 /** Une division telle qu'elle s'affiche : le palier compte depuis le HAUT. */
