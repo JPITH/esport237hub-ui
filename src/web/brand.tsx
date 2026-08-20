@@ -12,7 +12,7 @@ import { AppMark } from "./mark";
 export interface BrandLockupProps {
   /** `sm` (32 px) pour les barres latérales, `md` (36 px) pour l'accueil. */
   size?: "sm" | "md";
-  /** Masque le mot-symbole et ne garde que la pastille « E » (menu replié). */
+  /** Masque le mot-symbole et ne garde que le signe seul (menu replié). */
   compact?: boolean;
   /** Rend l'ensemble cliquable ; sinon simple `<span>`. */
   href?: string;

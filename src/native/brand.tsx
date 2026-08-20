@@ -22,7 +22,7 @@ import { AppMark } from './mark';
 export interface BrandLockupProps {
   /** `sm` (32 px) pour les en-têtes, `md` (36 px) pour les écrans d'accueil. */
   size?: 'sm' | 'md';
-  /** Masque le mot-symbole et ne garde que la pastille « E ». */
+  /** Masque le mot-symbole et ne garde que le signe seul. */
   compact?: boolean;
   /** Rend l'ensemble pressable (retour à l'accueil, par exemple). */
   onPress?: () => void;
