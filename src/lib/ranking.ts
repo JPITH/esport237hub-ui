@@ -171,8 +171,14 @@ export interface DivisionView {
    * voir `divisionTier()` côté NestJS. En son absence on retombe sur `rank`,
    * mais l'affichage sera alors à l'envers : c'est un défaut visible, pas une
    * corruption silencieuse.
+   *
+   * `null` est une réponse LÉGITIME de l'API : elle rend `null` plutôt qu'un
+   * palier plausible quand la division ne fait pas partie de l'échelle du jeu
+   * (identifiant orphelin). Le type l'accepte donc explicitement — le forcer à
+   * `undefined` obligerait chaque appelant à convertir, et l'un d'eux
+   * finirait par convertir en `0`.
    */
-  tier?: number;
+  tier?: number | null;
   name: string;
   color?: string | null;
 }

@@ -8,6 +8,7 @@ export * from './order-status';
 export * from './catalog';
 export * from './wallet';
 export * from './ranking';
+export * from './rating';
 export * from './relative-time';
 export * from './external-url';
 export * from './brand-mark';
