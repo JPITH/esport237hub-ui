@@ -56,10 +56,14 @@ export function SeasonHistory({ entries, gameSlug, style }: SeasonHistoryProps) 
 
   if (shown.length === 0) {
     return (
-      <Text style={[styles.empty, { color: c.textSecondary }, style]}>
-        Aucune saison jouée pour l’instant. Le premier duel validé ouvre ton
-        palmarès.
-      </Text>
+      // Le `style` reçu est un style de VUE : le poser sur un `Text` ne
+      // compile pas (userSelect diverge entre ViewStyle et TextStyle).
+      <View style={style}>
+        <Text style={[styles.empty, { color: c.textSecondary }]}>
+          Aucune saison jouée pour l’instant. Le premier duel validé ouvre ton
+          palmarès.
+        </Text>
+      </View>
     );
   }
 
