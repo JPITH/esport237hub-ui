@@ -248,6 +248,9 @@ export type {
   VenueReviewProps,
 } from './rating';
 
+export { SeasonHistory } from './season-history';
+export type { SeasonHistoryEntry, SeasonHistoryProps } from './season-history';
+
 export { SeasonBanner } from './season-banner';
 export type { SeasonBannerProps, SeasonView } from './season-banner';
 

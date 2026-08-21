@@ -226,3 +226,55 @@ export function seasonRemainingLabel(
   if (days <= 1) return 'Dernier jour';
   return `Il reste ${days} jours`;
 }
+
+/* ------------------------------------------------------------------ */
+/* Le palmarès d'une saison passée                                     */
+/* ------------------------------------------------------------------ */
+
+/** Ce qui est arrivé au joueur à la clôture (§8). */
+export type RolloverOutcome = 'promoted' | 'relegated' | 'stayed';
+
+/** Le mot, du point de vue du JOUEUR — pas du système. */
+export const ROLLOVER_OUTCOME_LABEL: Record<RolloverOutcome, string> = {
+  promoted: 'Promu',
+  relegated: 'Relégué',
+  stayed: 'Maintenu',
+};
+
+/**
+ * La tonalité du sort — vocabulaire partagé avec `lib/tone`.
+ *
+ * `stayed` est NEUTRE et non « succès » : se maintenir n'est ni une victoire
+ * ni un échec, et le peindre en vert récompenserait l'immobilité autant que la
+ * promotion.
+ */
+export const ROLLOVER_OUTCOME_TONE: Record<RolloverOutcome, 'success' | 'danger' | 'neutral'> = {
+  promoted: 'success',
+  relegated: 'danger',
+  stayed: 'neutral',
+};
+
+/**
+ * Le résultat d'une saison, en une phrase.
+ *
+ * ⚠️ Trois cas, et deux d'entre eux ont la même donnée (`finalPosition` nul) :
+ *  * saison EN COURS — elle n'a pas encore de palmarès ;
+ *  * saison CLÔTURÉE sans position — le joueur n'était pas classé, il n'a pas
+ *    atteint le plancher de duels de l'époque ;
+ *  * saison clôturée avec position — son rang final.
+ *
+ * Les confondre écrirait « non classé » sur la saison qu'un joueur est en
+ * train de jouer, ce qui est faux et décourageant.
+ */
+export function seasonResultLabel(
+  state: string,
+  finalPosition: number | null | undefined,
+): string {
+  if (state === 'live' || state === 'upcoming') {
+    return 'Saison en cours';
+  }
+  if (finalPosition === null || finalPosition === undefined) {
+    return 'Non classé';
+  }
+  return finalPosition === 1 ? '1ᵉʳ' : `${finalPosition}ᵉ`;
+}

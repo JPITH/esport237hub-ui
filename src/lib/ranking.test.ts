@@ -8,6 +8,9 @@ import { describe, expect, it } from 'bun:test';
 
 import {
   MAX_COUNTED_DUELS,
+  ROLLOVER_OUTCOME_LABEL,
+  ROLLOVER_OUTCOME_TONE,
+  seasonResultLabel,
   countedDuels,
   divisionDisplayRank,
   duelsUntilRankedLabel,
@@ -109,5 +112,37 @@ describe('bornes réglées en back-office', () => {
 
   it('suit le plafond fourni', () => {
     expect(countedDuels(25, 10)).toBe(10);
+  });
+});
+
+describe('seasonResultLabel — trois cas, deux fois la même donnée', () => {
+  it('ne dit PAS « non classé » sur une saison en cours', () => {
+    // `finalPosition` est nul dans les deux cas : seule la saison clôturée
+    // veut dire « il n'a pas atteint le plancher ». L'autre veut dire « elle
+    // n'est pas finie », et écrire « non classé » dessus serait faux et
+    // décourageant.
+    expect(seasonResultLabel('live', null)).toBe('Saison en cours');
+    expect(seasonResultLabel('upcoming', null)).toBe('Saison en cours');
+    expect(seasonResultLabel('closed', null)).toBe('Non classé');
+  });
+
+  it('écrit le rang final, et « 1ᵉʳ » plutôt que « 1ᵉ »', () => {
+    expect(seasonResultLabel('closed', 1)).toBe('1ᵉʳ');
+    expect(seasonResultLabel('closed', 4)).toBe('4ᵉ');
+    expect(seasonResultLabel('ended', 12)).toBe('12ᵉ');
+  });
+});
+
+describe('vocabulaire de la clôture', () => {
+  it('nomme le sort du point de vue du joueur', () => {
+    expect(ROLLOVER_OUTCOME_LABEL.promoted).toBe('Promu');
+    expect(ROLLOVER_OUTCOME_LABEL.relegated).toBe('Relégué');
+    expect(ROLLOVER_OUTCOME_LABEL.stayed).toBe('Maintenu');
+  });
+
+  it('garde « maintenu » NEUTRE — ce n’est ni une victoire ni un échec', () => {
+    expect(ROLLOVER_OUTCOME_TONE.stayed).toBe('neutral');
+    expect(ROLLOVER_OUTCOME_TONE.promoted).toBe('success');
+    expect(ROLLOVER_OUTCOME_TONE.relegated).toBe('danger');
   });
 });
