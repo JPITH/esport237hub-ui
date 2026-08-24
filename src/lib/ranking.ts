@@ -72,3 +72,209 @@ export function formatClock(timestamp: number): string {
     return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Portées du classement — saisonnier / général                        */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Les deux classements du produit, et il ne faut surtout pas les confondre.
+ *
+ * Document « G-Hub — Ranking, Divisions, Duels et Saisons » §4 :
+ *  * `season` — la Division répond à « quel est mon niveau compétitif pendant
+ *    cette saison ? ». Remis à zéro chaque mois, c'est LUI qui porte les
+ *    divisions : un grade n'a de sens que sur une période fermée.
+ *  * `national` — le Ranking national répond à « quelle est ma position
+ *    globale parmi tous les joueurs ? ». Jamais remis à zéro, et INDÉPENDANT
+ *    de la division : §2 le dit noir sur blanc, « un joueur peut être en
+ *    Division 3 et avoir un meilleur Ranking national qu'un joueur d'une
+ *    division supérieure ». Ne jamais y afficher de pilule de division.
+ */
+export type RankingScope = 'season' | 'national';
+
+export const RANKING_SCOPES: readonly RankingScope[] = ['season', 'national'];
+
+/** Onglet. Court : il vit dans un sélecteur de deux boutons. */
+export const RANKING_SCOPE_LABEL: Record<RankingScope, string> = {
+  season: 'Saison',
+  national: 'National',
+};
+
+/** Ce que l'onglet promet — affiché sous le sélecteur, une ligne. */
+export const RANKING_SCOPE_HINT: Record<RankingScope, string> = {
+  season: 'Points du mois en cours. Les divisions se jouent ici.',
+  national: 'Ta position parmi tous les joueurs. Indépendante de ta division.',
+};
+
+/* ------------------------------------------------------------------ */
+/* Le plancher et le plafond de duels d'une saison (§6)                */
+/* ------------------------------------------------------------------ */
+
+/**
+ * ⚠️ Ces deux bornes sont RÉGLABLES en back-office (table `ranking_rules`) :
+ * l'API les publie sur `GET /rankings/rules`. Les constantes ci-dessous ne
+ * sont que les valeurs du document — le repli quand l'écran n'a pas encore
+ * chargé le barème, jamais la vérité.
+ *
+ * Toutes les fonctions ci-dessous acceptent donc les bornes en paramètre. Un
+ * écran qui afficherait « encore 5 duels » alors que le porteur a réglé le
+ * plancher à 3 mentirait au joueur sur une échéance.
+ */
+export const MIN_DUELS_FOR_RANKING = 5;
+export const MAX_COUNTED_DUELS = 20;
+
+/** Le joueur sera-t-il classé si la saison se termine maintenant ? */
+export function isRankedForSeason(
+  duelsPlayed: number,
+  minDuels: number = MIN_DUELS_FOR_RANKING,
+): boolean {
+  return duelsPlayed >= minDuels;
+}
+
+/**
+ * Ce qu'il reste à faire pour être classé — la phrase que l'écran de saison
+ * doit montrer. `null` quand c'est acquis : on ne félicite pas à chaque
+ * affichage, et on n'écrit jamais « 0 duel restant ».
+ *
+ * Un joueur qui découvre en fin de mois qu'il n'était pas classé aura joué
+ * pour rien ; c'est la seule information de cet écran qui a une échéance.
+ */
+export function duelsUntilRankedLabel(
+  duelsPlayed: number,
+  minDuels: number = MIN_DUELS_FOR_RANKING,
+): string | null {
+  const left = minDuels - duelsPlayed;
+  if (left <= 0) return null;
+  return left === 1
+    ? 'Encore 1 duel pour être classé cette saison'
+    : `Encore ${left} duels pour être classé cette saison`;
+}
+
+/**
+ * Les duels de la saison qui rapportent encore. Au-delà du plafond, le joueur
+ * continue de jouer — il ne marque plus.
+ */
+export function countedDuels(
+  duelsPlayed: number,
+  maxCounted: number = MAX_COUNTED_DUELS,
+): number {
+  return Math.min(Math.max(0, duelsPlayed), maxCounted);
+}
+
+/** Une division telle qu'elle s'affiche : le palier compte depuis le HAUT. */
+export interface DivisionView {
+  /** Grade en base — le plus GRAND est le plus haut. Ne pas afficher. */
+  rank: number;
+  /**
+   * Palier affiché : 1 = la division la plus haute. C'est l'API qui le
+   * calcule (elle seule connaît la liste complète des divisions d'un jeu) —
+   * voir `divisionTier()` côté NestJS. En son absence on retombe sur `rank`,
+   * mais l'affichage sera alors à l'envers : c'est un défaut visible, pas une
+   * corruption silencieuse.
+   *
+   * `null` est une réponse LÉGITIME de l'API : elle rend `null` plutôt qu'un
+   * palier plausible quand la division ne fait pas partie de l'échelle du jeu
+   * (identifiant orphelin). Le type l'accepte donc explicitement — le forcer à
+   * `undefined` obligerait chaque appelant à convertir, et l'un d'eux
+   * finirait par convertir en `0`.
+   */
+  tier?: number | null;
+  name: string;
+  color?: string | null;
+}
+
+/** Le numéro à écrire dans la pilule « DIV n ». */
+export function divisionDisplayRank(division: DivisionView): number {
+  return division.tier ?? division.rank;
+}
+
+/**
+ * Avancement d'une saison, de 0 à 1. Sert à la barre « il reste X jours » :
+ * une saison sans date de fin renvoie `null`, et l'interface n'affiche alors
+ * pas de barre plutôt qu'une barre vide qui laisserait croire à une fin
+ * imminente.
+ */
+export function seasonProgress(
+  startsAt: string | number | Date,
+  endsAt: string | number | Date | null | undefined,
+  now: number = Date.now(),
+): number | null {
+  if (endsAt === null || endsAt === undefined) return null;
+  const start = new Date(startsAt).getTime();
+  const end = new Date(endsAt).getTime();
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return null;
+  const ratio = (now - start) / (end - start);
+  if (ratio <= 0) return 0;
+  if (ratio >= 1) return 1;
+  return Math.round(ratio * 100) / 100;
+}
+
+/**
+ * « Il reste 12 jours » / « Dernier jour » / « Saison terminée ».
+ * `null` quand la saison n'a pas de fin — on n'invente pas d'échéance.
+ */
+export function seasonRemainingLabel(
+  endsAt: string | number | Date | null | undefined,
+  now: number = Date.now(),
+): string | null {
+  if (endsAt === null || endsAt === undefined) return null;
+  const end = new Date(endsAt).getTime();
+  if (!Number.isFinite(end)) return null;
+  const msLeft = end - now;
+  if (msLeft <= 0) return 'Saison terminée';
+  const days = Math.ceil(msLeft / 86_400_000);
+  if (days <= 1) return 'Dernier jour';
+  return `Il reste ${days} jours`;
+}
+
+/* ------------------------------------------------------------------ */
+/* Le palmarès d'une saison passée                                     */
+/* ------------------------------------------------------------------ */
+
+/** Ce qui est arrivé au joueur à la clôture (§8). */
+export type RolloverOutcome = 'promoted' | 'relegated' | 'stayed';
+
+/** Le mot, du point de vue du JOUEUR — pas du système. */
+export const ROLLOVER_OUTCOME_LABEL: Record<RolloverOutcome, string> = {
+  promoted: 'Promu',
+  relegated: 'Relégué',
+  stayed: 'Maintenu',
+};
+
+/**
+ * La tonalité du sort — vocabulaire partagé avec `lib/tone`.
+ *
+ * `stayed` est NEUTRE et non « succès » : se maintenir n'est ni une victoire
+ * ni un échec, et le peindre en vert récompenserait l'immobilité autant que la
+ * promotion.
+ */
+export const ROLLOVER_OUTCOME_TONE: Record<RolloverOutcome, 'success' | 'danger' | 'neutral'> = {
+  promoted: 'success',
+  relegated: 'danger',
+  stayed: 'neutral',
+};
+
+/**
+ * Le résultat d'une saison, en une phrase.
+ *
+ * ⚠️ Trois cas, et deux d'entre eux ont la même donnée (`finalPosition` nul) :
+ *  * saison EN COURS — elle n'a pas encore de palmarès ;
+ *  * saison CLÔTURÉE sans position — le joueur n'était pas classé, il n'a pas
+ *    atteint le plancher de duels de l'époque ;
+ *  * saison clôturée avec position — son rang final.
+ *
+ * Les confondre écrirait « non classé » sur la saison qu'un joueur est en
+ * train de jouer, ce qui est faux et décourageant.
+ */
+export function seasonResultLabel(
+  state: string,
+  finalPosition: number | null | undefined,
+): string {
+  if (state === 'live' || state === 'upcoming') {
+    return 'Saison en cours';
+  }
+  if (finalPosition === null || finalPosition === undefined) {
+    return 'Non classé';
+  }
+  return finalPosition === 1 ? '1ᵉʳ' : `${finalPosition}ᵉ`;
+}

@@ -20,10 +20,12 @@ import {
 
 import {
   LIVE_STATUS_LABEL,
+  divisionDisplayRank,
   divisionMovementLabel,
   formatClock,
   rankMovementLabel,
   rankMovementPlaces,
+  type DivisionView,
   type LiveStatus,
   type RankMovement,
 } from '../lib/ranking';
@@ -153,7 +155,7 @@ export function MovementCell({
 
 export interface DivisionCellProps {
   /** `null` quand le joueur n'est encore classé dans aucune division. */
-  division: { rank: number; name: string; color?: string | null } | null;
+  division: DivisionView | null;
   /** Mouvement de GRADE (promotion / rétrogradation), pas de rang. */
   movement?: RankMovement;
 }
@@ -166,7 +168,7 @@ export function DivisionCell({ division, movement = 'same' }: DivisionCellProps)
   return (
     <View style={styles.divisionCell}>
       <DivisionBadge
-        rank={division.rank}
+        rank={divisionDisplayRank(division)}
         name={division.name}
         color={division.color}
       />

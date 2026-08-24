@@ -3,6 +3,8 @@
 import type { ReactNode } from "react";
 import { Moon, Sun } from "lucide-react";
 
+import { AppMark } from "./mark";
+
 /* ------------------------------------------------------------------ */
 /* BrandLockup                                                         */
 /* ------------------------------------------------------------------ */
@@ -10,7 +12,7 @@ import { Moon, Sun } from "lucide-react";
 export interface BrandLockupProps {
   /** `sm` (32 px) pour les barres latérales, `md` (36 px) pour l'accueil. */
   size?: "sm" | "md";
-  /** Masque le mot-symbole et ne garde que la pastille « E » (menu replié). */
+  /** Masque le mot-symbole et ne garde que le signe seul (menu replié). */
   compact?: boolean;
   /** Rend l'ensemble cliquable ; sinon simple `<span>`. */
   href?: string;
@@ -18,11 +20,16 @@ export interface BrandLockupProps {
 }
 
 /**
- * Bloc de marque « E » + « ESPORT 237 HUB ».
+ * Bloc de marque : le SIGNE (hexagone + monogramme « G/H ») + « ESPORT 237 HUB ».
  *
  * Il était recopié cinq fois (app-shell ×2, layout admin ×2, panneau
  * d'authentification) — et le « 237 » en vert n'était pas toujours au même
  * endroit. Une seule écriture, ici.
+ *
+ * La pastille verte au « E » a vécu jusqu'au 20/08/2026 : elle ne ressemblait
+ * à rien de la planche de marque et ne tenait pas en icône d'application. Le
+ * signe la remplace partout — même dessin que l'icône des stores, il vient du
+ * même module (`../lib/brand-mark`).
  */
 export function BrandLockup({
   size = "sm",
@@ -30,15 +37,10 @@ export function BrandLockup({
   href,
   className = "",
 }: BrandLockupProps) {
-  const box = size === "md" ? "size-9 text-lg" : "size-8";
+  const box = size === "md" ? 36 : 32;
   const content = (
     <>
-      <span
-        aria-hidden
-        className={`grid ${box} shrink-0 place-items-center rounded-md bg-accent font-display font-bold text-on-accent`}
-      >
-        E
-      </span>
+      <AppMark size={box} className="shrink-0" />
       {compact ? null : (
         <span className="font-display text-sm font-bold leading-tight tracking-tight">
           ESPORT <span className="text-accent">237</span> HUB

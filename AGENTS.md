@@ -82,6 +82,14 @@ is what forced ramp step 700 down to lightness 0.50.
    render initials. Fabricating a plausible-looking URL rendered broken icons
    for three disciplines out of five.
 9. UI copy in examples/docs is **French** (product language).
+10. **The brand mark lives in `src/lib/brand-mark.ts`, and only there.** The
+    hexagon + « G/H » monogram (planche « inspiration #1 », variant 02) is a
+    handful of literal SVG path strings. `src/web/mark.tsx` and
+    `src/native/mark.tsx` only choose the ink; the monorepo's
+    `scripts/brand-icons.py` re-reads the SAME strings by regex to rasterise
+    every store icon and favicon. So: one constant per path, one single-quoted
+    literal, never a template or a concatenation — and after any change to the
+    shape, run `bun run brand:icons` in the monorepo and commit the PNGs.
 
 ## Structure
 
