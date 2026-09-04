@@ -209,6 +209,14 @@ export interface ProductCardProps {
   /** `digital` (livraison automatique) ou `physical` (retrait en salle). */
   kind: string;
   imageUrl?: string | null;
+  /**
+   * Rupture de stock. L'action de la carte (`href`/`onClick`) est
+   * désactivée et un badge « Épuisé » remplace l'invite à consulter la
+   * fiche. Défaut `false` — un appelant qui garde la navigation active
+   * ailleurs (ex. lien du routeur posé autour de la carte) n'est pas
+   * affecté tant qu'il ne passe pas cette prop.
+   */
+  soldOut?: boolean;
   className?: string;
 }
 
@@ -225,12 +233,22 @@ export function ProductCard({
   priceXaf,
   kind,
   imageUrl,
+  soldOut = false,
   className = "",
 }: ProductCardProps) {
   const digital = kind === "digital";
   return (
-    <Clickable href={href} onClick={onClick} className={`h-full ${className}`.trim()}>
-      <Card className="flex h-full flex-col gap-3 transition-colors hover:border-accent/40">
+    <Clickable
+      href={soldOut ? undefined : href}
+      onClick={soldOut ? undefined : onClick}
+      className={`h-full ${className}`.trim()}
+    >
+      <Card
+        aria-disabled={soldOut || undefined}
+        className={`flex h-full flex-col gap-3 transition-colors ${
+          soldOut ? "opacity-60" : "hover:border-accent/40"
+        }`}
+      >
         <div className="relative">
           <MediaImage
             src={imageUrl}
@@ -246,12 +264,12 @@ export function ProductCard({
             }
             fallbackLabel="Visuel à venir"
           />
-          <Badge
-            tone={digital ? "cyan" : "neutral"}
-            className="absolute right-2 top-2"
-          >
-            {digital ? "Numérique" : "Physique"}
-          </Badge>
+          <div className="absolute right-2 top-2 flex flex-wrap justify-end gap-1.5">
+            <Badge tone={digital ? "cyan" : "neutral"}>
+              {digital ? "Numérique" : "Physique"}
+            </Badge>
+            {soldOut ? <Badge tone="danger">Épuisé</Badge> : null}
+          </div>
         </div>
         <div className="flex flex-col gap-1">
           <span className="font-semibold">{name}</span>
@@ -264,7 +282,8 @@ export function ProductCard({
             {formatXaf(priceXaf)}
           </span>
           <span className="flex items-center gap-1 text-xs text-muted">
-            <Package className="size-3.5" aria-hidden /> Voir
+            <Package className="size-3.5" aria-hidden />
+            {soldOut ? "Épuisé" : "Voir"}
           </span>
         </div>
       </Card>

@@ -30,7 +30,12 @@ import { haptic } from './haptics';
 import { useNeu } from './neu';
 import { fontFamily } from './typography';
 
-const DEFAULT_AUTH_BG = require('./assets/auth-bg.png') as ImageSourcePropType;
+// WebP, pas PNG : ce fond s'affiche sur le PREMIER écran, avant toute
+// connexion, et il pesait 1,74 Mo. Sur un forfait de données camerounais,
+// c'était la partie la plus chère de l'application, payée par quelqu'un qui
+// n'a encore rien vu du produit. Même image, 49 Ko. Expo décode le WebP sur
+// les deux plateformes.
+const DEFAULT_AUTH_BG = require('./assets/auth-bg.webp') as ImageSourcePropType;
 
 /* ------------------------------------------------------------------ */
 /* AuthScreen — layout partagé login / signup                          */
