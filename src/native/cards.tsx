@@ -204,6 +204,12 @@ export interface ProductCardProps {
   /** `digital` (livraison automatique) ou `physical` (retrait en salle). */
   kind: string;
   imageUrl?: string | null;
+  /**
+   * Rupture de stock. `onPress` est désactivé et un badge « Épuisé »
+   * remplace l'invite habituelle. Défaut `false` — sans changement pour
+   * les appels existants.
+   */
+  soldOut?: boolean;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -214,13 +220,14 @@ export function ProductCard({
   priceXaf,
   kind,
   imageUrl,
+  soldOut = false,
   style,
 }: ProductCardProps) {
   const c = useE237Colors();
   const digital = kind === 'digital';
   return (
-    <Clickable onPress={onPress} style={style}>
-      <Card style={styles.stack}>
+    <Clickable onPress={soldOut ? undefined : onPress} style={style}>
+      <Card style={[styles.stack, soldOut && styles.disabled]}>
         <View>
           <MediaImage
             src={imageUrl}
@@ -236,9 +243,12 @@ export function ProductCard({
             }
             fallbackLabel="Visuel à venir"
           />
-          <Badge tone={digital ? 'cyan' : 'neutral'} style={styles.floatBadge}>
-            {digital ? 'Numérique' : 'Physique'}
-          </Badge>
+          <View style={[styles.floatBadge, styles.badges]}>
+            <Badge tone={digital ? 'cyan' : 'neutral'}>
+              {digital ? 'Numérique' : 'Physique'}
+            </Badge>
+            {soldOut ? <Badge tone="danger">Épuisé</Badge> : null}
+          </View>
         </View>
         <Text style={[styles.title, { color: c.textPrimary }]}>{name}</Text>
         <Text
@@ -633,6 +643,7 @@ const styles = StyleSheet.create({
   metaItem: { flexDirection: 'row', alignItems: 'center', gap: spacing['1'] },
   meta: { fontSize: font.size.xs },
   floatBadge: { position: 'absolute', top: spacing['2'], right: spacing['2'] },
+  disabled: { opacity: 0.6 },
   qrRow: {
     flexDirection: 'row',
     alignItems: 'center',
