@@ -27,8 +27,8 @@
     "./native/expo": "./src/native/expo/index.tsx"
   },
   "scripts": {
-    "typecheck": "tsc -p tsconfig.web.json && tsc -p tsconfig.native.json",
-    "lint": "tsc -p tsconfig.web.json --noEmit",
+    "typecheck": "bun scripts/tsc7.ts -p tsconfig.web.json && bun scripts/tsc7.ts -p tsconfig.native.json",
+    "lint": "bun scripts/tsc7.ts -p tsconfig.web.json --noEmit",
     "test": "bun test src"
   },
   "dependencies": {
@@ -95,6 +95,6 @@
     "react-native-gesture-handler": "~2.32.0",
     "react-native-reanimated": "^4.0.0",
     "react-native-svg": "^15.0.0",
-    "typescript": "^5.9.2"
+    "typescript7": "npm:typescript@7.0.2"
   }
 }

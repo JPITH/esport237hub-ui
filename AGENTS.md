@@ -13,7 +13,7 @@ monorepo where this repo is mounted as a git submodule at `packages/ui`.
 ## Commands
 
 - `bun install` — install deps (**Bun only** — npm/pnpm/yarn are not used; `npm` is not even on PATH on the owner's machine)
-- `bun run typecheck` — runs `tsc -p tsconfig.web.json` (DOM) and `tsc -p tsconfig.native.json` (React Native)
+- `bun run typecheck` — runs TypeScript 7's `tsc` (alias package `typescript7`, via `scripts/tsc7.ts`) on `tsconfig.web.json` (DOM) and `tsconfig.native.json` (React Native). `typescript` 5.9 stays as the engine for tools that need the compiler's JS API.
 - One-off tools: `bunx <tool>` (never `npx`/`pnpm dlx`)
 
 ## Before touching a colour — read this
