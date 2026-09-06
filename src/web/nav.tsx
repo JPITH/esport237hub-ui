@@ -23,11 +23,18 @@ export function Tabs<T extends string>({
   value,
   onChange,
   className = "",
+  fill = false,
 }: {
   tabs: TabDef<T>[];
   value: T;
   onChange: (value: T) => void;
   className?: string;
+  /**
+   * Occupe toute la largeur disponible, onglets répartis à parts égales —
+   * pour une barre de 2-3 onglets en tête de page (Duels, Classement). Par
+   * défaut la barre est ajustée à son contenu et défile si elle déborde.
+   */
+  fill?: boolean;
 }) {
   const listRef = useRef<HTMLDivElement>(null);
   const [pill, setPill] = useState<{ left: number; width: number } | null>(
@@ -49,7 +56,11 @@ export function Tabs<T extends string>({
   }, [value, tabs]);
 
   return (
-    <div ref={listRef} className={`seg ${className}`} role="tablist">
+    <div
+      ref={listRef}
+      className={`seg ${fill ? "seg--fill" : ""} ${className}`}
+      role="tablist"
+    >
       {pill ? (
         <span
           aria-hidden

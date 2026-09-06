@@ -523,6 +523,19 @@
   /* Barre masquée : elle traverserait la pilule et gâcherait le rendu. */
   scrollbar-width: none;
 }
+/* Variante pleine largeur : la barre prend toute la place, les onglets se la
+   partagent à parts égales et se centrent. La pastille reste mesurée sur
+   l'`offsetLeft`, donc rien ne change pour elle. */
+.seg--fill {
+  display: flex;
+  width: 100%;
+  align-self: stretch;
+}
+.seg--fill .seg__item {
+  flex: 1 1 0;
+  justify-content: center;
+  min-width: 0;
+}
 .seg::-webkit-scrollbar {
   display: none;
 }
