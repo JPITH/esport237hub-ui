@@ -126,10 +126,28 @@ export function VerifiedMark({ className = "" }: { className?: string }) {
 export { Avatar, AvatarGroup, toAvatarSize } from './avatar';
 export type { AvatarProps, AvatarGroupProps, AvatarPerson, AvatarSize } from './avatar';
 
-export function formatDate(value: string | null): string {
+/**
+ * Locale d'affichage : celle CHOISIE dans l'app, pas celle du navigateur.
+ *
+ * Le dashboard pose `<html lang>` depuis le cookie `e237_locale` (voir
+ * `apps/web/src/app/layout.tsx`) : c'est donc la source de vérité. La lire ici
+ * évite de faire passer la locale en paramètre par la centaine d'appels à
+ * `formatDate`, et fait tomber d'un coup le « 10 sept., 11:19 » qui s'affichait
+ * en anglais parce que le format était figé sur `fr-FR`.
+ *
+ * `document` est absent au rendu serveur : on retombe alors sur le français,
+ * qui est la langue par défaut du produit.
+ */
+function displayLocale(): string {
+  if (typeof document === "undefined") return "fr-FR";
+  const lang = document.documentElement.lang;
+  return lang && lang.length > 1 ? lang : "fr-FR";
+}
+
+export function formatDate(value: string | null, locale?: string): string {
   if (!value) return "—";
   try {
-    return new Date(value).toLocaleString("fr-FR", {
+    return new Date(value).toLocaleString(locale ?? displayLocale(), {
       day: "2-digit",
       month: "short",
       hour: "2-digit",

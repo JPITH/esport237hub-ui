@@ -14,6 +14,7 @@ import {
   StyleSheet,
   Text,
   View,
+  type ImageSourcePropType,
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
@@ -35,6 +36,12 @@ const RADIUS: Record<MediaRounded, number> = {
 export interface MediaImageProps {
   /** URL distante ; `null`/`undefined` → repli visuel. */
   src?: string | null;
+  /**
+   * Source locale déjà résolue (`require(...)`), prioritaire sur `src`.
+   * Un asset embarqué n'a pas d'URL : sans ce chemin, l'appelant devait passer
+   * un `uri` bidon que `Image` ne sait pas charger.
+   */
+  source?: ImageSourcePropType | null;
   /** Description pour les lecteurs d'écran (produit, événement, salle…). */
   alt: string;
   /** Ratio largeur / hauteur (défaut 16 / 9). */
@@ -53,6 +60,7 @@ type Status = 'loading' | 'ready' | 'error';
 
 export function MediaImage({
   src,
+  source,
   alt,
   ratio = 16 / 9,
   rounded = 'md',
@@ -62,13 +70,14 @@ export function MediaImage({
   style,
 }: MediaImageProps) {
   const c = useE237Colors();
-  const [status, setStatus] = useState<Status>(src ? 'loading' : 'error');
+  const resolved: ImageSourcePropType | null = source ?? (src ? { uri: src } : null);
+  const [status, setStatus] = useState<Status>(resolved ? 'loading' : 'error');
 
   useEffect(() => {
-    setStatus(src ? 'loading' : 'error');
-  }, [src]);
+    setStatus(source || src ? 'loading' : 'error');
+  }, [source, src]);
 
-  const failed = !src || status === 'error';
+  const failed = !resolved || status === 'error';
 
   return (
     <View
@@ -86,9 +95,9 @@ export function MediaImage({
         style,
       ]}
     >
-      {src && !failed ? (
+      {resolved && !failed ? (
         <Image
-          source={{ uri: src }}
+          source={resolved}
           resizeMode={fit}
           style={styles.image}
           accessibilityIgnoresInvertColors
@@ -97,7 +106,7 @@ export function MediaImage({
         />
       ) : null}
 
-      {src && status === 'loading' ? (
+      {resolved && status === 'loading' ? (
         <View style={styles.overlay} pointerEvents="none">
           <ActivityIndicator size="small" color={c.textMuted} />
         </View>

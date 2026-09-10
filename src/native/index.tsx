@@ -68,6 +68,7 @@ export { TrendArrow, formatDelta } from './trend-arrow';
 export type { TrendArrowProps, TrendMovement } from './trend-arrow';
 
 export { MediaImage } from './media-image';
+export { setGameIconResolver, gameIconSource } from './game-assets';
 export type { MediaImageProps, MediaRounded } from './media-image';
 
 export {
