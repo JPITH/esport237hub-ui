@@ -7,6 +7,7 @@
  */
 import type { ReactNode } from 'react';
 import {
+  ActivityIndicator,
   Pressable,
   StyleSheet,
   Text,
@@ -73,6 +74,22 @@ export interface ButtonProps {
   onPress?: () => void;
   variant?: 'primary' | 'secondary' | 'ghost';
   disabled?: boolean;
+  /**
+   * Action en cours : le bouton se verrouille et affiche un indicateur.
+   *
+   * Le jumeau web l'avait depuis toujours, pas le natif. Chaque écran
+   * réinventait donc l'attente à la main — `disabled={busy}` plus un libellé
+   * « Enregistrement… » traduit une fois par action, soit une vingtaine de
+   * clés d'i18n qui disent toutes la même chose. Et un libellé qui change de
+   * longueur fait sauter la largeur du bouton sous le doigt.
+   */
+  loading?: boolean;
+  /** Pleine largeur — pour un CTA en bas de formulaire ou de feuille. */
+  block?: boolean;
+  /** Pictogramme avant le libellé ; masqué pendant le chargement. */
+  icon?: ReactNode;
+  /** Pictogramme après le libellé ; masqué pendant le chargement. */
+  iconRight?: ReactNode;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -81,10 +98,15 @@ export function Button({
   onPress,
   variant = 'primary',
   disabled = false,
+  loading = false,
+  block = false,
+  icon,
+  iconRight,
   style,
 }: ButtonProps) {
   const c = useE237Colors();
   const neu = useNeu();
+  const locked = disabled || loading;
   const containerStyle: ViewStyle[] = [styles.btn];
   const labelStyle: TextStyle[] = [styles.btnLabel];
 
@@ -98,17 +120,20 @@ export function Button({
     labelStyle.push({ color: c.accent });
   }
 
+  const spinnerColor = variant === 'primary' ? c.onAccent : c.accent;
+
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityState={{ disabled }}
+      accessibilityState={{ disabled: locked, busy: loading }}
       onPress={onPress}
       onPressIn={() => {
-        if (!disabled) haptic(variant === 'primary' ? 'medium' : 'light');
+        if (!locked) haptic(variant === 'primary' ? 'medium' : 'light');
       }}
-      disabled={disabled}
+      disabled={locked}
       style={({ pressed }) => [
         containerStyle,
+        block && styles.btnBlock,
         variant === 'primary'
           ? pressed
             ? neu.pressedSm
@@ -119,11 +144,26 @@ export function Button({
               : neu.raisedSm
             : null,
         pressed && variant === 'ghost' && styles.pressed,
-        disabled && styles.disabled,
+        locked && styles.disabled,
         style,
       ]}
     >
-      <Text style={labelStyle}>{label}</Text>
+      {/*
+        Le libellé RESTE monté pendant le chargement, rendu invisible, et
+        l'indicateur se pose par-dessus. Le remplacer ferait rétrécir le bouton
+        au moment précis où le doigt est encore dessus — et un bouton qui change
+        de taille sous le doigt donne l'impression d'avoir raté sa cible.
+      */}
+      {loading ? (
+        <View style={styles.btnSpinner} pointerEvents="none">
+          <ActivityIndicator size="small" color={spinnerColor} />
+        </View>
+      ) : null}
+      {!loading && icon ? icon : null}
+      <Text style={[...labelStyle, loading && styles.btnLabelHidden]}>
+        {label}
+      </Text>
+      {!loading && iconRight ? iconRight : null}
     </Pressable>
   );
 }
@@ -260,6 +300,17 @@ const styles = StyleSheet.create({
   pressed: {
     opacity: 0.85,
   },
+  btnBlock: { alignSelf: 'stretch' },
+  btnSpinner: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  btnLabelHidden: { opacity: 0 },
   disabled: {
     opacity: 0.5,
   },
