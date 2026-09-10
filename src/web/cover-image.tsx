@@ -2,6 +2,7 @@
 
 import { Building2, CalendarDays } from "lucide-react";
 
+import { useDsT } from "../i18n";
 import { MediaImage } from "./media-image";
 
 /** Arrondis proposés — sous-ensemble de `MediaRounded` utile aux visuels. */
@@ -34,14 +35,15 @@ export function EventCover({
   rounded = "md",
   className,
 }: EventCoverProps) {
+  const t = useDsT();
   return (
     <MediaImage
       src={src}
-      alt={`Affiche de l’évènement ${title}`}
+      alt={t("form.cover.eventAlt", { title })}
       ratio={ratio}
       rounded={rounded}
       fallbackIcon={<CalendarDays strokeWidth={1.25} aria-hidden />}
-      fallbackLabel="Affiche à venir"
+      fallbackLabel={t("form.cover.eventFallback")}
       className={className}
     />
   );
@@ -65,14 +67,15 @@ export function VenuePhoto({
   rounded = "md",
   className,
 }: VenuePhotoProps) {
+  const t = useDsT();
   return (
     <MediaImage
       src={src}
-      alt={`Photo de la salle ${name}`}
+      alt={t("form.cover.venueAlt", { name })}
       ratio={ratio}
       rounded={rounded}
       fallbackIcon={<Building2 strokeWidth={1.25} aria-hidden />}
-      fallbackLabel="Photo à venir"
+      fallbackLabel={t("form.cover.venueFallback")}
       className={className}
     />
   );
@@ -96,6 +99,7 @@ export function VenuePhotoStrip({
   width = 220,
   className = "",
 }: VenuePhotoStripProps) {
+  const t = useDsT();
   if (photos.length === 0) {
     return <VenuePhoto name={name} className={className} />;
   }
@@ -103,7 +107,7 @@ export function VenuePhotoStrip({
     <div
       className={`flex gap-2 overflow-x-auto pb-1 ${className}`.trim()}
       role="group"
-      aria-label={`Photos de la salle ${name}`}
+      aria-label={t("form.cover.venueStripLabel", { name })}
     >
       {photos.map((url) => (
         <div key={url} className="shrink-0" style={{ width }}>

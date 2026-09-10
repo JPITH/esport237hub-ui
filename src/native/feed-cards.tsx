@@ -45,6 +45,7 @@ import {
 import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { competitionFormatLabel, eventTypeLabel, eventTypeTone } from '../lib/catalog';
+import { useDsT } from '../i18n';
 import { gameIconSource } from './game-assets';
 import { priceOrFreeLabel } from '../lib/money';
 import { Badge, Card, font, spacing, useE237Colors } from './core';
@@ -155,9 +156,10 @@ export function FeedTournamentCard({
   style,
 }: FeedTournamentCardProps) {
   const c = useE237Colors();
+  const t = useDsT();
   const icon = game ? gameIconSource(game.slug) : undefined;
   const tone = placesTone(slotsLeft, capacity);
-  const lieu = isOnline ? 'En ligne' : (venueName ?? city ?? null);
+  const lieu = isOnline ? t('ui.online') : (venueName ?? city ?? null);
 
   return (
     <Pressable

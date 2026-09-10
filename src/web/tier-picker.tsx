@@ -1,5 +1,6 @@
 "use client";
 
+import { useDsT } from "../i18n";
 import { Badge } from "./foundation";
 import { PerkList } from "./perk-list";
 
@@ -42,13 +43,15 @@ export function TierPicker({
   tiers,
   value,
   onChange,
-  label = "Catégorie de billet",
+  label,
   className = "",
 }: TierPickerProps) {
+  const t = useDsT();
+  const groupLabel = label ?? t("form.tier.groupLabel");
   return (
     <div
       role="radiogroup"
-      aria-label={label}
+      aria-label={groupLabel}
       className={`flex flex-col gap-2 ${className}`.trim()}
     >
       {tiers.map((tier) => {
@@ -96,7 +99,7 @@ export function TierPicker({
                 <PerkList items={tier.limitations} variant="limitation" />
                 {!hasDetails ? (
                   <p className="text-xs text-muted">
-                    Aucun avantage ni restriction annoncés pour cette catégorie.
+                    {t("form.tier.noDetails")}
                   </p>
                 ) : null}
               </div>

@@ -68,6 +68,19 @@ export { TrendArrow, formatDelta } from './trend-arrow';
 export type { TrendArrowProps, TrendMovement } from './trend-arrow';
 
 export { MediaImage } from './media-image';
+export { NavGroup, NavItem } from './nav-list';
+export type { NavItemProps } from './nav-list';
+export {
+  dsT,
+  dsLocale,
+  dsTranslate,
+  setDsLocale,
+  useDsT,
+  useDsLocale,
+  type DsKey,
+  type DsLocale,
+  type DsVars,
+} from '../i18n';
 export { setGameIconResolver, gameIconSource } from './game-assets';
 export type { MediaImageProps, MediaRounded } from './media-image';
 

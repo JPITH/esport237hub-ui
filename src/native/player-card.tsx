@@ -12,6 +12,7 @@
 import { useMemo } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 
+import { useDsT } from '../i18n';
 import { cardStats, cityAbbr, type StatDef } from '../lib/player-stats';
 import { CARD_LAYOUT, FLAG_RADIUS, pct } from '../skins/geometry';
 import { stopColor, type SkinSpec } from '../skins/spec';
@@ -195,6 +196,7 @@ function PlayerCardBody({
   skin = 'signature',
   country = 'CM',
 }: PlayerCardProps) {
+  const t = useDsT();
   const spec = useSkin(skin);
   const s = useCardStyles();
   const rows = cardStats({ gameSlug, rating, stats, seed: username, statDefs });
@@ -237,7 +239,7 @@ function PlayerCardBody({
           adjustsFontSizeToFit
           minimumFontScale={0.7}
           style={[s.record, { color: spec.ink }]}>
-          {wins} VICT.
+          {wins} {t('ui.card.wins')}
         </Text>
       </View>
 

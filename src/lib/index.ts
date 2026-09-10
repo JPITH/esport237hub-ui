@@ -12,3 +12,4 @@ export * from './rating';
 export * from './relative-time';
 export * from './external-url';
 export * from './brand-mark';
+export * from '../i18n';

@@ -421,7 +421,14 @@ export {
   auditActorLabel,
   formatXafCompact,
   safeExternalUrl,
+  dsT,
+  dsLocale,
+  dsTranslate,
+  setDsLocale,
+  useDsT,
+  useDsLocale,
 } from '../lib';
+export type { DsKey, DsLocale, DsVars } from '../lib';
 export type {
   GameCategory,
   StatDef,

@@ -18,6 +18,8 @@ import {
   Search,
 } from "lucide-react";
 
+import { useDsT, type DsKey } from "../i18n";
+
 /* ------------------------------------------------------------------ */
 /* Socle commun des menus déroulants maison (aucun contrôle natif).    */
 /* ------------------------------------------------------------------ */
@@ -123,13 +125,15 @@ export function Select({
   options,
   value,
   onChange,
-  placeholder = "Choisir…",
+  placeholder,
   disabled,
   className = "",
   id,
 }: SelectProps) {
+  const t = useDsT();
   const autoId = useId();
   const fieldId = id ?? autoId;
+  const fieldPlaceholder = placeholder ?? t("form.select.placeholder");
   const wrapRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [hi, setHi] = useState(-1);
@@ -189,7 +193,7 @@ export function Select({
           className="ui-field flex h-11 w-full cursor-pointer items-center justify-between gap-2 px-3.5 text-left text-base"
         >
           <span className={`truncate ${selected ? "" : "text-muted"}`}>
-            {selected?.label ?? placeholder}
+            {selected?.label ?? fieldPlaceholder}
           </span>
           <ChevronDown
             className={`size-4 shrink-0 text-muted transition-transform ${
@@ -235,15 +239,20 @@ export function Combobox({
   options,
   value,
   onChange,
-  placeholder = "Choisir…",
-  searchPlaceholder = "Rechercher…",
-  emptyText = "Aucun résultat.",
+  placeholder,
+  searchPlaceholder,
+  emptyText,
   disabled,
   className = "",
   id,
 }: ComboboxProps) {
+  const t = useDsT();
   const autoId = useId();
   const fieldId = id ?? autoId;
+  const fieldPlaceholder = placeholder ?? t("form.select.placeholder");
+  const fieldSearchPlaceholder =
+    searchPlaceholder ?? t("form.field.search.placeholder");
+  const fieldEmptyText = emptyText ?? t("form.noResults");
   const wrapRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
@@ -301,7 +310,7 @@ export function Combobox({
           className="ui-field flex h-11 w-full cursor-pointer items-center justify-between gap-2 px-3.5 text-left text-base"
         >
           <span className={`truncate ${selected ? "" : "text-muted"}`}>
-            {selected?.label ?? placeholder}
+            {selected?.label ?? fieldPlaceholder}
           </span>
           <ChevronDown
             className={`size-4 shrink-0 text-muted transition-transform ${
@@ -325,14 +334,14 @@ export function Combobox({
                     setHi(0);
                   }}
                   onKeyDown={onKeyDown}
-                  placeholder={searchPlaceholder}
+                  placeholder={fieldSearchPlaceholder}
                   className="h-9 w-full bg-transparent text-sm text-primary outline-none placeholder:text-muted"
                 />
               </div>
             </div>
             <div role="listbox" className="max-h-60 overflow-y-auto p-1">
               {filtered.length === 0 ? (
-                <p className="px-3 py-3 text-sm text-muted">{emptyText}</p>
+                <p className="px-3 py-3 text-sm text-muted">{fieldEmptyText}</p>
               ) : (
                 filtered.map((o, i) => (
                   <OptionRow
@@ -358,20 +367,30 @@ export function Combobox({
 /* DatePicker — calendrier maison (évènements, tournois…).             */
 /* ------------------------------------------------------------------ */
 
-const WEEKDAYS = ["L", "M", "M", "J", "V", "S", "D"];
-const MONTHS = [
-  "Janvier",
-  "Février",
-  "Mars",
-  "Avril",
-  "Mai",
-  "Juin",
-  "Juillet",
-  "Août",
-  "Septembre",
-  "Octobre",
-  "Novembre",
-  "Décembre",
+// Clés de traduction, pas des libellés rendus : ce composant s'affiche sur
+// des apps bilingues (cf. DUEL_STATUS_META dans src/lib/duel-status.ts).
+const WEEKDAY_KEYS: DsKey[] = [
+  "form.date.weekday.mon",
+  "form.date.weekday.tue",
+  "form.date.weekday.wed",
+  "form.date.weekday.thu",
+  "form.date.weekday.fri",
+  "form.date.weekday.sat",
+  "form.date.weekday.sun",
+];
+const MONTH_KEYS: DsKey[] = [
+  "form.date.month.january",
+  "form.date.month.february",
+  "form.date.month.march",
+  "form.date.month.april",
+  "form.date.month.may",
+  "form.date.month.june",
+  "form.date.month.july",
+  "form.date.month.august",
+  "form.date.month.september",
+  "form.date.month.october",
+  "form.date.month.november",
+  "form.date.month.december",
 ];
 
 function toISO(y: number, m: number, d: number): string {
@@ -395,12 +414,16 @@ export function DatePicker({
   label,
   value,
   onChange,
-  placeholder = "Choisir une date…",
+  placeholder,
   min,
   disabled,
   className = "",
   id,
 }: DatePickerProps) {
+  const t = useDsT();
+  const MONTHS = MONTH_KEYS.map((key) => t(key));
+  const WEEKDAYS = WEEKDAY_KEYS.map((key) => t(key));
+  const fieldPlaceholder = placeholder ?? t("form.date.placeholder");
   const autoId = useId();
   const fieldId = id ?? autoId;
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -452,7 +475,7 @@ export function DatePicker({
         >
           <CalendarDays className="size-[18px] shrink-0 text-muted" />
           <span className={`truncate ${display ? "" : "text-muted"}`}>
-            {display ?? placeholder}
+            {display ?? fieldPlaceholder}
           </span>
         </button>
 
@@ -461,7 +484,7 @@ export function DatePicker({
             <div className="mb-2 flex items-center justify-between">
               <button
                 type="button"
-                aria-label="Mois précédent"
+                aria-label={t("form.date.prevMonth")}
                 onClick={() => shift(-1)}
                 className="grid size-8 place-items-center rounded-md text-secondary transition-colors hover:bg-raised hover:text-primary"
               >
@@ -472,7 +495,7 @@ export function DatePicker({
               </span>
               <button
                 type="button"
-                aria-label="Mois suivant"
+                aria-label={t("form.date.nextMonth")}
                 onClick={() => shift(1)}
                 className="grid size-8 place-items-center rounded-md text-secondary transition-colors hover:bg-raised hover:text-primary"
               >
@@ -528,7 +551,7 @@ export function DatePicker({
                 }}
                 className="rounded-md px-2 py-1 text-xs font-medium text-accent transition-colors hover:bg-raised"
               >
-                Aujourd&rsquo;hui
+                {t("form.date.today")}
               </button>
               <button
                 type="button"
@@ -538,7 +561,7 @@ export function DatePicker({
                 }}
                 className="rounded-md px-2 py-1 text-xs text-muted transition-colors hover:bg-raised hover:text-primary"
               >
-                Effacer
+                {t("form.action.clear")}
               </button>
             </div>
           </Panel>
@@ -575,6 +598,7 @@ export function TimePicker({
   className = "",
   id,
 }: TimePickerProps) {
+  const t = useDsT();
   const autoId = useId();
   const fieldId = id ?? autoId;
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -623,7 +647,7 @@ export function TimePicker({
             <div className="grid grid-cols-2">
               <div className="flex flex-col gap-0.5 border-r border-edge p-1">
                 <span className="px-1 py-1 text-center text-[11px] font-semibold uppercase text-muted">
-                  Heures
+                  {t("form.date.hours")}
                 </span>
                 <div className="flex max-h-52 flex-col gap-0.5 overflow-y-auto">
                   {hours.map((hh) => (
@@ -640,7 +664,7 @@ export function TimePicker({
               </div>
               <div className="flex flex-col gap-0.5 p-1">
                 <span className="px-1 py-1 text-center text-[11px] font-semibold uppercase text-muted">
-                  Minutes
+                  {t("form.date.minutes")}
                 </span>
                 <div className="flex max-h-52 flex-col gap-0.5 overflow-y-auto">
                   {minutes.map((mm) => (

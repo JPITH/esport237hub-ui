@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { Banknote } from "lucide-react";
 
+import { useDsT } from "../i18n";
 import { formatXaf } from "../lib/money";
 import { Button } from "./button";
 import { Card } from "./foundation";
@@ -84,16 +85,21 @@ export function PayoutCard({
   busy = false,
   error,
   onPayout,
-  netLabel = "Recette",
-  payableLabel = "À reverser",
+  netLabel,
+  payableLabel,
   className = "",
 }: PayoutCardProps) {
+  const t = useDsT();
   return (
     <Card className={`flex flex-col gap-3 ${className}`.trim()}>
-      <LabelValueRow label={netLabel} value={formatXaf(netXaf)} />
+      <LabelValueRow label={netLabel ?? t("money.payout.net")} value={formatXaf(netXaf)} />
       {payableXaf > 0 ? (
         <>
-          <LabelValueRow label={payableLabel} value={formatXaf(payableXaf)} strong />
+          <LabelValueRow
+            label={payableLabel ?? t("money.payout.payable")}
+            value={formatXaf(payableXaf)}
+            strong
+          />
           {error ? <Notice tone="danger">{error}</Notice> : null}
           <Button
             loading={busy}
@@ -101,11 +107,13 @@ export function PayoutCard({
             className="w-fit"
             onClick={onPayout}
           >
-            {busy ? "Encaissement…" : `Encaisser ${formatXaf(payableXaf)}`}
+            {busy
+              ? t("money.payout.processing")
+              : t("money.payout.collect", { amount: formatXaf(payableXaf) })}
           </Button>
         </>
       ) : (
-        <span className="text-xs text-muted">À jour — rien à reverser.</span>
+        <span className="text-xs text-muted">{t("money.payout.upToDate")}</span>
       )}
     </Card>
   );

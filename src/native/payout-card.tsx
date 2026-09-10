@@ -8,6 +8,7 @@
 import type { ReactNode } from 'react';
 import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 
+import { useDsT } from '../i18n';
 import { formatXaf } from '../lib/money';
 import { Button, Card, font, spacing, useE237Colors } from './core';
 import { Notice } from './notice';
@@ -74,20 +75,29 @@ export function PayoutCard({
   busy = false,
   error,
   onPayout,
-  netLabel = 'Recette',
-  payableLabel = 'À reverser',
+  netLabel,
+  payableLabel,
   style,
 }: PayoutCardProps) {
   const c = useE237Colors();
+  const t = useDsT();
   return (
     <Card style={[styles.card, style]}>
-      <LabelValueRow label={netLabel} value={formatXaf(netXaf)} />
+      <LabelValueRow label={netLabel ?? t('money.payout.net')} value={formatXaf(netXaf)} />
       {payableXaf > 0 ? (
         <>
-          <LabelValueRow label={payableLabel} value={formatXaf(payableXaf)} strong />
+          <LabelValueRow
+            label={payableLabel ?? t('money.payout.payable')}
+            value={formatXaf(payableXaf)}
+            strong
+          />
           {error ? <Notice tone="danger">{error}</Notice> : null}
           <Button
-            label={busy ? 'Encaissement…' : `Encaisser ${formatXaf(payableXaf)}`}
+            label={
+              busy
+                ? t('money.payout.processing')
+                : t('money.payout.collect', { amount: formatXaf(payableXaf) })
+            }
             disabled={busy}
             style={styles.btn}
             onPress={onPayout}
@@ -95,7 +105,7 @@ export function PayoutCard({
         </>
       ) : (
         <Text style={[styles.upToDate, { color: c.textMuted }]}>
-          À jour — rien à reverser.
+          {t('money.payout.upToDate')}
         </Text>
       )}
     </Card>

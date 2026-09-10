@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import type { DuelStatus } from "@esport237hub/types";
 
+import { useDsT } from "../i18n";
 import { Badge, Card } from "./foundation";
 import { DuelStatusBadge } from "./primitives";
 
@@ -49,18 +50,24 @@ export function DuelRow({
   status,
   className = "",
 }: DuelRowProps) {
+  const t = useDsT();
   const hasScore = challengerScore !== null && opponentScore !== null;
   const body = (
     <Card className="flex items-center justify-between gap-3 py-3 transition-all hover:-translate-y-0.5 hover:border-accent">
       <div className="flex min-w-0 flex-col">
         <span className="truncate text-sm font-medium">
-          {challengerName ?? "?"} vs {opponentName ?? "adversaire ouvert"}
+          {challengerName ?? "?"} vs {opponentName ?? t("ui.openOpponent")}
         </span>
-        <span className="text-xs text-muted">
-          {gameName ?? "—"} · {isOnline ? "En ligne" : "En salle"} · {dateLabel}
+        <span className="truncate text-xs text-muted">
+          {/* La date en tête : l'ellipse mange la fin, et c'est la date qu'on
+              cherche d'abord dans une liste de duels. */}
+          {dateLabel} · {gameName ?? "—"} ·{" "}
+          {isOnline ? t("ui.online") : t("ui.inVenue")}
         </span>
       </div>
-      <div className="flex shrink-0 items-center gap-3">
+      {/* `min-w-[7rem]` : sans largeur minimale, chaque pastille de statut
+          commence où finit son texte et la colonne de droite zigzague. */}
+      <div className="flex min-w-[7rem] shrink-0 items-center justify-end gap-3">
         {hasScore ? (
           <span className="scoreboard text-sm">
             {challengerScore}–{opponentScore}
@@ -125,6 +132,7 @@ export function ScoreSide({
   children,
   className = "",
 }: ScoreSideProps) {
+  const t = useDsT();
   return (
     <div className={`flex flex-col items-center gap-1 ${className}`.trim()}>
       <span className="text-3xl font-black tabular-nums">{score ?? "–"}</span>
@@ -133,10 +141,10 @@ export function ScoreSide({
           {username}
         </a>
       ) : (
-        <span className="text-sm font-semibold">{username ?? "En attente"}</span>
+        <span className="text-sm font-semibold">{username ?? t("ui.waiting")}</span>
       )}
       {name ? <span className="text-xs text-muted">{name}</span> : null}
-      {winner ? <Badge tone="gold">Vainqueur</Badge> : null}
+      {winner ? <Badge tone="gold">{t("ui.winner")}</Badge> : null}
       {children}
     </div>
   );

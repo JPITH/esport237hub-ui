@@ -24,6 +24,7 @@ import {
 
 // Le drapeau était recopié à l'identique ici : une seule source, './flag'.
 import { CameroonFlag } from './flag';
+import { useDsT } from '../i18n';
 
 function cx(...parts: Array<string | false | null | undefined>): string {
   return parts.filter(Boolean).join(' ');
@@ -132,6 +133,7 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
  */
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ label, hint, icon, className, id, type = 'text', ...rest }, ref) => {
+    const t = useDsT();
     const autoId = useId();
     const fieldId = id ?? autoId;
     const [revealed, setRevealed] = useState(false);
@@ -160,7 +162,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               type="button"
               onClick={() => setRevealed((v) => !v)}
               aria-label={
-                revealed ? 'Masquer le mot de passe' : 'Afficher le mot de passe'
+                revealed
+                  ? t('form.field.password.hide')
+                  : t('form.field.password.show')
               }
               aria-pressed={revealed}
               className="e237-field-toggle"
@@ -243,6 +247,7 @@ export function NumberInput({
   className,
   id,
 }: NumberInputProps) {
+  const t = useDsT();
   const autoId = useId();
   const fieldId = id ?? autoId;
   // Texte local : autorise le champ vide ou une frappe partielle sans
@@ -292,7 +297,7 @@ export function NumberInput({
         <button
           type="button"
           tabIndex={-1}
-          aria-label="Diminuer"
+          aria-label={t('form.field.number.decrease')}
           disabled={!canMinus}
           onClick={() => nudge(-1)}
           className="e237-stepper-btn e237-stepper-btn--minus"
@@ -323,7 +328,7 @@ export function NumberInput({
         <button
           type="button"
           tabIndex={-1}
-          aria-label="Augmenter"
+          aria-label={t('form.field.number.increase')}
           disabled={!canPlus}
           onClick={() => nudge(1)}
           className="e237-stepper-btn e237-stepper-btn--plus"
@@ -364,7 +369,7 @@ export interface PhoneInputProps {
  * l'indicatif deviendra sélectionnable à l'ouverture d'autres pays.
  */
 export function PhoneInput({
-  label = 'Téléphone',
+  label,
   hint,
   value,
   onChange,
@@ -373,11 +378,13 @@ export function PhoneInput({
   className,
   id,
 }: PhoneInputProps) {
+  const t = useDsT();
   const autoId = useId();
   const fieldId = id ?? autoId;
+  const fieldLabel = label ?? t('form.field.phone.label');
   return (
     <div className={cx('e237-field-group', className)}>
-      {label ? <Label id={fieldId}>{label}</Label> : null}
+      {fieldLabel ? <Label id={fieldId}>{fieldLabel}</Label> : null}
       <div
         className={cx(
           'e237-field',
@@ -426,13 +433,15 @@ export function SearchField({
   value,
   onChange,
   onSubmit,
-  placeholder = 'Rechercher…',
+  placeholder,
   loading = false,
   className,
   autoFocus = false,
 }: SearchFieldProps) {
+  const t = useDsT();
   const [focused, setFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const fieldPlaceholder = placeholder ?? t('form.field.search.placeholder');
 
   useEffect(() => {
     if (autoFocus) inputRef.current?.focus();
@@ -454,14 +463,14 @@ export function SearchField({
         onKeyDown={(e) => {
           if (e.key === 'Enter') onSubmit?.();
         }}
-        placeholder={placeholder}
+        placeholder={fieldPlaceholder}
         className="e237-field"
       />
       {value ? (
         <button
           type="button"
           onClick={() => onChange('')}
-          aria-label="Effacer"
+          aria-label={t('form.action.clear')}
           className="e237-search-clear"
         >
           <IconX />

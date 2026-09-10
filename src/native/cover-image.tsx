@@ -10,6 +10,7 @@
 import { Building2, CalendarDays } from 'lucide-react-native';
 import { ScrollView, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
+import { useDsT } from '../i18n';
 import { spacing, useE237Colors } from './core';
 import { MediaImage } from './media-image';
 
@@ -36,14 +37,15 @@ export function EventCover({
   style,
 }: EventCoverProps) {
   const c = useE237Colors();
+  const t = useDsT();
   return (
     <MediaImage
       src={src}
-      alt={`Affiche de l’évènement ${title}`}
+      alt={t('form.cover.eventAlt', { title })}
       ratio={ratio}
       rounded={rounded}
       fallbackIcon={<CalendarDays color={c.textMuted} size={26} strokeWidth={1.25} />}
-      fallbackLabel="Affiche à venir"
+      fallbackLabel={t('form.cover.eventFallback')}
       style={style}
     />
   );
@@ -68,14 +70,15 @@ export function VenuePhoto({
   style,
 }: VenuePhotoProps) {
   const c = useE237Colors();
+  const t = useDsT();
   return (
     <MediaImage
       src={src}
-      alt={`Photo de la salle ${name}`}
+      alt={t('form.cover.venueAlt', { name })}
       ratio={ratio}
       rounded={rounded}
       fallbackIcon={<Building2 color={c.textMuted} size={26} strokeWidth={1.25} />}
-      fallbackLabel="Photo à venir"
+      fallbackLabel={t('form.cover.venueFallback')}
       style={style}
     />
   );

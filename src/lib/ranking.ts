@@ -7,6 +7,7 @@
  * bandeau « Mis à jour à … ». On garde les secondes : le classement en direct
  * bouge à la seconde, l'heure doit le montrer.
  */
+import { dsLocale, dsT } from '../i18n';
 
 /** Sens de mouvement d'une ligne (rang) ou d'un grade (division). */
 export type RankMovement = 'up' | 'down' | 'same';
@@ -14,10 +15,21 @@ export type RankMovement = 'up' | 'down' | 'same';
 /** État du canal temps réel du classement. */
 export type LiveStatus = 'live' | 'connecting' | 'offline';
 
+/**
+ * Getters plutôt que des valeurs figées : `LIVE_STATUS_LABEL[status]` reste
+ * indexable comme avant (des écrans hors de ce paquet le lisent ainsi), mais
+ * chaque lecture retraduit dans la langue courante.
+ */
 export const LIVE_STATUS_LABEL: Record<LiveStatus, string> = {
-  live: 'En direct',
-  connecting: 'Connexion au direct…',
-  offline: 'Hors direct',
+  get live() {
+    return dsT('ranking.live_status.live');
+  },
+  get connecting() {
+    return dsT('ranking.live_status.connecting');
+  },
+  get offline() {
+    return dsT('ranking.live_status.offline');
+  },
 };
 
 /**
@@ -40,11 +52,12 @@ export function rankMovementLabel(
   movement: RankMovement,
   places: number | undefined,
 ): string {
-  if (places === undefined) return 'Position stable';
-  const plural = places > 1 ? 's' : '';
-  return movement === 'up'
-    ? `Monté de ${places} place${plural}`
-    : `Descendu de ${places} place${plural}`;
+  if (places === undefined) return dsT('ranking.movement.stable');
+  const suffix = places > 1 ? 'other' : 'one';
+  return dsT(
+    movement === 'up' ? `ranking.movement.up_${suffix}` : `ranking.movement.down_${suffix}`,
+    { n: places },
+  );
 }
 
 /** « Promu en Elite » / « Rétrogradé en Challenger » / division inchangée. */
@@ -52,19 +65,27 @@ export function divisionMovementLabel(
   movement: RankMovement,
   divisionName: string,
 ): string {
-  if (movement === 'same') return `Division ${divisionName}`;
-  return movement === 'up'
-    ? `Promu en ${divisionName}`
-    : `Rétrogradé en ${divisionName}`;
+  if (movement === 'same') {
+    return dsT('ranking.division_movement.same', { division: divisionName });
+  }
+  return dsT(
+    movement === 'up' ? 'ranking.division_movement.up' : 'ranking.division_movement.down',
+    { division: divisionName },
+  );
 }
 
-/** Heure locale « 14:32:05 » — l'horodatage n'existe qu'après montage. */
+/**
+ * Heure locale « 14:32:05 » — l'horodatage n'existe qu'après montage.
+ * Le tag de langue suit `dsLocale()` : un joueur en anglais ne doit pas lire
+ * une horloge mise en forme à la française.
+ */
 export function formatClock(timestamp: number): string {
   try {
-    return new Intl.DateTimeFormat('fr-FR', {
+    return new Intl.DateTimeFormat(dsLocale() === 'en' ? 'en-GB' : 'fr-FR', {
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
+      hourCycle: 'h23',
     }).format(new Date(timestamp));
   } catch {
     const d = new Date(timestamp);
@@ -96,14 +117,22 @@ export const RANKING_SCOPES: readonly RankingScope[] = ['season', 'national'];
 
 /** Onglet. Court : il vit dans un sélecteur de deux boutons. */
 export const RANKING_SCOPE_LABEL: Record<RankingScope, string> = {
-  season: 'Saison',
-  national: 'National',
+  get season() {
+    return dsT('ranking.scope_label.season');
+  },
+  get national() {
+    return dsT('ranking.scope_label.national');
+  },
 };
 
 /** Ce que l'onglet promet — affiché sous le sélecteur, une ligne. */
 export const RANKING_SCOPE_HINT: Record<RankingScope, string> = {
-  season: 'Points du mois en cours. Les divisions se jouent ici.',
-  national: 'Ta position parmi tous les joueurs. Indépendante de ta division.',
+  get season() {
+    return dsT('ranking.scope_hint.season');
+  },
+  get national() {
+    return dsT('ranking.scope_hint.national');
+  },
 };
 
 /* ------------------------------------------------------------------ */
@@ -145,9 +174,10 @@ export function duelsUntilRankedLabel(
 ): string | null {
   const left = minDuels - duelsPlayed;
   if (left <= 0) return null;
-  return left === 1
-    ? 'Encore 1 duel pour être classé cette saison'
-    : `Encore ${left} duels pour être classé cette saison`;
+  return dsT(
+    left === 1 ? 'ranking.duels_until_ranked_one' : 'ranking.duels_until_ranked_other',
+    { n: left },
+  );
 }
 
 /**
@@ -221,10 +251,10 @@ export function seasonRemainingLabel(
   const end = new Date(endsAt).getTime();
   if (!Number.isFinite(end)) return null;
   const msLeft = end - now;
-  if (msLeft <= 0) return 'Saison terminée';
+  if (msLeft <= 0) return dsT('ranking.season_remaining.ended');
   const days = Math.ceil(msLeft / 86_400_000);
-  if (days <= 1) return 'Dernier jour';
-  return `Il reste ${days} jours`;
+  if (days <= 1) return dsT('ranking.season_remaining.last_day');
+  return dsT('ranking.season_remaining.days', { days });
 }
 
 /* ------------------------------------------------------------------ */
@@ -236,9 +266,15 @@ export type RolloverOutcome = 'promoted' | 'relegated' | 'stayed';
 
 /** Le mot, du point de vue du JOUEUR — pas du système. */
 export const ROLLOVER_OUTCOME_LABEL: Record<RolloverOutcome, string> = {
-  promoted: 'Promu',
-  relegated: 'Relégué',
-  stayed: 'Maintenu',
+  get promoted() {
+    return dsT('ranking.rollover.promoted');
+  },
+  get relegated() {
+    return dsT('ranking.rollover.relegated');
+  },
+  get stayed() {
+    return dsT('ranking.rollover.stayed');
+  },
 };
 
 /**
@@ -271,10 +307,37 @@ export function seasonResultLabel(
   finalPosition: number | null | undefined,
 ): string {
   if (state === 'live' || state === 'upcoming') {
-    return 'Saison en cours';
+    return dsT('ranking.season_result.in_progress');
   }
   if (finalPosition === null || finalPosition === undefined) {
-    return 'Non classé';
+    return dsT('ranking.season_result.unranked');
   }
-  return finalPosition === 1 ? '1ᵉʳ' : `${finalPosition}ᵉ`;
+  return ordinalLabel(finalPosition);
+}
+
+/**
+ * L'ordinal d'un rang final, une règle par langue :
+ *  * français — « 1ᵉʳ » pour 1, « ᵉ » pour tout le reste (2ᵉ, 11ᵉ, 21ᵉ…),
+ *    sans exception ;
+ *  * anglais — 1st/2nd/3rd/nth, avec l'exception classique des nombres
+ *    finissant par 11, 12 ou 13 (11th, 12th, 13th, pas 11st/12nd/13rd).
+ * Deux règles simples valent mieux qu'un algorithme unique qui devine la
+ * langue depuis le nombre — ça n'existe pas, et ça finirait fragile.
+ */
+function ordinalLabel(position: number): string {
+  if (dsLocale() !== 'en') {
+    return position === 1 ? `${position}ᵉʳ` : `${position}ᵉ`;
+  }
+  const mod100 = position % 100;
+  if (mod100 >= 11 && mod100 <= 13) return `${position}th`;
+  switch (position % 10) {
+    case 1:
+      return `${position}st`;
+    case 2:
+      return `${position}nd`;
+    case 3:
+      return `${position}rd`;
+    default:
+      return `${position}th`;
+  }
 }

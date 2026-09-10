@@ -32,6 +32,7 @@ import {
   useToneSurface,
   withAlpha,
 } from './core';
+import { dsLocale, useDsT } from '../i18n';
 import { haptic } from './haptics';
 import { Txt } from './text';
 
@@ -248,25 +249,29 @@ export function Avatar({
  */
 export function VerifiedMark({ size = 14 }: { size?: number }) {
   const c = useE237Colors();
+  const t = useDsT();
   return (
     <BadgeCheck
       color={c.cyan}
       size={size}
-      accessibilityLabel="Joueur vérifié"
+      accessibilityLabel={t('ui.player.verified')}
     />
   );
 }
 
 /**
- * Date courte en français — jumelle de `formatDate` du web (même sortie).
+ * Date courte — jumelle de `formatDate` du web (même sortie).
  * Elle manquait au natif : chaque application refaisait la sienne.
+ *
+ * La locale vient du design system, pas d'un `'fr-FR'` figé : un joueur en
+ * anglais lisait « 10 sept., 11:19 » au milieu d'un écran traduit.
  */
 export function formatDate(value: string | null | undefined): string {
   if (!value) return '—';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '—';
   try {
-    return date.toLocaleString('fr-FR', {
+    return date.toLocaleString(dsLocale() === 'en' ? 'en-GB' : 'fr-FR', {
       day: '2-digit',
       month: 'short',
       hour: '2-digit',

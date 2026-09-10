@@ -11,6 +11,7 @@ import { Check, Lock } from 'lucide-react-native';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Polygon, Stop } from 'react-native-svg';
 
+import { useDsT } from '../i18n';
 import { stopColor } from '../skins/spec';
 import { useSkin } from '../skins/context';
 
@@ -51,6 +52,7 @@ export function SkinSwatch({
   width = 60,
 }: SkinSwatchProps) {
   const c = useE237Colors();
+  const t = useDsT();
   const neu = useNeu();
   const spec = useSkin(skin);
   const height = Math.round((width * 88) / 63);
@@ -61,7 +63,7 @@ export function SkinSwatch({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${spec.label}${locked ? ' (verrouillé)' : ''}`}
+      accessibilityLabel={`${spec.label}${locked ? t('form.skin.lockedSuffix') : ''}`}
       accessibilityState={{ selected }}
       disabled={!onPress}
       onPress={() => {

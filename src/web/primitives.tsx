@@ -5,6 +5,7 @@ import { AlertTriangle, ArrowLeft, BadgeCheck } from "lucide-react";
 import type { DuelStatus } from "@esport237hub/types";
 
 import { DUEL_STATUS_META } from "../lib/duel-status";
+import { useDsT } from "../i18n";
 import { Badge, SectionLabel } from "./foundation";
 
 /** Lien de retour avec chevron — placé en haut à gauche des pages. */
@@ -77,15 +78,21 @@ export function PageContainer({
 }
 
 export function DuelStatusBadge({ status }: { status: DuelStatus }) {
+  const t = useDsT();
   const meta = DUEL_STATUS_META[status];
-  return <Badge tone={meta?.tone ?? "neutral"}>{meta?.label ?? status}</Badge>;
+  return (
+    <Badge tone={meta?.tone ?? "neutral"}>
+      {meta ? t(meta.labelKey) : status}
+    </Badge>
+  );
 }
 
-export function Spinner({ label = "Chargement…" }: { label?: string }) {
+export function Spinner({ label }: { label?: string }) {
+  const t = useDsT();
   return (
     <div className="flex items-center gap-3 py-8 text-sm text-secondary">
       <span className="ui-spinner size-4 text-accent" />
-      {label}
+      {label ?? t("ui.loading")}
     </div>
   );
 }
@@ -114,9 +121,10 @@ export function ErrorNote({ message }: { message: string }) {
 
 /** Marque « joueur vérifié » (icône Lucide BadgeCheck). */
 export function VerifiedMark({ className = "" }: { className?: string }) {
+  const t = useDsT();
   return (
     <BadgeCheck
-      aria-label="Joueur vérifié"
+      aria-label={t("ui.player.verified")}
       className={`inline-block size-4 shrink-0 text-cyan ${className}`}
     />
   );
