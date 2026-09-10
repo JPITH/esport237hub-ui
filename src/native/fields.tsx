@@ -28,6 +28,7 @@ import { haptic } from './haptics';
 import { useNeu } from './neu';
 import Svg, { Circle, Path } from 'react-native-svg';
 
+import { useDsT } from '../i18n';
 import { color, radius, spacing, type ColorScale } from '../tokens';
 import { Txt } from './text';
 import { fontFamily } from './typography';
@@ -159,6 +160,7 @@ export type FieldProps = TextInputProps & {
 /** Champ de saisie. Jamais de TextInput natif brut dans les écrans. */
 export function Field({ label, style, secureTextEntry, ...props }: FieldProps) {
   const c = useColors();
+  const t = useDsT();
   const isPassword = !!secureTextEntry;
   // Le mot de passe démarre masqué ; l'œil bascule l'affichage.
   const neu = useNeu();
@@ -195,7 +197,9 @@ export function Field({ label, style, secureTextEntry, ...props }: FieldProps) {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={
-              hidden ? 'Afficher le mot de passe' : 'Masquer le mot de passe'
+              hidden
+                ? t('form.field.password.show')
+                : t('form.field.password.hide')
             }
             hitSlop={8}
             onPress={() => setHidden((v) => !v)}
@@ -278,6 +282,7 @@ export function Stepper({
   style?: StyleProp<ViewStyle>;
 }) {
   const c = useColors();
+  const t = useDsT();
   const neu = useNeu();
   const [focused, setFocused] = useState(false);
 
@@ -292,7 +297,9 @@ export function Stepper({
     return (
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={dir === 1 ? 'Augmenter' : 'Diminuer'}
+        accessibilityLabel={
+          dir === 1 ? t('form.field.number.increase') : t('form.field.number.decrease')
+        }
         disabled={disabled}
         onPress={() => {
           haptic('selection');
@@ -355,7 +362,7 @@ function formatCmPhone(digits: string): string {
  * l'indicatif deviendra sélectionnable à l'ouverture d'autres pays.
  */
 export function PhoneField({
-  label = 'Téléphone',
+  label,
   value,
   onChange,
   placeholder = '6XX XX XX XX',
@@ -369,12 +376,14 @@ export function PhoneField({
   style?: StyleProp<ViewStyle>;
 }) {
   const c = useColors();
+  const t = useDsT();
   const neu = useNeu();
   const [focused, setFocused] = useState(false);
+  const fieldLabel = label ?? t('form.field.phone.label');
   return (
     <View style={[{ gap: spacing['1'] }, style]}>
-      {label ? (
-        <Text style={[styles.fieldLabel, { color: c.textSecondary }]}>{label}</Text>
+      {fieldLabel ? (
+        <Text style={[styles.fieldLabel, { color: c.textSecondary }]}>{fieldLabel}</Text>
       ) : null}
       <View style={[styles.phoneWrap, fieldSurface(c, neu, focused)]}>
         <View
@@ -413,7 +422,7 @@ export function SearchField({
   value,
   onChange,
   onSubmit,
-  placeholder = 'Rechercher…',
+  placeholder,
   loading = false,
   style,
 }: {
@@ -425,6 +434,7 @@ export function SearchField({
   style?: StyleProp<ViewStyle>;
 }) {
   const c = useColors();
+  const t = useDsT();
   const neu = useNeu();
   const [focused, setFocused] = useState(false);
   return (
@@ -440,7 +450,7 @@ export function SearchField({
         value={value}
         onChangeText={onChange}
         onSubmitEditing={onSubmit}
-        placeholder={placeholder}
+        placeholder={placeholder ?? t('form.field.search.placeholder')}
         placeholderTextColor={c.textMuted}
         returnKeyType="search"
         onFocus={() => setFocused(true)}
@@ -450,7 +460,7 @@ export function SearchField({
       {value ? (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Effacer"
+          accessibilityLabel={t('form.action.clear')}
           hitSlop={8}
           onPress={() => onChange('')}
           style={styles.searchClear}

@@ -2,6 +2,7 @@
 
 import { CalendarClock, Info } from "lucide-react";
 
+import { useDsT, type DsKey } from "../i18n";
 import {
   RANKING_SCOPE_HINT,
   duelsUntilRankedLabel,
@@ -34,11 +35,11 @@ export interface SeasonBannerProps {
   className?: string;
 }
 
-const STATE_LABEL: Record<string, string> = {
-  upcoming: "À venir",
-  live: "En cours",
-  ended: "Terminée",
-  closed: "Palmarès figé",
+const STATE_LABEL_KEY: Record<string, DsKey> = {
+  upcoming: "ranking.season_state.upcoming",
+  live: "ranking.season_state.live",
+  ended: "ranking.season_state.ended",
+  closed: "ranking.season_state.closed",
 };
 
 /**
@@ -59,6 +60,7 @@ export function SeasonBanner({
   minDuels,
   className = "",
 }: SeasonBannerProps) {
+  const t = useDsT();
   const progress = seasonProgress(season.startsAt, season.endsAt);
   const remaining =
     season.state === "live" ? seasonRemainingLabel(season.endsAt) : null;
@@ -66,6 +68,7 @@ export function SeasonBanner({
     duelsPlayed === null || duelsPlayed === undefined
       ? null
       : duelsUntilRankedLabel(duelsPlayed, minDuels);
+  const stateKey = STATE_LABEL_KEY[season.state];
 
   return (
     <div
@@ -75,7 +78,7 @@ export function SeasonBanner({
         <CalendarClock aria-hidden className="size-4 shrink-0 text-accent" />
         <span className="font-display text-sm font-bold">{season.name}</span>
         <span className="rounded-full bg-raised px-2 py-0.5 text-[11px] font-semibold text-secondary">
-          {STATE_LABEL[season.state] ?? season.state}
+          {stateKey ? t(stateKey) : season.state}
         </span>
         {remaining ? (
           <span className="ml-auto text-xs text-secondary">{remaining}</span>
@@ -89,7 +92,7 @@ export function SeasonBanner({
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={Math.round(progress * 100)}
-          aria-label={`Avancement de ${season.name}`}
+          aria-label={t("ranking.progress_aria", { name: season.name })}
         >
           <div
             className="h-full rounded-full bg-accent"

@@ -14,6 +14,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 
+import { useDsT } from '../i18n';
 import { Badge, font, radius, spacing, useE237Colors } from './core';
 import { PerkList } from './perk-list';
 
@@ -45,13 +46,15 @@ export function TierPicker({
   tiers,
   value,
   onChange,
-  label = 'Catégorie de billet',
+  label,
   style,
 }: TierPickerProps) {
   const c = useE237Colors();
+  const t = useDsT();
+  const groupLabel = label ?? t('form.tier.groupLabel');
 
   return (
-    <View accessibilityRole="radiogroup" accessibilityLabel={label} style={[styles.group, style]}>
+    <View accessibilityRole="radiogroup" accessibilityLabel={groupLabel} style={[styles.group, style]}>
       {tiers.map((tier) => {
         const selected = tier.id === value;
         const hasDetails =
@@ -101,7 +104,7 @@ export function TierPicker({
                 <PerkList items={tier.limitations} variant="limitation" />
                 {!hasDetails ? (
                   <Text style={[styles.description, { color: c.textMuted }]}>
-                    Aucun avantage ni restriction annoncés pour cette catégorie.
+                    {t('form.tier.noDetails')}
                   </Text>
                 ) : null}
               </View>

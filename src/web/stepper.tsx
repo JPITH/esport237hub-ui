@@ -2,6 +2,8 @@
 
 import { Check } from "lucide-react";
 
+import { useDsT } from "../i18n";
+
 export interface StepperStep {
   id: string;
   label: string;
@@ -18,9 +20,10 @@ export interface StepperProps {
  * Indicateur d'étapes pour formulaires multi-volets (web).
  */
 export function Stepper({ steps, currentStep, className = "" }: StepperProps) {
+  const t = useDsT();
   return (
     <nav
-      aria-label="Étapes"
+      aria-label={t("form.stepper.navLabel")}
       className={`flex items-center gap-2 ${className}`.trim()}
     >
       {steps.map((step, index) => {

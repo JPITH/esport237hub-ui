@@ -3,6 +3,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Lock, Star } from "lucide-react";
 
+import { useDsT } from "../i18n";
 import {
   RATING_AXES,
   RATING_GATE_MESSAGE,
@@ -48,12 +49,13 @@ export function StarRating({
   showValue = false,
   className = "",
 }: StarRatingProps) {
+  const t = useDsT();
   const fills = starFills(value);
   const filled = fills.reduce((sum, f) => sum + f, 0);
   const label =
     value === null || value === undefined
-      ? "Pas encore noté"
-      : `${formatRatingAverage(value)} sur ${RATING_MAX}`;
+      ? t("rating.summary.not_rated")
+      : t("rating.summary.value_of_max", { value: formatRatingAverage(value), max: RATING_MAX });
 
   return (
     <span
@@ -133,6 +135,7 @@ export function StarRatingInput({
   disabled = false,
   className = "",
 }: StarRatingInputProps) {
+  const t = useDsT();
   const scores: RatingScore[] = [1, 2, 3, 4, 5];
 
   return (
@@ -174,7 +177,7 @@ export function StarRatingInput({
       </div>
       {/* La légende de l'échelle, sinon 3 étoiles ne veulent rien dire. */}
       <span className="text-xs text-secondary" aria-live="polite">
-        {value === null ? "Choisis une note" : RATING_LABELS[value]}
+        {value === null ? t("rating.input.choose") : RATING_LABELS[value]}
       </span>
     </fieldset>
   );
@@ -208,6 +211,7 @@ export function RatingSummary({
   axes,
   className = "",
 }: RatingSummaryProps) {
+  const t = useDsT();
   const empty = !count;
   const bars = breakdown ? ratingDistribution(breakdown) : null;
 
@@ -238,10 +242,7 @@ export function RatingSummary({
             ))}
           </ul>
         ) : (
-          <p className="flex-1 text-sm text-secondary">
-            Personne n’a encore noté cette salle. Joue une séance ici, tu seras le premier
-            à donner ton avis.
-          </p>
+          <p className="flex-1 text-sm text-secondary">{t("rating.summary.empty")}</p>
         )}
       </div>
 
@@ -292,6 +293,7 @@ export function VenueReview({
   className = "",
   style,
 }: VenueReviewProps) {
+  const t = useDsT();
   return (
     <article
       className={`flex flex-col gap-2 border-b border-edge py-3 last:border-b-0 ${className}`.trim()}
@@ -301,7 +303,7 @@ export function VenueReview({
         <span className="text-sm font-semibold">{author}</span>
         {verified ? (
           <span className="rounded-full bg-accent/12 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-accent">
-            A joué ici
+            {t("rating.review.played_here")}
           </span>
         ) : null}
         <span className="ml-auto text-xs text-muted">{when}</span>

@@ -1,5 +1,6 @@
 import type { DuelStatus } from '@esport237hub/types';
 
+import { dsT, type DsKey } from '../i18n/store';
 import type { Tone } from './tone';
 
 /**
@@ -17,27 +18,32 @@ import type { Tone } from './tone';
  *    « Résultat soumis » (patiente) portaient le même orange.
  * 3. **`cyan` = en direct.** Un seul statut l'utilise, et c'est ce qui le rend
  *    repérable d'un coup d'œil dans une liste.
+ *
+ * La table porte une CLÉ de traduction, pas un libellé rendu : un statut de
+ * duel s'affiche sur les trois apps, et deux d'entre elles sont bilingues.
+ * Passer par `statusLabel()` plutôt que par `.label`.
  */
 export const DUEL_STATUS_META: Record<
   DuelStatus,
-  { label: string; tone: Tone }
+  { labelKey: DsKey; tone: Tone }
 > = {
-  draft: { label: 'Brouillon', tone: 'neutral' },
-  sent: { label: 'Envoyée', tone: 'info' },
-  accepted: { label: 'Acceptée', tone: 'info' },
-  venue_pending: { label: 'Salle en attente', tone: 'warning' },
-  scheduled: { label: 'Programmée', tone: 'info' },
-  checkin_open: { label: 'Check-in ouvert', tone: 'warning' },
-  in_progress: { label: 'En cours', tone: 'cyan' },
-  result_submitted: { label: 'Résultat soumis', tone: 'warning' },
-  under_review: { label: 'En validation', tone: 'info' },
-  validated: { label: 'Validé', tone: 'success' },
-  disputed: { label: 'Contesté', tone: 'danger' },
-  cancelled: { label: 'Annulé', tone: 'neutral' },
+  draft: { labelKey: 'status.duel.draft', tone: 'neutral' },
+  sent: { labelKey: 'status.duel.sent', tone: 'info' },
+  accepted: { labelKey: 'status.duel.accepted', tone: 'info' },
+  venue_pending: { labelKey: 'status.duel.venue_pending', tone: 'warning' },
+  scheduled: { labelKey: 'status.duel.scheduled', tone: 'info' },
+  checkin_open: { labelKey: 'status.duel.checkin_open', tone: 'warning' },
+  in_progress: { labelKey: 'status.duel.in_progress', tone: 'cyan' },
+  result_submitted: { labelKey: 'status.duel.result_submitted', tone: 'warning' },
+  under_review: { labelKey: 'status.duel.under_review', tone: 'info' },
+  validated: { labelKey: 'status.duel.validated', tone: 'success' },
+  disputed: { labelKey: 'status.duel.disputed', tone: 'danger' },
+  cancelled: { labelKey: 'status.duel.cancelled', tone: 'neutral' },
 };
 
 export function statusLabel(status: DuelStatus): string {
-  return DUEL_STATUS_META[status]?.label ?? status;
+  const key = DUEL_STATUS_META[status]?.labelKey;
+  return key ? dsT(key) : status;
 }
 
 /**
@@ -52,15 +58,15 @@ export const DISPUTE_STATUSES = [
 ] as const;
 export type DisputeStatus = (typeof DISPUTE_STATUSES)[number];
 
-/** Libellé français + ton visuel de chaque statut de litige. */
+/** Clé de libellé + ton visuel de chaque statut de litige. */
 export const DISPUTE_STATUS_META: Record<
   DisputeStatus,
-  { label: string; tone: Tone }
+  { labelKey: DsKey; tone: Tone }
 > = {
-  open: { label: 'Ouvert', tone: 'warning' },
-  under_review: { label: 'En examen', tone: 'info' },
-  resolved: { label: 'Résolu', tone: 'success' },
-  rejected: { label: 'Rejeté', tone: 'neutral' },
+  open: { labelKey: 'status.dispute.open', tone: 'warning' },
+  under_review: { labelKey: 'status.dispute.under_review', tone: 'info' },
+  resolved: { labelKey: 'status.dispute.resolved', tone: 'success' },
+  rejected: { labelKey: 'status.dispute.rejected', tone: 'neutral' },
 };
 
 /** Repli propre : l'API renvoie du texte libre, un statut inconnu reste lisible. */
@@ -68,10 +74,8 @@ export function disputeStatusMeta(status: string): {
   label: string;
   tone: Tone;
 } {
-  return (
-    DISPUTE_STATUS_META[status as DisputeStatus] ?? {
-      label: 'Statut inconnu',
-      tone: 'neutral',
-    }
-  );
+  const meta = DISPUTE_STATUS_META[status as DisputeStatus];
+  return meta
+    ? { label: dsT(meta.labelKey), tone: meta.tone }
+    : { label: dsT('status.unknown'), tone: 'neutral' };
 }

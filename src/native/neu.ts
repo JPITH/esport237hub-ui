@@ -7,6 +7,8 @@
 import { useMemo } from 'react';
 import { useColorScheme } from 'react-native';
 
+import { withAlpha } from '../tokens';
+
 export type NeuMode = 'light' | 'dark';
 
 /**
@@ -66,9 +68,17 @@ export function createNeu(mode: NeuMode): NeuShadows {
     raisedSm: shadow(raisedSm),
     pressed: shadow(pressed),
     pressedSm: shadow(pressedSm),
+    /*
+     * `color-mix()` est une fonction CSS. react-native-web la comprend, le
+     * moteur natif NON : son analyseur de couleurs (`normalize-color`) ne
+     * connaît que hex / rgb / rgba / noms. La recette était donc invalide sur
+     * un vrai téléphone, et la lueur du bouton principal — le CTA le plus
+     * répandu du produit — tombait silencieusement. `withAlpha` fait le même
+     * calcul en JS, avec une sortie que les deux plateformes acceptent.
+     */
     primaryGlow: (accent: string) =>
       shadow(
-        `0 1px 0 color-mix(in srgb, #fff 25%, transparent) inset, 0 6px 18px -8px color-mix(in srgb, ${accent} 70%, transparent)`,
+        `inset 0 1px 0 ${withAlpha('#ffffff', 0.25)}, 0 6px 18px -8px ${withAlpha(accent, 0.7)}`,
       ),
   };
 }

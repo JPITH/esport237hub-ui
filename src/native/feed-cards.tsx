@@ -44,7 +44,9 @@ import {
 } from 'lucide-react-native';
 import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 
-import { competitionFormatLabel, eventTypeLabel, eventTypeTone, gameIconUrl } from '../lib/catalog';
+import { competitionFormatLabel, eventTypeLabel, eventTypeTone } from '../lib/catalog';
+import { useDsT } from '../i18n';
+import { gameIconSource } from './game-assets';
 import { priceOrFreeLabel } from '../lib/money';
 import { Badge, Card, font, spacing, useE237Colors } from './core';
 import { MediaImage } from './media-image';
@@ -85,11 +87,11 @@ function GameChips({ games, max = 3 }: { games: FeedCardGame[]; max?: number }) 
   return (
     <View style={styles.chipRow}>
       {visibles.map((game) => {
-        const icon = gameIconUrl(game.slug);
+        const icon = gameIconSource(game.slug);
         return (
           <View key={game.id} style={[styles.chip, { backgroundColor: c.frame, borderColor: c.border }]}>
             {icon ? (
-              <MediaImage src={icon} alt="" ratio={1} rounded="sm" style={styles.chipIcon} />
+              <MediaImage source={icon} alt="" ratio={1} rounded="sm" style={styles.chipIcon} />
             ) : null}
             <Text style={[styles.chipText, { color: c.textSecondary }]} numberOfLines={1}>
               {game.name}
@@ -154,9 +156,10 @@ export function FeedTournamentCard({
   style,
 }: FeedTournamentCardProps) {
   const c = useE237Colors();
-  const icon = game ? gameIconUrl(game.slug) : undefined;
+  const t = useDsT();
+  const icon = game ? gameIconSource(game.slug) : undefined;
   const tone = placesTone(slotsLeft, capacity);
-  const lieu = isOnline ? 'En ligne' : (venueName ?? city ?? null);
+  const lieu = isOnline ? t('ui.online') : (venueName ?? city ?? null);
 
   return (
     <Pressable
@@ -168,7 +171,7 @@ export function FeedTournamentCard({
         <View style={styles.tournHead}>
           {/* Vignette du jeu : c'est l'identité de la carte, pas un ornement. */}
           {icon ? (
-            <MediaImage src={icon} alt={game?.name ?? ''} ratio={1} rounded="md" style={styles.tournIcon} />
+            <MediaImage source={icon} alt={game?.name ?? ''} ratio={1} rounded="md" style={styles.tournIcon} />
           ) : (
             <View style={[styles.tournIcon, styles.tournIconPh, { backgroundColor: c.frame }]}>
               <Trophy color={c.textMuted} size={20} />

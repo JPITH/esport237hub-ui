@@ -38,19 +38,28 @@ import Svg, {
   Stop,
 } from 'react-native-svg';
 
+import { useDsT, type DsKey } from '../i18n';
 import { font, radius, spacing, useE237Colors } from './core';
 import { haptic } from './haptics';
 import { Txt } from './text';
 
 const BAR_HEIGHT = 64;
 const FAB_SIZE = 58;
+/**
+ * De combien le FAB déborde au-dessus de la barre.
+ *
+ * `fabSlot` remonte de 30 px et le halo commence 6 px plus haut : c'est cette
+ * valeur, et non 22, que le voile et la réserve de défilement doivent couvrir.
+ * Elle était écrite en dur à trois endroits qui ne s'accordaient pas.
+ */
+const FAB_OVERHANG = 36;
 const NOTCH_HALF = 42;
 
 /**
  * Réserve à laisser sous le contenu d'un écran à onglets (la barre est
  * flottante) : `Screen padBottom={TAB_BAR_SPACE + insets.bottom}`.
  */
-export const TAB_BAR_SPACE = BAR_HEIGHT + 32;
+export const TAB_BAR_SPACE = BAR_HEIGHT + FAB_OVERHANG + 16;
 
 /**
  * Une route sans entrée ici n'est pas rendue dans la barre (`if (!meta)`) :
@@ -58,13 +67,13 @@ export const TAB_BAR_SPACE = BAR_HEIGHT + 32;
  */
 const TAB_META: Record<
   string,
-  { label: string; Icon: LucideIcon; fab?: boolean }
+  { labelKey: DsKey; Icon: LucideIcon; fab?: boolean }
 > = {
-  index: { label: 'Accueil', Icon: House },
-  salles: { label: 'Salles', Icon: Store },
-  duels: { label: 'Duels', Icon: Swords, fab: true },
-  evenements: { label: 'Évènements', Icon: CalendarDays },
-  boutique: { label: 'Boutique', Icon: ShoppingBag },
+  index: { labelKey: 'ui.tab.accueil', Icon: House },
+  salles: { labelKey: 'ui.tab.salles', Icon: Store },
+  duels: { labelKey: 'ui.tab.duels', Icon: Swords, fab: true },
+  evenements: { labelKey: 'ui.tab.evenements', Icon: CalendarDays },
+  boutique: { labelKey: 'ui.tab.boutique', Icon: ShoppingBag },
 };
 
 export interface E237TabBarProps {
@@ -186,6 +195,7 @@ function DuelsFab({
   onLongPress?: () => void;
 }) {
   const c = useE237Colors();
+  const t = useDsT();
   const scale = useSharedValue(1);
   const glow = useSharedValue(focused ? 1 : 0.55);
 
@@ -214,7 +224,7 @@ function DuelsFab({
       <Pressable
         accessibilityRole="button"
         accessibilityState={{ selected: focused }}
-        accessibilityLabel="Duels"
+        accessibilityLabel={t('ui.tab.duels')}
         onPress={onPress}
         onLongPress={onLongPress}
         onPressIn={() => {
@@ -257,7 +267,7 @@ function DuelsFab({
         numberOfLines={1}
         style={styles.fabLabel}
       >
-        Duels
+        {t('ui.tab.duels')}
       </Txt>
     </View>
   );
@@ -270,38 +280,56 @@ export function E237TabBar({
   safeAreaBottom = 0,
 }: E237TabBarProps) {
   const c = useE237Colors();
+  const t = useDsT();
   const { width: screenWidth } = useWindowDimensions();
   const barTotalHeight = BAR_HEIGHT + safeAreaBottom;
   const d = barPath(screenWidth, barTotalHeight);
+  /** Le voile doit couvrir la barre ET la partie du FAB qui la dépasse. */
+  const scrimHeight = barTotalHeight + FAB_OVERHANG + 28;
 
   return (
     <View
       style={[
         styles.root,
         {
-          height: barTotalHeight + 22,
+          // La racine doit contenir le FAB, sinon la moitié haute du disque
+          // sort de la vue et n'accepte plus le toucher sur Android.
+          height: barTotalHeight + FAB_OVERHANG,
           paddingBottom: safeAreaBottom,
         },
       ]}
     >
-      {/* Voile : le contenu qui défile se fond dans la barre au lieu de la heurter. */}
+      {/*
+        Voile : le contenu qui défile se fond dans la barre au lieu de la heurter.
+
+        Deux corrections après recette au téléphone. (1) Il montait 22 px
+        au-dessus de la barre, alors que le FAB en déborde de 36 : une ligne de
+        liste passait DERRIÈRE le disque, en pleine opacité, et le bouton
+        principal du produit se lisait sur du texte. (2) Un dégradé à deux
+        arrêts monte linéairement, donc il est encore à moitié transparent à
+        mi-hauteur — c'est là que le regard tombe. Cinq arrêts en courbe :
+        presque rien en haut, l'essentiel gagné avant d'arriver au FAB.
+      */}
       <Svg
         width={screenWidth}
-        height={barTotalHeight + 22}
+        height={scrimHeight}
         style={styles.scrim}
         pointerEvents="none"
       >
         <Defs>
           <LinearGradient id="e237BarScrim" x1="0" y1="0" x2="0" y2="1">
             <Stop offset="0" stopColor={c.bg} stopOpacity={0} />
-            <Stop offset="1" stopColor={c.bg} stopOpacity={0.92} />
+            <Stop offset="0.32" stopColor={c.bg} stopOpacity={0.42} />
+            <Stop offset="0.55" stopColor={c.bg} stopOpacity={0.82} />
+            <Stop offset="0.75" stopColor={c.bg} stopOpacity={0.97} />
+            <Stop offset="1" stopColor={c.bg} stopOpacity={1} />
           </LinearGradient>
         </Defs>
         <Rect
           x="0"
           y="0"
           width={screenWidth}
-          height={barTotalHeight + 22}
+          height={scrimHeight}
           fill="url(#e237BarScrim)"
         />
       </Svg>
@@ -367,7 +395,7 @@ export function E237TabBar({
           return (
             <TabItem
               key={route.key}
-              label={options.title ?? meta.label}
+              label={options.title ?? t(meta.labelKey)}
               Icon={meta.Icon}
               focused={focused}
               onPress={onPress}
@@ -426,7 +454,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-start',
-    marginTop: -30,
+    marginTop: -(FAB_OVERHANG - 6),
   },
   fabHalo: {
     position: 'absolute',

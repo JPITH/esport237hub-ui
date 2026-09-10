@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { UserRound } from "lucide-react";
 
+import { useDsT } from "../i18n";
 import { cardStats, cityAbbr, type StatDef } from "../lib/player-stats";
 import { DivisionBadge } from "./division-badge";
 import {
@@ -172,6 +173,7 @@ export function PlayerCard({
   style,
   animated = false,
 }: PlayerCardProps) {
+  const t = useDsT();
   const rows = cardStats({ gameSlug, rating, stats, seed: username, statDefs });
 
   return (
@@ -195,7 +197,9 @@ export function PlayerCard({
 
       <div className="pcard__identity">
         <div className="pcard__name">{username}</div>
-        <div className="pcard__meta">{wins} VICT.</div>
+        <div className="pcard__meta">
+          {wins} {t('ui.card.wins')}
+        </div>
       </div>
 
       <div className="pcard__stats">

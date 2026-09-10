@@ -16,6 +16,7 @@
  * note à la décimale côté natif (« 4,3 ») sur la même salle, et le joueur croit
  * à deux salles différentes.
  */
+import { dsLocale, dsT } from '../i18n/store';
 
 /** Bornes de la note. La base les garde aussi (`check (rating between 1 and 5)`). */
 export const RATING_MIN = 1;
@@ -30,13 +31,27 @@ export const RATING_SCORES: readonly RatingScore[] = [5, 4, 3, 2, 1];
 /**
  * Ce que chaque note VEUT DIRE. Sans ces mots, deux joueurs ne mettent pas
  * 3 étoiles pour la même chose : l'échelle est affichée, pas devinée.
+ *
+ * Des getters plutôt que des valeurs figées : `RATING_LABELS[score]` reste
+ * indexable comme avant, mais chaque lecture retraduit dans la langue
+ * courante.
  */
 export const RATING_LABELS: Record<RatingScore, string> = {
-  1: 'À éviter',
-  2: 'Décevant',
-  3: 'Correct',
-  4: 'Très bien',
-  5: 'Excellent',
+  get 1() {
+    return dsT('rating.label.poor');
+  },
+  get 2() {
+    return dsT('rating.label.disappointing');
+  },
+  get 3() {
+    return dsT('rating.label.fair');
+  },
+  get 4() {
+    return dsT('rating.label.great');
+  },
+  get 5() {
+    return dsT('rating.label.excellent');
+  },
 };
 
 /**
@@ -44,12 +59,48 @@ export const RATING_LABELS: Record<RatingScore, string> = {
  * note globale ne dit pas POURQUOI : une salle notée 3 pour sa connexion et
  * une salle notée 3 pour son accueil n'ont pas le même problème à corriger,
  * et c'est le gérant qui lit ça.
+ *
+ * `label`/`hint` sont des getters, pour la même raison que `RATING_LABELS` :
+ * l'axe garde sa forme `{ key, label, hint }` pour les appelants existants,
+ * mais chaque lecture retraduit dans la langue courante.
  */
 export const RATING_AXES = [
-  { key: 'equipment', label: 'Équipement', hint: 'Manettes, écrans, consoles' },
-  { key: 'connection', label: 'Connexion', hint: 'Débit et stabilité' },
-  { key: 'comfort', label: 'Confort', hint: 'Place, sièges, propreté' },
-  { key: 'staff', label: 'Accueil', hint: 'Personnel et organisation' },
+  {
+    key: 'equipment',
+    get label() {
+      return dsT('rating.axis.equipment.label');
+    },
+    get hint() {
+      return dsT('rating.axis.equipment.hint');
+    },
+  },
+  {
+    key: 'connection',
+    get label() {
+      return dsT('rating.axis.connection.label');
+    },
+    get hint() {
+      return dsT('rating.axis.connection.hint');
+    },
+  },
+  {
+    key: 'comfort',
+    get label() {
+      return dsT('rating.axis.comfort.label');
+    },
+    get hint() {
+      return dsT('rating.axis.comfort.hint');
+    },
+  },
+  {
+    key: 'staff',
+    get label() {
+      return dsT('rating.axis.staff.label');
+    },
+    get hint() {
+      return dsT('rating.axis.staff.hint');
+    },
+  },
 ] as const;
 
 /** Clé d'un axe détaillé. */
@@ -73,22 +124,24 @@ export function ratingLabel(value: number): string {
 }
 
 /**
- * La moyenne telle qu'elle s'écrit : une décimale, virgule française, et un
- * tiret cadratin quand personne n'a encore noté. JAMAIS « 0 » — une salle
- * sans avis n'est pas une salle nulle, et l'afficher ainsi la condamne.
+ * La moyenne telle qu'elle s'écrit : une décimale, séparateur adapté à la
+ * langue (virgule en français, point en anglais), et un tiret cadratin quand
+ * personne n'a encore noté. JAMAIS « 0 » — une salle sans avis n'est pas une
+ * salle nulle, et l'afficher ainsi la condamne.
  */
 export function formatRatingAverage(average: number | null | undefined): string {
   if (average === null || average === undefined || !Number.isFinite(average)) {
     return '—';
   }
-  return average.toFixed(1).replace('.', ',');
+  const text = average.toFixed(1);
+  return dsLocale() === 'fr' ? text.replace('.', ',') : text;
 }
 
 /** « Aucun avis » / « 1 avis » / « 12 avis ». */
 export function ratingCountLabel(count: number | null | undefined): string {
   const n = Number.isFinite(count) ? Math.max(0, Math.trunc(count as number)) : 0;
-  if (n === 0) return 'Aucun avis';
-  return `${n} avis`;
+  if (n === 0) return dsT('rating.count.none');
+  return dsT('rating.count.value', { n });
 }
 
 /**
@@ -150,9 +203,16 @@ export type RatingGate = 'open' | 'needs_account' | 'needs_paid_session' | 'clos
  * pour y avoir droit (UX.md — ne jamais laisser un écran sans issue).
  */
 export const RATING_GATE_MESSAGE: Record<RatingGate, string> = {
-  open: 'Donne ton avis sur la salle.',
-  needs_account: 'Connecte-toi pour donner ton avis sur cette salle.',
-  needs_paid_session:
-    'Les avis sont réservés aux joueurs qui ont payé une séance ou un abonnement ici. Joue une séance, tu pourras noter juste après.',
-  closed: 'Les avis sont fermés sur cette salle.',
+  get open() {
+    return dsT('rating.gate.open');
+  },
+  get needs_account() {
+    return dsT('rating.gate.needs_account');
+  },
+  get needs_paid_session() {
+    return dsT('rating.gate.needs_paid_session');
+  },
+  get closed() {
+    return dsT('rating.gate.closed');
+  },
 };

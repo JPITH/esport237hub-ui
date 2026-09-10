@@ -5,6 +5,7 @@
  */
 import type { OrderStatus } from '@esport237hub/types';
 
+import { dsT } from '../i18n/store';
 import type { Tone } from './tone';
 
 export const ORDER_STATUS_TONE: Record<OrderStatus, Tone> = {
@@ -16,23 +17,23 @@ export const ORDER_STATUS_TONE: Record<OrderStatus, Tone> = {
 };
 
 /**
- * Libellé FR d'un statut de commande. `collected` se lit différemment selon
- * le type de produit : livraison automatique (numérique) ou retrait physique
+ * Libellé d'un statut de commande. `collected` se lit différemment selon le
+ * type de produit : livraison automatique (numérique) ou retrait physique
  * effectivement passé au comptoir (physique).
  */
 export function orderStatusLabel(status: OrderStatus, kind?: string): string {
   if (status === 'collected') {
-    return kind === 'digital' ? 'Livrée' : 'Retirée en salle';
+    return dsT(kind === 'digital' ? 'status.order.delivered' : 'status.order.collected');
   }
   switch (status) {
     case 'pending':
-      return 'En attente';
+      return dsT('status.order.pending');
     case 'paid':
-      return 'Payée';
+      return dsT('status.order.paid');
     case 'ready':
-      return 'Prête — à retirer en salle';
+      return dsT('status.order.ready');
     case 'cancelled':
-      return 'Annulée';
+      return dsT('status.order.cancelled');
     default:
       return status;
   }

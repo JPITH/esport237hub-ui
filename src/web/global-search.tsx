@@ -7,6 +7,7 @@
 import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
+import { useDsT } from '../i18n';
 import { SearchField } from './fields';
 import { Picture } from './picture';
 
@@ -60,10 +61,14 @@ export function GlobalSearch({
   open,
   onClose,
   items,
-  placeholder = 'Rechercher joueurs, duels, jeux, salles…',
-  emptyLabel = 'Aucun résultat.',
-  shortcutHint = 'Échap pour fermer',
+  placeholder,
+  emptyLabel,
+  shortcutHint,
 }: GlobalSearchProps) {
+  const t = useDsT();
+  const fieldPlaceholder = placeholder ?? t('form.search.placeholder');
+  const fieldEmptyLabel = emptyLabel ?? t('form.noResults');
+  const fieldShortcutHint = shortcutHint ?? t('form.search.closeHint');
   const [query, setQuery] = useState('');
   const [active, setActive] = useState(0);
   const [mounted, setMounted] = useState(false);
@@ -139,14 +144,14 @@ export function GlobalSearch({
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Recherche"
+          aria-label={t('form.search.dialogLabel')}
           className="e237-global-search ui-animate-pop"
         >
           <div ref={inputWrapRef} className="e237-global-search__field">
             <SearchField
               value={query}
               onChange={setQuery}
-              placeholder={placeholder}
+              placeholder={fieldPlaceholder}
             />
           </div>
 
@@ -154,10 +159,10 @@ export function GlobalSearch({
             id={listId}
             className="e237-global-search__list"
             role="listbox"
-            aria-label="Résultats"
+            aria-label={t('form.search.resultsLabel')}
           >
             {flat.length === 0 ? (
-              <p className="e237-global-search__empty">{emptyLabel}</p>
+              <p className="e237-global-search__empty">{fieldEmptyLabel}</p>
             ) : (
               groups.map(([group, groupItems]) => (
                 <div key={group} className="e237-global-search__group">
@@ -213,9 +218,9 @@ export function GlobalSearch({
           </div>
 
           <div className="e237-global-search__footer">
-            <span>↑↓ naviguer</span>
-            <span>↵ ouvrir</span>
-            <span>{shortcutHint}</span>
+            <span>{t('form.search.navigateHint')}</span>
+            <span>{t('form.search.openHint')}</span>
+            <span>{fieldShortcutHint}</span>
           </div>
         </div>
       </div>

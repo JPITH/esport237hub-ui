@@ -8,24 +8,35 @@ import { CalendarDays, ChevronLeft, ChevronRight, Clock } from 'lucide-react-nat
 import { useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
+import { useDsT, type DsKey } from '../i18n';
 import { Sheet } from './sheet';
 import { Txt } from './text';
 
-const MONTHS = [
-  'Janvier',
-  'Février',
-  'Mars',
-  'Avril',
-  'Mai',
-  'Juin',
-  'Juillet',
-  'Août',
-  'Septembre',
-  'Octobre',
-  'Novembre',
-  'Décembre',
+// Clés de traduction, pas des libellés rendus : ce composant s'affiche sur
+// des apps bilingues (cf. DUEL_STATUS_META dans src/lib/duel-status.ts).
+const MONTH_KEYS: DsKey[] = [
+  'form.date.month.january',
+  'form.date.month.february',
+  'form.date.month.march',
+  'form.date.month.april',
+  'form.date.month.may',
+  'form.date.month.june',
+  'form.date.month.july',
+  'form.date.month.august',
+  'form.date.month.september',
+  'form.date.month.october',
+  'form.date.month.november',
+  'form.date.month.december',
 ];
-const WEEKDAYS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+const WEEKDAY_KEYS: DsKey[] = [
+  'form.date.weekday.mon',
+  'form.date.weekday.tue',
+  'form.date.weekday.wed',
+  'form.date.weekday.thu',
+  'form.date.weekday.fri',
+  'form.date.weekday.sat',
+  'form.date.weekday.sun',
+];
 
 function toISO(y: number, m: number, d: number): string {
   return `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
@@ -77,7 +88,7 @@ export function DateField({
   label,
   value,
   onChange,
-  placeholder = 'Choisir une date…',
+  placeholder,
 }: {
   label?: string;
   value: string | null;
@@ -85,6 +96,10 @@ export function DateField({
   placeholder?: string;
 }) {
   const c = useE237Colors();
+  const t = useDsT();
+  const MONTHS = MONTH_KEYS.map((key) => t(key));
+  const WEEKDAYS = WEEKDAY_KEYS.map((key) => t(key));
+  const fieldPlaceholder = placeholder ?? t('form.date.placeholder');
   const [open, setOpen] = useState(false);
 
   const today = new Date();
@@ -114,7 +129,7 @@ export function DateField({
         month: 'short',
         year: 'numeric',
       })
-    : placeholder;
+    : fieldPlaceholder;
 
   return (
     <>
@@ -126,11 +141,11 @@ export function DateField({
         onPress={() => setOpen(true)}
       />
 
-      <Sheet open={open} onClose={() => setOpen(false)} title={label ?? 'Date'}>
+      <Sheet open={open} onClose={() => setOpen(false)} title={label ?? t('form.date.sheetTitle.date')}>
         <View style={styles.monthNav}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Mois précédent"
+            accessibilityLabel={t('form.date.prevMonth')}
             onPress={() => shift(-1)}
             style={styles.monthBtn}>
             <ChevronLeft color={c.textSecondary} size={20} />
@@ -140,7 +155,7 @@ export function DateField({
           </Txt>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Mois suivant"
+            accessibilityLabel={t('form.date.nextMonth')}
             onPress={() => shift(1)}
             style={styles.monthBtn}>
             <ChevronRight color={c.textSecondary} size={20} />
@@ -195,7 +210,7 @@ export function DateField({
             }}
             style={styles.footerBtn}>
             <Txt variant="label" size={13} tone="accent">
-              Aujourd&rsquo;hui
+              {t('form.date.today')}
             </Txt>
           </Pressable>
           <Pressable
@@ -206,7 +221,7 @@ export function DateField({
             }}
             style={styles.footerBtn}>
             <Txt variant="body" size={13} tone="muted">
-              Effacer
+              {t('form.action.clear')}
             </Txt>
           </Pressable>
         </View>
@@ -230,6 +245,7 @@ export function TimeField({
   placeholder?: string;
 }) {
   const c = useE237Colors();
+  const t = useDsT();
   const [open, setOpen] = useState(false);
 
   const [h, m] = value ? value.split(':').map(Number) : [null, null];
@@ -252,11 +268,11 @@ export function TimeField({
         onPress={() => setOpen(true)}
       />
 
-      <Sheet open={open} onClose={() => setOpen(false)} title={label ?? 'Heure'}>
+      <Sheet open={open} onClose={() => setOpen(false)} title={label ?? t('form.date.sheetTitle.time')}>
         <View style={{ flexDirection: 'row', gap: spacing['3'] }}>
-          <TimeColumn heading="Heures" items={hours} active={h} onPick={(n) => set(n, null)} />
+          <TimeColumn heading={t('form.date.hours')} items={hours} active={h} onPick={(n) => set(n, null)} />
           <TimeColumn
-            heading="Minutes"
+            heading={t('form.date.minutes')}
             items={minutes}
             active={m}
             onPick={(n) => {

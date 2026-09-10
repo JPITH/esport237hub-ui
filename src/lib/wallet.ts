@@ -6,25 +6,27 @@
  * de recharge était écrite deux fois (`recharge-form.tsx` et
  * `apps/mobile/src/app/wallet.tsx`).
  */
+import { dsT, type DsKey } from '../i18n/store';
 
-/** Origine d'une opération → libellé lisible par un joueur. */
-export const WALLET_SOURCE_LABEL: Record<string, string> = {
-  topup: 'Recharge',
-  duel_booking: 'Réservation de salle',
-  booking: 'Réservation de salle',
-  event_ticket: "Billet d'événement",
-  payout: 'Reversement',
-  withdrawal: 'Retrait',
-  refund: 'Remboursement',
-  adjustment: 'Ajustement',
-  shop_purchase: 'Achat boutique',
-  subscription: 'Abonnement salle',
-  duel: 'Duel',
+/** Origine d'une opération → clé de libellé lisible par un joueur. */
+export const WALLET_SOURCE_LABEL: Record<string, DsKey> = {
+  topup: 'money.source.topup',
+  duel_booking: 'money.source.roomBooking',
+  booking: 'money.source.roomBooking',
+  event_ticket: 'money.source.eventTicket',
+  payout: 'money.source.payout',
+  withdrawal: 'money.source.withdrawal',
+  refund: 'money.source.refund',
+  adjustment: 'money.source.adjustment',
+  shop_purchase: 'money.source.shopPurchase',
+  subscription: 'money.source.subscription',
+  duel: 'money.source.duel',
 };
 
 export function walletSourceLabel(source: string | null | undefined): string {
-  if (!source) return 'Opération';
-  return WALLET_SOURCE_LABEL[source] ?? source;
+  if (!source) return dsT('money.source.fallback');
+  const key = WALLET_SOURCE_LABEL[source];
+  return key ? dsT(key) : source;
 }
 
 /** Montants proposés en un clic dans le formulaire de recharge (FCFA). */

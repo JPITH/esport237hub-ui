@@ -421,7 +421,15 @@ export {
   auditActorLabel,
   formatXafCompact,
   safeExternalUrl,
+  dsT,
+  dsLocale,
+  dsTranslate,
+  setDsLocale,
 } from '../lib';
+export type { DsKey, DsLocale, DsVars } from '../lib';
+// Les hooks portent `'use client'` : ils ne peuvent pas transiter par `../lib`,
+// que des Server Components importent.
+export { useDsT, useDsLocale } from '../i18n/hooks';
 export type {
   GameCategory,
   StatDef,

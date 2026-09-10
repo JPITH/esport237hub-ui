@@ -48,7 +48,11 @@ export function AppMark({ size = 32, variant, title, contrast, style }: AppMarkP
       style={style}
       accessibilityRole={title ? 'image' : undefined}
       accessibilityLabel={title}
-      accessible={Boolean(title)}>
+      // `accessible={false}` (et non `undefined`) descendait jusqu'au DOM via
+      // react-native-svg et faisait crier React : « Received `false` for a
+      // non-boolean attribute ». Le logo est dans la barre du haut de tous les
+      // écrans, donc l'erreur s'affichait partout en développement.
+      accessible={title ? true : undefined}>
       {markParts(size, variant).map((part) => (
         <Path key={part.key} d={part.d} fill={ink[part.role]} fillRule="nonzero" />
       ))}

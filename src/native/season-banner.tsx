@@ -8,6 +8,7 @@
 import { CalendarClock, Info } from 'lucide-react-native';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
+import { useDsT, type DsKey } from '../i18n';
 import {
   RANKING_SCOPE_HINT,
   duelsUntilRankedLabel,
@@ -37,11 +38,11 @@ export interface SeasonBannerProps {
   style?: StyleProp<ViewStyle>;
 }
 
-const STATE_LABEL: Record<string, string> = {
-  upcoming: 'À venir',
-  live: 'En cours',
-  ended: 'Terminée',
-  closed: 'Palmarès figé',
+const STATE_LABEL_KEY: Record<string, DsKey> = {
+  upcoming: 'ranking.season_state.upcoming',
+  live: 'ranking.season_state.live',
+  ended: 'ranking.season_state.ended',
+  closed: 'ranking.season_state.closed',
 };
 
 export function SeasonBanner({
@@ -51,6 +52,7 @@ export function SeasonBanner({
   style,
 }: SeasonBannerProps) {
   const c = useE237Colors();
+  const t = useDsT();
   const progress = seasonProgress(season.startsAt, season.endsAt);
   const remaining =
     season.state === 'live' ? seasonRemainingLabel(season.endsAt) : null;
@@ -58,6 +60,7 @@ export function SeasonBanner({
     duelsPlayed === null || duelsPlayed === undefined
       ? null
       : duelsUntilRankedLabel(duelsPlayed, minDuels);
+  const stateKey = STATE_LABEL_KEY[season.state];
 
   return (
     <Card style={[styles.card, style]}>
@@ -66,7 +69,7 @@ export function SeasonBanner({
         <Text style={[styles.name, { color: c.textPrimary }]}>{season.name}</Text>
         <View style={[styles.state, { backgroundColor: c.surfaceRaised }]}>
           <Text style={[styles.stateText, { color: c.textSecondary }]}>
-            {STATE_LABEL[season.state] ?? season.state}
+            {stateKey ? t(stateKey) : season.state}
           </Text>
         </View>
         {remaining ? (

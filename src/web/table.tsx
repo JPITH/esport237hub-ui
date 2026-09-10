@@ -2,6 +2,8 @@
 
 import type { ReactNode } from "react";
 
+import { useDsT } from "../i18n";
+
 export interface Column<T> {
   key: string;
   header: ReactNode;
@@ -30,6 +32,7 @@ export function Table<T>({
   empty,
   className = "",
 }: TableProps<T>) {
+  const t = useDsT();
   const alignClass = (a?: Column<T>["align"]) =>
     a === "right" ? "text-right" : a === "center" ? "text-center" : "text-left";
 
@@ -60,7 +63,7 @@ export function Table<T>({
                 colSpan={columns.length}
                 className="px-4 py-10 text-center text-sm text-secondary"
               >
-                {empty ?? "Aucune donnée."}
+                {empty ?? t("form.table.empty")}
               </td>
             </tr>
           ) : (

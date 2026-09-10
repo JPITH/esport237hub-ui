@@ -2084,15 +2084,33 @@
     var(--e237-surface-raised);
 }
 
+/*
+ * Deux voiles superposés, et non un seul en diagonale.
+ *
+ * Le corps du hero (`__body`) est ancré EN BAS et occupe toute la largeur dès
+ * que l'écran est étroit. Le voile diagonal seul n'assombrissait que la moitié
+ * gauche : sur téléphone, la fin de chaque ligne retombait sur la photo nue, et
+ * en thème clair le texte est presque noir — titre illisible sur une image de
+ * stade éclairé. Le voile vertical garantit le fond derrière le texte à TOUTES
+ * les largeurs ; le diagonal reste par-dessus pour la lecture en grand écran.
+ */
 .e237-featured-hero__veil {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    105deg,
-    color-mix(in srgb, var(--e237-bg) 88%, transparent) 0%,
-    color-mix(in srgb, var(--e237-bg) 45%, transparent) 55%,
-    transparent 100%
-  );
+  background:
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--e237-bg) 94%, transparent) 0%,
+      color-mix(in srgb, var(--e237-bg) 82%, transparent) 45%,
+      color-mix(in srgb, var(--e237-bg) 32%, transparent) 78%,
+      transparent 100%
+    ),
+    linear-gradient(
+      105deg,
+      color-mix(in srgb, var(--e237-bg) 88%, transparent) 0%,
+      color-mix(in srgb, var(--e237-bg) 45%, transparent) 55%,
+      transparent 100%
+    );
 }
 
 .e237-featured-hero__body {
@@ -2712,9 +2730,17 @@ a.mkt-brand:active {
   top: 0;
   z-index: 20;
   padding-block: var(--e237-spacing-3);
-  /* Voile très léger pour rester lisible au défilement, sans séparateur. */
-  background: color-mix(in srgb, var(--e237-bg) 78%, transparent);
-  backdrop-filter: blur(10px);
+  /*
+   * Voile, sans séparateur (règle « barre du haut » de DESIGN.md).
+   *
+   * 78 % ne suffisaient pas : sur téléphone la barre n'a pas de navigation à
+   * afficher, donc les boutons de la page passent DIRECTEMENT sous le logo au
+   * défilement, et on lisait « Télécharger l'app » à travers le sigle. Le voile
+   * doit masquer ce qui passe dessous, pas seulement l'atténuer — c'est tout ce
+   * qu'on lui demande, et il n'y a toujours ni bordure ni ombre.
+   */
+  background: color-mix(in srgb, var(--e237-bg) 92%, transparent);
+  backdrop-filter: blur(14px);
 }
 .mkt-header__inner {
   width: 100%;

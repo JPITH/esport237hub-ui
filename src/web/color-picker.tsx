@@ -10,6 +10,8 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 
+import { useDsT } from "../i18n";
+
 /* ------------------------------------------------------------------ */
 /* Helpers de conversion couleur (aucune dépendance)                   */
 /* ------------------------------------------------------------------ */
@@ -111,6 +113,7 @@ export function ColorPicker({
   hint,
   id: idProp,
 }: ColorPickerProps) {
+  const t = useDsT();
   const genId = useId();
   const id = idProp ?? genId;
 
@@ -211,7 +214,7 @@ export function ColorPicker({
           type="button"
           className="cpick__swatch"
           style={{ background: value }}
-          aria-label="Ouvrir le sélecteur de couleur"
+          aria-label={t("form.color.openPicker")}
           aria-expanded={open}
           onClick={() => setOpen((o) => !o)}
         />
@@ -224,7 +227,7 @@ export function ColorPicker({
           onBlur={handleHexBlur}
           spellCheck={false}
           maxLength={7}
-          aria-label={label ?? "Couleur hexadécimale"}
+          aria-label={label ?? t("form.color.hexLabel")}
         />
       </div>
 
@@ -260,7 +263,7 @@ export function ColorPicker({
             max={360}
             value={svH}
             onChange={handleHue}
-            aria-label="Teinte"
+            aria-label={t("form.color.hue")}
           />
 
           {/* Aperçu + hex en lecture */}

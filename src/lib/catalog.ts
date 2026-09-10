@@ -8,6 +8,7 @@
  * ici ; les fonctions sont tolérantes aux valeurs inconnues pour ne jamais
  * afficher un identifiant technique brut à un joueur.
  */
+import { dsT, type DsKey } from '../i18n/store';
 import type { Tone } from './tone';
 
 /* ------------------------------------------------------------------ */
@@ -53,7 +54,7 @@ export function gameHeroUrl(slug: string | null | undefined): string | undefined
 /* ------------------------------------------------------------------ */
 
 /**
- * Actions journalisées → libellé français.
+ * Actions journalisées → clé de libellé.
  *
  * Le journal d'audit affichait ses identifiants bruts (`duel.validate`,
  * `points.recompute`) en police à chasse fixe. C'est la règle transverse la
@@ -61,39 +62,39 @@ export function gameHeroUrl(slug: string | null | undefined): string | undefined
  * base n'atteint jamais l'écran telle quelle. Un modérateur qui relit une
  * décision de la veille ne devrait pas avoir à traduire mentalement un slug.
  */
-export const AUDIT_ACTION_LABEL: Record<string, string> = {
-  'duel.validate': 'Duel validé',
-  'duel.cancel': 'Duel annulé',
-  'duel.dispute': 'Litige ouvert',
-  'duel.resolve': 'Litige tranché',
-  'venue.verify': 'Salle vérifiée',
-  'venue.reject': 'Salle refusée',
-  'venue.suspend': 'Salle suspendue',
-  'points.recompute': 'Points recalculés',
-  'division.update': 'Division modifiée',
-  'game.update': 'Discipline modifiée',
-  'user.suspend': 'Compte suspendu',
-  'payout.approve': 'Reversement approuvé',
+export const AUDIT_ACTION_LABEL: Record<string, DsKey> = {
+  'duel.validate': 'catalog.audit.action.duelValidate',
+  'duel.cancel': 'catalog.audit.action.duelCancel',
+  'duel.dispute': 'catalog.audit.action.duelDispute',
+  'duel.resolve': 'catalog.audit.action.duelResolve',
+  'venue.verify': 'catalog.audit.action.venueVerify',
+  'venue.reject': 'catalog.audit.action.venueReject',
+  'venue.suspend': 'catalog.audit.action.venueSuspend',
+  'points.recompute': 'catalog.audit.action.pointsRecompute',
+  'division.update': 'catalog.audit.action.divisionUpdate',
+  'game.update': 'catalog.audit.action.gameUpdate',
+  'user.suspend': 'catalog.audit.action.userSuspend',
+  'payout.approve': 'catalog.audit.action.payoutApprove',
 };
 
 /** Type d'objet concerné par une action d'audit. */
-export const AUDIT_OBJECT_LABEL: Record<string, string> = {
-  duel: 'Duel',
-  venue: 'Salle',
-  season: 'Saison',
-  division: 'Division',
-  game: 'Discipline',
-  user: 'Compte',
-  payout: 'Reversement',
-  event: 'Événement',
+export const AUDIT_OBJECT_LABEL: Record<string, DsKey> = {
+  duel: 'catalog.audit.object.duel',
+  venue: 'catalog.audit.object.venue',
+  season: 'catalog.audit.object.season',
+  division: 'catalog.audit.object.division',
+  game: 'catalog.audit.object.game',
+  user: 'catalog.audit.object.user',
+  payout: 'catalog.audit.object.payout',
+  event: 'catalog.audit.object.event',
 };
 
 /** Auteur d'une action journalisée. */
-export const AUDIT_ACTOR_LABEL: Record<string, string> = {
-  admin: 'Administrateur',
-  system: 'Automatique',
-  venue: 'Salle',
-  player: 'Joueur',
+export const AUDIT_ACTOR_LABEL: Record<string, DsKey> = {
+  admin: 'catalog.audit.actor.admin',
+  system: 'catalog.audit.actor.system',
+  venue: 'catalog.audit.actor.venue',
+  player: 'catalog.audit.actor.player',
 };
 
 /**
@@ -104,34 +105,37 @@ export const AUDIT_ACTOR_LABEL: Record<string, string> = {
 export function auditActionLabel(action: string | null | undefined): string {
   if (!action) return '—';
   const known = AUDIT_ACTION_LABEL[action];
-  if (known) return known;
+  if (known) return dsT(known);
   const [object, verb] = action.split('.');
   if (verb && object) {
-    return `${AUDIT_OBJECT_LABEL[object] ?? object} · ${verb}`;
+    const objectKey = AUDIT_OBJECT_LABEL[object];
+    return `${objectKey ? dsT(objectKey) : object} · ${verb}`;
   }
   return action;
 }
 
 export function auditObjectLabel(kind: string | null | undefined): string {
   if (!kind) return '—';
-  return AUDIT_OBJECT_LABEL[kind] ?? kind;
+  const key = AUDIT_OBJECT_LABEL[kind];
+  return key ? dsT(key) : kind;
 }
 
 export function auditActorLabel(kind: string | null | undefined): string {
   if (!kind) return '—';
-  return AUDIT_ACTOR_LABEL[kind] ?? kind;
+  const key = AUDIT_ACTOR_LABEL[kind];
+  return key ? dsT(key) : kind;
 }
 
 /* ------------------------------------------------------------------ */
 /* Évènements                                                          */
 /* ------------------------------------------------------------------ */
 
-export const EVENT_TYPE_LABEL: Record<string, string> = {
-  tournament: 'Tournoi',
-  meetup: 'Rencontre',
-  watch_party: 'Projection',
-  showcase: 'Démo/Showcase',
-  other: 'Autre',
+export const EVENT_TYPE_LABEL: Record<string, DsKey> = {
+  tournament: 'catalog.eventType.tournament',
+  meetup: 'catalog.eventType.meetup',
+  watch_party: 'catalog.eventType.watchParty',
+  showcase: 'catalog.eventType.showcase',
+  other: 'catalog.eventType.other',
 };
 
 export const EVENT_TYPE_TONE: Record<string, Tone> = {
@@ -142,10 +146,11 @@ export const EVENT_TYPE_TONE: Record<string, Tone> = {
   other: 'neutral',
 };
 
-/** Type d'évènement en français, tolérant aux valeurs absentes/inconnues. */
+/** Type d'évènement, tolérant aux valeurs absentes/inconnues. */
 export function eventTypeLabel(type: string | null | undefined): string {
   if (!type) return '—';
-  return EVENT_TYPE_LABEL[type] ?? type;
+  const key = EVENT_TYPE_LABEL[type];
+  return key ? dsT(key) : type;
 }
 
 export function eventTypeTone(type: string | null | undefined): Tone {
@@ -153,30 +158,38 @@ export function eventTypeTone(type: string | null | undefined): Tone {
   return EVENT_TYPE_TONE[type] ?? 'neutral';
 }
 
-export const EVENT_STATUS_LABEL: Record<string, string> = {
-  draft: 'Brouillon',
-  published: 'Publié',
-  cancelled: 'Annulé',
-  finished: 'Terminé',
+export const EVENT_STATUS_LABEL: Record<string, DsKey> = {
+  draft: 'catalog.eventStatus.draft',
+  published: 'catalog.eventStatus.published',
+  cancelled: 'catalog.eventStatus.cancelled',
+  finished: 'catalog.eventStatus.finished',
 };
+
+/** Statut d'évènement, tolérant aux valeurs absentes/inconnues. */
+export function eventStatusLabel(status: string | null | undefined): string {
+  if (!status) return '—';
+  const key = EVENT_STATUS_LABEL[status];
+  return key ? dsT(key) : status;
+}
 
 /* ------------------------------------------------------------------ */
 /* Compétitions                                                        */
 /* ------------------------------------------------------------------ */
 
-export const COMPETITION_FORMAT_LABEL: Record<string, string> = {
-  single_elimination: 'Élimination directe',
-  double_elimination: 'Double élimination',
-  round_robin: 'Poules (round robin)',
-  groups_playoffs: 'Poules + phase finale',
-  swiss: 'Système suisse',
+export const COMPETITION_FORMAT_LABEL: Record<string, DsKey> = {
+  single_elimination: 'catalog.competitionFormat.singleElimination',
+  double_elimination: 'catalog.competitionFormat.doubleElimination',
+  round_robin: 'catalog.competitionFormat.roundRobin',
+  groups_playoffs: 'catalog.competitionFormat.groupsPlayoffs',
+  swiss: 'catalog.competitionFormat.swiss',
 };
 
 export function competitionFormatLabel(
   format: string | null | undefined,
 ): string {
   if (!format) return '—';
-  return COMPETITION_FORMAT_LABEL[format] ?? format;
+  const key = COMPETITION_FORMAT_LABEL[format];
+  return key ? dsT(key) : format;
 }
 
 export const COMPETITION_STATUS_TONE: Record<string, Tone> = {
@@ -185,17 +198,18 @@ export const COMPETITION_STATUS_TONE: Record<string, Tone> = {
   finished: 'neutral',
 };
 
-export const COMPETITION_STATUS_LABEL: Record<string, string> = {
-  ongoing: 'En cours',
-  upcoming: 'À venir',
-  finished: 'Terminée',
+export const COMPETITION_STATUS_LABEL: Record<string, DsKey> = {
+  ongoing: 'catalog.competitionStatus.ongoing',
+  upcoming: 'catalog.competitionStatus.upcoming',
+  finished: 'catalog.competitionStatus.finished',
 };
 
 export function competitionStatusLabel(
   status: string | null | undefined,
 ): string {
   if (!status) return '—';
-  return COMPETITION_STATUS_LABEL[status] ?? status;
+  const key = COMPETITION_STATUS_LABEL[status];
+  return key ? dsT(key) : status;
 }
 
 export function competitionStatusTone(status: string | null | undefined): Tone {
@@ -207,34 +221,36 @@ export function competitionStatusTone(status: string | null | undefined): Tone {
 /* Billets d'évènement                                                 */
 /* ------------------------------------------------------------------ */
 
-export const TICKET_STATUS_META: Record<string, { label: string; tone: Tone }> = {
-  paid: { label: 'Payé', tone: 'accent' },
-  reserved: { label: 'À régler sur place', tone: 'warning' },
-  cancelled: { label: 'Annulé', tone: 'danger' },
-  refunded: { label: 'Remboursé', tone: 'neutral' },
+export const TICKET_STATUS_META: Record<string, { labelKey: DsKey; tone: Tone }> = {
+  paid: { labelKey: 'catalog.ticketStatus.paid', tone: 'accent' },
+  reserved: { labelKey: 'catalog.ticketStatus.reserved', tone: 'warning' },
+  cancelled: { labelKey: 'catalog.ticketStatus.cancelled', tone: 'danger' },
+  refunded: { labelKey: 'catalog.ticketStatus.refunded', tone: 'neutral' },
 };
 
 export function ticketStatusMeta(status: string): { label: string; tone: Tone } {
-  return TICKET_STATUS_META[status] ?? { label: status, tone: 'neutral' };
+  const meta = TICKET_STATUS_META[status];
+  return meta ? { label: dsT(meta.labelKey), tone: meta.tone } : { label: status, tone: 'neutral' };
 }
 
 /* ------------------------------------------------------------------ */
 /* Abonnements de salle                                                */
 /* ------------------------------------------------------------------ */
 
-export const SUBSCRIPTION_STATUS_LABEL: Record<string, string> = {
-  pending_payment: 'En attente d’encaissement',
-  active: 'Active',
-  exhausted: 'Épuisé',
-  expired: 'Expiré',
-  cancelled: 'Annulé',
+export const SUBSCRIPTION_STATUS_LABEL: Record<string, DsKey> = {
+  pending_payment: 'catalog.subscriptionStatus.pendingPayment',
+  active: 'catalog.subscriptionStatus.active',
+  exhausted: 'catalog.subscriptionStatus.exhausted',
+  expired: 'catalog.subscriptionStatus.expired',
+  cancelled: 'catalog.subscriptionStatus.cancelled',
 };
 
 export function subscriptionStatusLabel(
   status: string | null | undefined,
 ): string {
   if (!status) return '—';
-  return SUBSCRIPTION_STATUS_LABEL[status] ?? status;
+  const key = SUBSCRIPTION_STATUS_LABEL[status];
+  return key ? dsT(key) : status;
 }
 
 /* ------------------------------------------------------------------ */
@@ -246,16 +262,17 @@ export function subscriptionStatusLabel(
  * La table était recopiée mot pour mot dans les deux écrans « Duels »
  * (web et natif) : une seule source ici, comme le reste du vocabulaire.
  */
-export const PLATFORM_LABEL: Record<string, string> = {
-  ps5: 'PS5',
-  ps4: 'PS4',
-  xbox: 'Xbox',
-  pc: 'PC',
-  mobile: 'Mobile',
+export const PLATFORM_LABEL: Record<string, DsKey> = {
+  ps5: 'catalog.platform.ps5',
+  ps4: 'catalog.platform.ps4',
+  xbox: 'catalog.platform.xbox',
+  pc: 'catalog.platform.pc',
+  mobile: 'catalog.platform.mobile',
 };
 
 /** Plateforme en clair ; on retombe sur l'identifiant si elle est inconnue. */
 export function platformLabel(platform: string | null | undefined): string {
   if (!platform) return '—';
-  return PLATFORM_LABEL[platform] ?? platform;
+  const key = PLATFORM_LABEL[platform];
+  return key ? dsT(key) : platform;
 }

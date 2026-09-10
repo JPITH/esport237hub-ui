@@ -13,7 +13,8 @@ import {
   type ViewStyle,
 } from 'react-native';
 
-import { Badge, Card, font, radius, spacing, useE237Colors } from './core';
+import { useDsT } from '../i18n';
+import { Badge, Card, font, radius, spacing, useE237Colors, useNeu } from './core';
 import { DuelStatusBadge } from './duel-status-badge';
 
 /* ------------------------------------------------------------------ */
@@ -37,7 +38,31 @@ export interface DuelRowProps {
   style?: StyleProp<ViewStyle>;
 }
 
-/** Ligne de liste d'un duel : adversaires, contexte, score et statut. */
+/**
+ * Ligne de liste d'un duel : adversaires, contexte, score et statut.
+ *
+ * TROIS RÈGLES DE MISE EN PAGE, TIRÉES D'UNE RECETTE AU TÉLÉPHONE
+ *
+ * 1. **Une ligne fait toujours la même hauteur.** Le libellé de contexte
+ *    n'était pas borné : « EA SPORTS FC 27 · En salle · 11 sept., 08:19 »
+ *    passait à la ligne, celui d'à côté non, et la liste montrait des cartes
+ *    de deux tailles en alternance. Les deux textes sont désormais sur une
+ *    ligne avec ellipse, et la ligne porte une hauteur minimale.
+ *
+ * 2. **Les statuts s'alignent en colonne.** Sans largeur minimale à droite,
+ *    chaque pastille commençait où finissait son texte — « Validé » et
+ *    « Salle en attente » ne partageaient aucun bord. Le regard doit pouvoir
+ *    descendre la colonne des statuts sans zigzaguer.
+ *
+ * 3. **Le score ne change pas la hauteur.** Il était EMPILÉ au-dessus de la
+ *    pastille : une ligne avec résultat était plus haute qu'une ligne sans.
+ *    Il se pose maintenant À CÔTÉ, dans la même rangée.
+ *
+ * La date passe EN TÊTE du libellé de contexte, avant le jeu et le lieu.
+ * L'ellipse mange toujours la fin : avec l'ordre d'avant, « EA SPORTS FC 27 »
+ * survivait entier et la date — la seule chose qu'on cherche dans une liste de
+ * duels — se coupait en « 11 … ».
+ */
 export function DuelRow({
   onPress,
   challengerName,
@@ -51,16 +76,25 @@ export function DuelRow({
   style,
 }: DuelRowProps) {
   const c = useE237Colors();
+  const neu = useNeu();
+  const t = useDsT();
   const hasScore = challengerScore !== null && opponentScore !== null;
 
-  const body = (
-    <Card style={[styles.row, style]}>
+  const body = (pressed: boolean) => (
+    <Card style={[styles.row, pressed ? neu.pressedSm : null, style]}>
       <View style={styles.main}>
-        <Text style={[styles.names, { color: c.textPrimary }]}>
-          {challengerName ?? '?'} vs {opponentName ?? 'adversaire ouvert'}
+        <Text
+          style={[styles.names, { color: c.textPrimary }]}
+          numberOfLines={1}
+        >
+          {challengerName ?? '?'} vs {opponentName ?? t('ui.openOpponent')}
         </Text>
-        <Text style={[styles.meta, { color: c.textMuted }]}>
-          {gameName ?? '—'} · {isOnline ? 'En ligne' : 'En salle'} · {dateLabel}
+        <Text
+          style={[styles.meta, { color: c.textMuted }]}
+          numberOfLines={1}
+        >
+          {dateLabel} · {gameName ?? '—'} ·{' '}
+          {isOnline ? t('ui.online') : t('ui.inVenue')}
         </Text>
       </View>
       <View style={styles.trailing}>
@@ -74,15 +108,17 @@ export function DuelRow({
     </Card>
   );
 
-  if (!onPress) return body;
+  if (!onPress) return body(false);
 
   return (
-    <Pressable
-      accessibilityRole="button"
-      onPress={onPress}
-      style={({ pressed }) => (pressed ? styles.pressed : undefined)}
-    >
-      {body}
+    <Pressable accessibilityRole="button" onPress={onPress}>
+      {/*
+        Enfoncement neumorphique plutôt qu'un `opacity: 0.85`. Baisser
+        l'opacité d'une carte en relief éclaircit ses ombres en même temps que
+        son fond : la carte a l'air de s'effacer, pas de s'enfoncer. C'est la
+        recette `pressedSm` qui dit « appuyé » dans ce langage visuel.
+      */}
+      {({ pressed }) => body(pressed)}
     </Pressable>
   );
 }
@@ -120,9 +156,10 @@ export function ScoreSide({
   style,
 }: ScoreSideProps) {
   const c = useE237Colors();
+  const t = useDsT();
   const label = (
     <Text style={[styles.username, { color: c.textPrimary }]}>
-      {username ?? 'En attente'}
+      {username ?? t('ui.waiting')}
     </Text>
   );
 
@@ -145,7 +182,7 @@ export function ScoreSide({
       {name ? (
         <Text style={[styles.meta, { color: c.textMuted }]}>{name}</Text>
       ) : null}
-      {winner ? <Badge tone="gold">Vainqueur</Badge> : null}
+      {winner ? <Badge tone="gold">{t('ui.winner')}</Badge> : null}
       {children}
     </View>
   );
@@ -158,11 +195,20 @@ const styles = StyleSheet.create({
     gap: spacing['3'],
     paddingVertical: spacing['3'],
     borderRadius: radius.lg,
+    // Rythme constant de la liste — voir la règle 1 en tête de `DuelRow`.
+    minHeight: 72,
   },
-  main: { flex: 1, gap: 2 },
+  main: { flex: 1, gap: 2, minWidth: 0 },
   names: { fontSize: font.size.sm, fontWeight: font.weight.semibold },
   meta: { fontSize: font.size.xs },
-  trailing: { alignItems: 'flex-end', gap: spacing['1'] },
+  trailing: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: spacing['2'],
+    // Colonne de statuts alignée — voir la règle 2.
+    minWidth: 108,
+  },
   score: { fontSize: 15, fontWeight: font.weight.bold },
   side: { alignItems: 'center', gap: spacing['1'] },
   bigScore: { fontSize: font.size['3xl'], fontWeight: font.weight.bold },

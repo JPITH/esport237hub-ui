@@ -15,6 +15,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 
+import { useDsT } from '../i18n';
 import {
   RATING_AXES,
   RATING_GATE_MESSAGE,
@@ -51,11 +52,12 @@ export interface StarRatingProps {
  */
 export function StarRating({ value, size = 16, showValue = false, style }: StarRatingProps) {
   const c = useE237Colors();
+  const t = useDsT();
   const fills = starFills(value);
   const label =
     value === null || value === undefined
-      ? 'Pas encore noté'
-      : `${formatRatingAverage(value)} sur ${RATING_MAX}`;
+      ? t('rating.summary.not_rated')
+      : t('rating.summary.value_of_max', { value: formatRatingAverage(value), max: RATING_MAX });
 
   return (
     <View
@@ -115,6 +117,7 @@ export function StarRatingInput({
   style,
 }: StarRatingInputProps) {
   const c = useE237Colors();
+  const t = useDsT();
 
   return (
     <View style={[styles.inputBlock, disabled ? styles.disabled : null, style]}>
@@ -142,7 +145,7 @@ export function StarRatingInput({
       </View>
       {/* L'échelle en toutes lettres : « 3 étoiles » ne veut rien dire seul. */}
       <Text style={[styles.hint, { color: c.textSecondary }]}>
-        {value === null ? 'Choisis une note' : RATING_LABELS[value]}
+        {value === null ? t('rating.input.choose') : RATING_LABELS[value]}
       </Text>
     </View>
   );
@@ -167,6 +170,7 @@ export interface RatingSummaryProps {
  */
 export function RatingSummary({ average, count, breakdown, axes, style }: RatingSummaryProps) {
   const c = useE237Colors();
+  const t = useDsT();
   const empty = !count;
   const bars = breakdown ? ratingDistribution(breakdown) : null;
 
@@ -197,8 +201,7 @@ export function RatingSummary({ average, count, breakdown, axes, style }: Rating
           </View>
         ) : (
           <Text style={[styles.emptyText, { color: c.textSecondary }]}>
-            Personne n’a encore noté cette salle. Joue une séance ici, tu seras le premier à
-            donner ton avis.
+            {t('rating.summary.empty')}
           </Text>
         )}
       </View>
@@ -245,13 +248,16 @@ export function VenueReview({
   style,
 }: VenueReviewProps) {
   const c = useE237Colors();
+  const t = useDsT();
   return (
     <View style={[styles.review, { borderBottomColor: c.border }, style]}>
       <View style={styles.reviewHead}>
         <Text style={[styles.author, { color: c.textPrimary }]}>{author}</Text>
         {verified ? (
           <View style={[styles.playedHere, { backgroundColor: c.accentSubtle }]}>
-            <Text style={[styles.playedHereText, { color: c.accent }]}>A JOUÉ ICI</Text>
+            <Text style={[styles.playedHereText, { color: c.accent }]}>
+              {t('rating.review.played_here')}
+            </Text>
           </View>
         ) : null}
         <Text style={[styles.when, { color: c.textMuted }]}>{when}</Text>
@@ -323,7 +329,12 @@ const styles = StyleSheet.create({
   reviewHead: { flexDirection: 'row', alignItems: 'center', gap: spacing['2'] },
   author: { fontSize: font.size.sm, fontWeight: font.weight.semibold },
   playedHere: { borderRadius: radius.full, paddingHorizontal: spacing['2'], paddingVertical: 2 },
-  playedHereText: { fontSize: 10, fontWeight: font.weight.semibold, letterSpacing: 0.4 },
+  playedHereText: {
+    fontSize: 10,
+    fontWeight: font.weight.semibold,
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
+  },
   when: { marginLeft: 'auto', fontSize: font.size.xs },
   comment: { fontSize: font.size.sm },
 
