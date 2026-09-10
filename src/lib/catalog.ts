@@ -8,7 +8,7 @@
  * ici ; les fonctions sont tolérantes aux valeurs inconnues pour ne jamais
  * afficher un identifiant technique brut à un joueur.
  */
-import { dsT, type DsKey } from '../i18n';
+import { dsT, type DsKey } from '../i18n/store';
 import type { Tone } from './tone';
 
 /* ------------------------------------------------------------------ */

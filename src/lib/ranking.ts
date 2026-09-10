@@ -7,7 +7,7 @@
  * bandeau « Mis à jour à … ». On garde les secondes : le classement en direct
  * bouge à la seconde, l'heure doit le montrer.
  */
-import { dsLocale, dsT } from '../i18n';
+import { dsLocale, dsT } from '../i18n/store';
 
 /** Sens de mouvement d'une ligne (rang) ou d'un grade (division). */
 export type RankMovement = 'up' | 'down' | 'same';

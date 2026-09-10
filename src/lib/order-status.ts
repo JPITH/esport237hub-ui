@@ -5,7 +5,7 @@
  */
 import type { OrderStatus } from '@esport237hub/types';
 
-import { dsT } from '../i18n';
+import { dsT } from '../i18n/store';
 import type { Tone } from './tone';
 
 export const ORDER_STATUS_TONE: Record<OrderStatus, Tone> = {

@@ -6,7 +6,7 @@
  * de recharge était écrite deux fois (`recharge-form.tsx` et
  * `apps/mobile/src/app/wallet.tsx`).
  */
-import { dsT, type DsKey } from '../i18n';
+import { dsT, type DsKey } from '../i18n/store';
 
 /** Origine d'une opération → clé de libellé lisible par un joueur. */
 export const WALLET_SOURCE_LABEL: Record<string, DsKey> = {

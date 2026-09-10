@@ -16,7 +16,7 @@
  * note à la décimale côté natif (« 4,3 ») sur la même salle, et le joueur croit
  * à deux salles différentes.
  */
-import { dsLocale, dsT } from '../i18n';
+import { dsLocale, dsT } from '../i18n/store';
 
 /** Bornes de la note. La base les garde aussi (`check (rating between 1 and 5)`). */
 export const RATING_MIN = 1;
