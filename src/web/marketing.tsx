@@ -127,6 +127,8 @@ const ICONS = {
   Zap,
 } satisfies Record<string, LucideIcon>;
 
+import { BRAND_HOME_LABEL, BRAND_NAME_ACCENT, BRAND_NAME_REST } from '../lib/brand-name';
+
 export type IconName = keyof typeof ICONS;
 
 export interface GlyphProps {
@@ -162,7 +164,7 @@ export interface BrandLogoProps {
 }
 
 /**
- * Logo + mot-clé « ESPORT 237 HUB », identiques au dashboard
+ * Logo + mot-symbole, identiques au dashboard
  * (`apps/web/src/components/app-shell.tsx`) : image réelle, jamais une
  * initiale dessinée en CSS.
  */
@@ -186,7 +188,8 @@ export function BrandLogo({
         decoding="async"
       />
       <span className={cx('mkt-brand__word', compactWordmark && 'mkt-brand__word--compact')}>
-        ESPORT <span className="mkt-brand__accent">237</span> HUB
+        <span className="mkt-brand__accent">{BRAND_NAME_ACCENT}</span>
+        {BRAND_NAME_REST}
       </span>
     </>
   );
@@ -195,7 +198,7 @@ export function BrandLogo({
     return <span className={cx('mkt-brand', className)}>{inner}</span>;
   }
   return (
-    <a href={href} className={cx('mkt-brand', className)} aria-label="ESPORT 237 HUB — accueil">
+    <a href={href} className={cx('mkt-brand', className)} aria-label={BRAND_HOME_LABEL}>
       {inner}
     </a>
   );

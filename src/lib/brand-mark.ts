@@ -1,29 +1,43 @@
 /**
  * Le SIGNE de la marque — hexagone + monogramme « G/H ».
  *
- * ⚠️ PROVISOIRE, et il faut le savoir avant d'y toucher. Le porteur n'a PAS
- * validé ce dessin (20/08/2026). La planche de référence est une image tramée,
- * avec dégradés et facettes 3D ; ce qui suit en est une interprétation
- * VECTORIELLE À PLAT — même construction, même géométrie, deux encres, mais
- * pas les facettes.
- *
- * La suite est décidée : on attend le fichier vectoriel du graphiste
- * (.ai / .svg / .eps). Il remplacera les tracés ci-dessous et RIEN D'AUTRE —
- * composants, icônes des stores et favicons se régénèrent depuis eux
- * (`bun run brand:icons` dans le monorepo).
- *
- * Donc : ne pas relancer d'aller-retour d'affinage sur ces coordonnées. Quatre
- * itérations à l'aveugle n'ont pas convergé, et c'est normal — on ne retrouve
- * pas un dégradé au jugé. En attendant le fichier source, ce signe tient sa
- * place ; il ne prétend pas être l'identité définitive.
- *
- * Variante retenue par le porteur (20/08/2026) : la planche « Variations du
- * logo — inspiration #1 », proposition **02**, cadre hexagonal. C'est ce signe
- * qui sert d'icône d'application (iOS, Android, favicon) et de pastille dans
- * le bloc de marque : un « E » posé dans un carré arrondi ne tenait pas à
- * 48 px et ne ressemblait à rien de la planche.
- *
  * ─────────────────────────────────────────────────────────────────────────────
+ * D'OÙ VIENNENT CES TRACÉS (17/09/2026)
+ *
+ * Du fichier vectoriel fourni par le porteur — `ghub-iconsvg.svg`, repère
+ * 800×800. C'est l'attente que la version précédente de ce fichier annonçait :
+ * « on attend le fichier vectoriel du graphiste ; il remplacera les tracés
+ * ci-dessous et RIEN D'AUTRE ». Il est arrivé, il les a remplacés, et le signe
+ * n'est donc plus une interprétation à plat d'une planche tramée : c'est le
+ * dessin lui-même.
+ *
+ * Trois choses ont dû être TRADUITES, parce que le SVG source s'autorise ce
+ * que le rastériseur de `scripts/brand-icons.py` ne sait pas faire :
+ *
+ *  1. LE CADRE ÉTAIT UN `stroke` (largeur 13, jointure `miter`). Le rastériseur
+ *     ne sait que REMPLIR. Le contour est donc converti en anneau plein : un
+ *     hexagone extérieur horaire, un hexagone intérieur anti-horaire, et le
+ *     vide naît du SENS des contours — pas d'une règle de remplissage exotique.
+ *     Les deux rayons encadrent le rayon d'origine (366) de la demi-épaisseur
+ *     mesurée perpendiculairement au côté : 6,5 / cos 30° = 7,5056.
+ *
+ *  2. LE MONOGRAMME ÉTAIT DANS UN `<g transform="translate(-69 6.7)">`. La
+ *     translation est appliquée une fois pour toutes dans les coordonnées
+ *     ci-dessous : un tracé qui a besoin d'un groupe pour être au bon endroit
+ *     est un tracé qu'on posera un jour de travers.
+ *
+ *  3. LE FOND NOIR DU SVG N'EST PAS REPRIS. Le signe doit vivre en clair comme
+ *     en sombre (DESIGN.md, règle 4) ; l'aplat sombre est posé par la surface
+ *     qui l'accueille — `SURFACE` pour les icônes des stores, rien du tout pour
+ *     un favicon transparent.
+ *
+ * CE QUI N'A PAS CHANGÉ : les encres restent des RÔLES, jamais des hex. Le SVG
+ * source dit `#ADEB0B`, `#FFFFFF`, `#93CF0A` ; on garde le RAPPORT entre eux
+ * (la marque, le trait clair, la marque d'un échelon plus sombre) et chaque
+ * surface le résout dans son thème. Un hex écrit ici serait un vert inventé de
+ * plus, et DESIGN.md l'interdit.
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
  * POURQUOI DES TRACÉS LITTÉRAUX, ET NON UN CALCUL
  *
  * Ces chaînes sont lues à DEUX endroits qui ne partagent pas de runtime :
@@ -31,88 +45,59 @@
  *    aux mêmes coordonnées, sur les trois plateformes ;
  *  * `scripts/brand-icons.py` du monorepo, qui rastérise les icônes livrées
  *    aux stores. Il les extrait par expression régulière sur
- *    `export const MARK_*_PATH = '…'`.
+ *    `export const MARK_*_PATH = '…'` et lit `MARK_SIZE` de la même façon.
  *
  * Donc : une constante par tracé, une seule chaîne littérale entre apostrophes,
  * jamais de concaténation ni de gabarit. Changer la forme du signe se fait ici
  * et NULLE PART AILLEURS — puis on rejoue `bun run brand:icons`.
- * ─────────────────────────────────────────────────────────────────────────────
- *
- * Repère : carré de 256, centre (128, 128). L'hexagone est « pointe en haut »
- * (sommets à 12 h et 6 h, côtés verticaux à gauche et à droite), rayon
- * circonscrit 112 à l'extérieur, 100 à l'intérieur — soit un trait d'environ
- * 10,4 px mesuré perpendiculairement au côté.
- *
- * Les trois tracés se remplissent en `nonzero` :
- *  * l'anneau est un contour horaire suivi d'un contour ANTI-horaire — le
- *    second creuse le premier, c'est ce qui fait le vide au centre. Le rendre
- *    en `stroke` aurait donné un résultat différent du rastériseur Python, qui
- *    ne sait que remplir ;
- *  * le « G » est un C carré ouvert à droite, d'un seul tenant ;
- *  * le « H » est fait de trois rectangles de même sens : leur union est
- *    exactement le remplissage `nonzero`.
  */
 
-/** Côté du repère. Le `viewBox` du signe est `0 0 256 256`. */
-export const MARK_SIZE = 256;
+/**
+ * Côté du repère — celui du fichier source, gardé tel quel. Transposer les
+ * coordonnées dans un carré de 256 aurait fait entrer un arrondi dans chaque
+ * sommet pour ne rien gagner : le rastériseur et les deux moteurs SVG mettent
+ * le tracé à l'échelle de toute façon.
+ */
+export const MARK_SIZE = 800;
 
 /** `viewBox` prêt à poser sur un `<svg>` / `<Svg>`. */
 export const MARK_VIEW_BOX = `0 0 ${MARK_SIZE} ${MARK_SIZE}`;
 
 /**
- * Cadre hexagonal. Contour extérieur (rayon 112) puis contour intérieur
- * (rayon 103) écrit dans l'autre sens : le trou est produit par le SENS, pas
- * par une règle de remplissage exotique. Le trait fait donc environ 7,8 unités
- * mesuré perpendiculairement au côté — fin, comme sur la planche : un cadre
- * épais écrase le monogramme au lieu de le porter.
+ * Le cadre hexagonal, « pointe en haut ». Contour extérieur horaire
+ * (rayon 373,51), contour intérieur anti-horaire (rayon 358,49) : leur
+ * différence rend exactement le trait de 13 du fichier source.
  */
 export const MARK_RING_PATH =
-  'M 128 16 L 224.99 72 L 224.99 184 L 128 240 L 31.01 184 L 31.01 72 Z M 128 25 L 38.8 76.5 L 38.8 179.5 L 128 231 L 217.2 179.5 L 217.2 76.5 Z';
+  'M 400 26.49 L 723.47 213.25 L 723.47 586.75 L 400 773.51 L 76.53 586.75 L 76.53 213.25 Z M 400 41.51 L 89.54 220.76 L 89.54 579.24 L 400 758.49 L 710.46 579.24 L 710.46 220.76 Z';
 
 /**
- * Le « G » — d'un seul tenant, et c'est LUI qui porte la moitié haute du « H ».
- *
- * Trois choses font tout, et les trois manquaient à la première version :
- *
- *  1. LES COUPES À 45°. Tous les angles saillants sont biseautés sur 14 à 16
- *     unités. C'est ce qui distingue un monogramme PLIÉ d'un empilement de
- *     rectangles — sans elles le signe se lit comme du pixel art, ce qui était
- *     exactement le reproche.
- *
- *  2. LA LANGUE. Le tracé descend du bras supérieur (x 128→154) au lieu de
- *     s'arrêter : c'est le retour du G, et c'est aussi la moitié HAUTE du
- *     montant gauche du « H ». Sans elle, le blanc n'est qu'un « C ».
- *
- *  3. LE PLI, deux fois. En haut, la langue se termine sur une diagonale
- *     (154,90)→(128,116) que le vert reprend cinq unités plus bas : un même
- *     trait change d'encre en cours de route, et la couture sombre entre les
- *     deux est le pli de la planche. En bas, le bras s'arrête à x 124 quand le
- *     vert commence à 128 — quatre unités de fond, la même couture, verticale.
- *     Sans ces deux coutures, blanc et vert se touchent à plat et l'entrelacs
- *     disparaît.
- *
- * L'ouverture (la bouche du G) reste franche : y poser une coupe la
- * refermerait à l'œil.
+ * Le « G » — deux contours de MÊME sens, donc leur union est le remplissage
+ * `nonzero` : la panse, puis l'ergot qui prolonge le bras vers le « H ». C'est
+ * cet ergot qui fait l'entrelacs : sans lui, le blanc n'est qu'un « C » posé à
+ * côté du vert.
  */
 export const MARK_LETTER_G_PATH =
-  'M 62 74 L 78 58 L 140 58 L 154 72 L 154 90 L 128 116 L 128 84 L 104 84 L 88 100 L 88 156 L 104 172 L 124 172 L 124 184 L 110 198 L 78 198 L 62 182 Z';
+  'M 180 274.7 L 441 136.4 L 441 228.4 L 264 322.2 L 264 521.7 L 357 571 L 357 663.7 L 180 569.9 Z M 357 368.7 L 441 324.2 L 441 417.2 L 357 461.7 Z';
 
 /**
- * Le « H » — trois traits, tous écrits dans le MÊME sens : leur union est
- * exactement le remplissage `nonzero`.
- *
- *  * le montant gauche REPREND la langue du G sur la même diagonale, cinq
- *    unités plus bas, et descend plus bas que le G. C'est le pli : un seul
- *    trait, deux encres ;
- *  * la traverse, seule partie verte à couper la bouche du G ;
- *  * le montant droit, qui monte plus haut que le gauche ne descend. Ce
- *    déséquilibre est voulu — c'est lui qui donne son élan au signe sur la
- *    planche, et le corriger le rendrait inerte.
- *
- * Coupes à 45° à toutes les extrémités libres, comme sur le G.
+ * Le « H » — d'un seul tenant, en dix sommets. Le montant droit monte plus haut
+ * que le gauche ne descend ; ce déséquilibre est celui du fichier source, et
+ * c'est lui qui donne son élan au signe. Le corriger le rendrait inerte.
  */
 export const MARK_LETTER_H_PATH =
-  'M 128 122 L 154 96 L 154 196 L 140 210 L 128 210 Z M 190 72 L 202 72 L 202 172 L 188 186 L 176 186 L 176 86 Z M 128 128 L 202 128 L 202 154 L 128 154 Z';
+  'M 357 461.7 L 536 366.8 L 536 241.7 L 620 197.2 L 620 524.3 L 536 568.8 L 536 458.9 L 441 509.2 L 441 619.2 L 357 663.7 Z';
+
+/**
+ * La traverse, un échelon plus sombre — la seule facette que le fichier source
+ * conserve de la planche d'origine. Elle se pose PAR-DESSUS le « H » et donne
+ * au pli son épaisseur ; sans elle le monogramme redevient plat.
+ *
+ * Elle disparaît dans la variante pleine : à 16 px, une quatrième encre sur un
+ * quadrilatère de trois pixels ne fait que salir le vert.
+ */
+export const MARK_CROSSBAR_SHADE_PATH =
+  'M 441 417.2 L 536 366.8 L 536 458.9 L 441 509.2 Z';
 
 /**
  * Hexagone PLEIN — la variante des toutes petites tailles. En dessous d'une
@@ -121,24 +106,24 @@ export const MARK_LETTER_H_PATH =
  * silhouette hexagonale pleine et le monogramme s'y détache en clair.
  */
 export const MARK_HEX_SOLID_PATH =
-  'M 128 16 L 224.99 72 L 224.99 184 L 128 240 L 31.01 184 L 31.01 72 Z';
+  'M 400 26.49 L 723.47 213.25 L 723.47 586.75 L 400 773.51 L 76.53 586.75 L 76.53 213.25 Z';
 
 /**
- * Les trois pièces dans leur ORDRE DE PEINTURE — le « H » passe par-dessus le
- * « G », c'est l'entrelacement de la planche. Le rôle dit quelle encre poser :
- * `accent` la marque (vert), `contrast` le trait clair (blanc sur fond sombre,
- * encre du texte sur fond clair).
+ * Les pièces dans leur ORDRE DE PEINTURE, celui du fichier source : cadre, puis
+ * « G », puis « H » par-dessus, puis la facette de la traverse. Le rôle dit
+ * quelle encre poser ; aucune surface ne connaît de hex.
  */
 export const MARK_PARTS_OUTLINE = [
   { key: 'ring', role: 'accent', d: MARK_RING_PATH },
   { key: 'letterG', role: 'contrast', d: MARK_LETTER_G_PATH },
   { key: 'letterH', role: 'accent', d: MARK_LETTER_H_PATH },
+  { key: 'crossbarShade', role: 'accentShade', d: MARK_CROSSBAR_SHADE_PATH },
 ] as const;
 
 /**
  * Variante pleine : la silhouette porte l'accent, le monogramme entier passe
- * en encre posée-sur-accent. Deux encres au lieu de trois — à 16 px, la
- * troisième ne se voyait pas, elle ne faisait que salir le vert.
+ * en encre posée-sur-accent. Deux encres au lieu de quatre — à 16 px, les
+ * autres ne se voient pas, elles ne font que salir le vert.
  */
 export const MARK_PARTS_SOLID = [
   { key: 'hex', role: 'accent', d: MARK_HEX_SOLID_PATH },
@@ -146,8 +131,17 @@ export const MARK_PARTS_SOLID = [
   { key: 'letterH', role: 'onAccent', d: MARK_LETTER_H_PATH },
 ] as const;
 
-/** Rôle d'encre d'une pièce du signe. */
-export type MarkPartRole = 'accent' | 'contrast' | 'onAccent';
+/**
+ * Rôle d'encre d'une pièce du signe.
+ *
+ * `accentShade` est l'accent D'UN ÉCHELON PLUS SOMBRE, pas une couleur de plus :
+ * les surfaces le résolvent sur le même barreau que l'état survolé de l'accent
+ * (clair : 700 → 800 ; sombre : 400 → 500). C'est exactement le rapport que le
+ * fichier source pose entre `#ADEB0B` et `#93CF0A`, et cela évite d'ajouter un
+ * jeton — donc un test de contraste, une variable CSS et une couleur native —
+ * pour un quadrilatère.
+ */
+export type MarkPartRole = 'accent' | 'contrast' | 'onAccent' | 'accentShade';
 
 /** Une pièce du signe, telle que la parcourt un composant de rendu. */
 export interface MarkPart {

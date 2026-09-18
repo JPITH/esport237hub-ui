@@ -12,6 +12,7 @@
 import { useMemo } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 
+import { BRAND_NAME } from '../lib/brand-name';
 import { useDsT } from '../i18n';
 import { cardStats, cityAbbr, type StatDef } from '../lib/player-stats';
 import { CARD_LAYOUT, FLAG_RADIUS, pct } from '../skins/geometry';
@@ -140,7 +141,7 @@ export function CardFooter({ spec }: { spec: SkinSpec }) {
   return (
     <View style={s.footer} pointerEvents="none">
       <View style={[s.chip, { borderColor: stopColor(spec.frame, 1) }]}>
-        <Text style={[s.chipText, { color: spec.ink }]}>ESPORT 237</Text>
+        <Text style={[s.chipText, { color: spec.ink }]}>{BRAND_NAME}</Text>
       </View>
     </View>
   );

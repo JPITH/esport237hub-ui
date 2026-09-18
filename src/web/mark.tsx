@@ -15,11 +15,19 @@ import type { CSSProperties } from "react";
 
 import { MARK_VIEW_BOX, markParts, type MarkPartRole, type MarkVariant } from "../lib/brand-mark";
 
-/** Encre de chaque rôle. `contrast` hérite de la couleur de texte courante. */
+/**
+ * Encre de chaque rôle. `contrast` hérite de la couleur de texte courante.
+ *
+ * `accentShade` — la facette de la traverse — réutilise l'échelon de l'accent
+ * survolé plutôt qu'un jeton à elle : c'est déjà « l'accent d'un barreau plus
+ * sombre » dans les deux thèmes (clair 700 → 800, sombre 400 → 500), soit
+ * exactement le rapport du fichier source entre `#ADEB0B` et `#93CF0A`.
+ */
 const INK: Record<MarkPartRole, string> = {
   accent: "var(--e237-accent)",
   contrast: "currentColor",
   onAccent: "var(--e237-on-accent)",
+  accentShade: "var(--e237-accent-hover)",
 };
 
 export interface AppMarkProps {

@@ -34,10 +34,15 @@ export interface AppMarkProps {
 
 export function AppMark({ size = 32, variant, title, contrast, style }: AppMarkProps) {
   const c = useE237Colors();
+  // `accentShade` — la facette de la traverse — réutilise l'échelon de l'accent
+  // survolé plutôt qu'une couleur à elle : c'est déjà « l'accent d'un barreau
+  // plus sombre » dans les deux thèmes, soit le rapport du fichier source entre
+  // `#ADEB0B` et `#93CF0A`.
   const ink: Record<MarkPartRole, string> = {
     accent: c.accent,
     contrast: contrast ?? c.textPrimary,
     onAccent: c.onAccent,
+    accentShade: c.accentHover,
   };
 
   return (

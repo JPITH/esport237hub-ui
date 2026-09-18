@@ -18,6 +18,8 @@ import { Picture } from './picture';
  * acceptée — un skin créé dans le dashboard est une clé arbitraire, résolue
  * par le catalogue (`SkinCatalogProvider`).
  */
+import { BRAND_NAME } from '../lib/brand-name';
+
 export type CardSkin = BuiltinSkinKey | (string & {});
 
 /**
@@ -212,7 +214,7 @@ export function PlayerCard({
       </div>
 
       <div className="pcard__footer">
-        <span className="pcard__chip">ESPORT 237</span>
+        <span className="pcard__chip">{BRAND_NAME}</span>
       </div>
     </CardChrome>
   );
@@ -331,7 +333,7 @@ export function GlobalCard({
       </div>
 
       <div className="pcard__footer">
-        <span className="pcard__chip">ESPORT 237</span>
+        <span className="pcard__chip">{BRAND_NAME}</span>
       </div>
     </CardChrome>
   );

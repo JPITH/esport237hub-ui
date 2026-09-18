@@ -16,6 +16,8 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
+
+import { BRAND_NAME_ACCENT, BRAND_NAME_REST } from '../lib/brand-name';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -186,7 +188,8 @@ export function AuthHero({
         <AppMark size={48} />
       )}
       <Text style={[styles.brand, { color: c.textPrimary }]}>
-        ESPORT <Text style={{ color: c.accent }}>237</Text> HUB
+        <Text style={{ color: c.accent }}>{BRAND_NAME_ACCENT}</Text>
+        {BRAND_NAME_REST}
       </Text>
       <Text style={[styles.heroTitle, { color: c.textPrimary }]}>{title}</Text>
       {subtitle ? (

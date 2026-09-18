@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { Moon, Sun } from "lucide-react";
 
+import { BRAND_HOME_LABEL, BRAND_NAME, BRAND_NAME_ACCENT, BRAND_NAME_REST } from "../lib/brand-name";
 import { AppMark } from "./mark";
 
 /* ------------------------------------------------------------------ */
@@ -20,11 +21,15 @@ export interface BrandLockupProps {
 }
 
 /**
- * Bloc de marque : le SIGNE (hexagone + monogramme « G/H ») + « ESPORT 237 HUB ».
+ * Bloc de marque : le SIGNE (hexagone + monogramme « G/H ») + le mot-symbole.
  *
- * Il était recopié cinq fois (app-shell ×2, layout admin ×2, panneau
- * d'authentification) — et le « 237 » en vert n'était pas toujours au même
- * endroit. Une seule écriture, ici.
+ * Le nom vient de `../lib/brand-name` et n'est PAS écrit ici — c'est ce qui a
+ * fait durer douze jours un renommage à moitié appliqué (voir ce module).
+ *
+ * Le BLOC était recopié cinq fois (app-shell ×2, layout admin ×2, panneau
+ * d'authentification) ; il est écrit une seule fois ici. Le NOM, lui, l'était
+ * treize fois dans le dépôt, et il est écrit une seule fois dans
+ * `../lib/brand-name`.
  *
  * La pastille verte au « E » a vécu jusqu'au 20/08/2026 : elle ne ressemblait
  * à rien de la planche de marque et ne tenait pas en icône d'application. Le
@@ -43,7 +48,8 @@ export function BrandLockup({
       <AppMark size={box} className="shrink-0" />
       {compact ? null : (
         <span className="font-display text-sm font-bold leading-tight tracking-tight">
-          ESPORT <span className="text-accent">237</span> HUB
+          <span className="text-accent">{BRAND_NAME_ACCENT}</span>
+          {BRAND_NAME_REST}
         </span>
       )}
     </>
@@ -52,13 +58,13 @@ export function BrandLockup({
   const cls = `flex items-center gap-2 ${className}`.trim();
   if (href) {
     return (
-      <a href={href} aria-label="ESPORT 237 HUB — accueil" className={cls}>
+      <a href={href} aria-label={BRAND_HOME_LABEL} className={cls}>
         {content}
       </a>
     );
   }
   return (
-    <span aria-label="ESPORT 237 HUB" className={cls}>
+    <span aria-label={BRAND_NAME} className={cls}>
       {content}
     </span>
   );

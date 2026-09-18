@@ -12,6 +12,7 @@ export * from './rating';
 export * from './relative-time';
 export * from './external-url';
 export * from './brand-mark';
+export * from './brand-name';
 /*
  * Le STORE seul, pas les hooks.
  *

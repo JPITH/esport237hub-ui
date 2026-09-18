@@ -1,8 +1,11 @@
 /**
- * Bloc de marque : le SIGNE (hexagone + monogramme « G/H ») + « ESPORT 237
- * HUB » (natif) — jumeau de la `BrandLockup` du web (même nom, mêmes props
- * sauf `href`, remplacé par `onPress` : le design system ne connaît pas le
+ * Bloc de marque : le SIGNE (hexagone + monogramme « G/H ») + le mot-symbole
+ * (natif) — jumeau de la `BrandLockup` du web (même nom, mêmes props sauf
+ * `href`, remplacé par `onPress` : le design system ne connaît pas le
  * routeur).
+ *
+ * Le nom vient de `../lib/brand-name` et n'est PAS écrit ici : recopié, il
+ * n'avait changé qu'à un endroit sur six lors du renommage en G-HUB.
  *
  * La pastille verte au « E » a vécu jusqu'au 20/08/2026 ; le signe la
  * remplace, et c'est le même dessin que l'icône de l'application.
@@ -16,6 +19,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 
+import { BRAND_HOME_LABEL, BRAND_NAME_ACCENT, BRAND_NAME_REST } from '../lib/brand-name';
 import { font, spacing, useE237Colors } from './core';
 import { AppMark } from './mark';
 
@@ -43,7 +47,8 @@ export function BrandLockup({
       <AppMark size={box} />
       {compact ? null : (
         <Text style={[styles.wordmark, { color: c.textPrimary }]}>
-          ESPORT <Text style={{ color: c.accent }}>237</Text> HUB
+          <Text style={{ color: c.accent }}>{BRAND_NAME_ACCENT}</Text>
+          {BRAND_NAME_REST}
         </Text>
       )}
     </View>
@@ -54,7 +59,7 @@ export function BrandLockup({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel="ESPORT 237 HUB — accueil"
+      accessibilityLabel={BRAND_HOME_LABEL}
       onPress={onPress}
       style={({ pressed }) => (pressed ? styles.pressed : undefined)}
     >
@@ -88,7 +93,7 @@ export function AppLogo({ size = 32, onPress, style }: AppLogoProps) {
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel="ESPORT 237 HUB — accueil"
+      accessibilityLabel={BRAND_HOME_LABEL}
       onPress={onPress}
       hitSlop={8}
       style={({ pressed }) => (pressed ? styles.pressed : undefined)}
