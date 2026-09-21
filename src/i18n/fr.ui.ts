@@ -21,6 +21,10 @@ export const frUi = {
   'ui.waiting': 'En attente',
   'ui.winner': 'Vainqueur',
 
+  // Feuille modale : la poignée est manipulable, elle doit se dire.
+  'ui.sheet.handle': 'Poignée de la feuille',
+  'ui.sheet.handleHint': 'Agrandir ou réduire la feuille',
+
   // Temps relatif (fil d'actualité)
   'ui.time.now': 'à l’instant',
   'ui.time.minutes': 'il y a {n} min',

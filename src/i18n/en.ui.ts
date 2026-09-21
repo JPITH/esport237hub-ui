@@ -19,6 +19,10 @@ export const enUi: Record<keyof typeof frUi, string> = {
   'ui.waiting': 'Waiting',
   'ui.winner': 'Winner',
 
+  // Feuille modale : la poignée est manipulable, elle doit se dire.
+  'ui.sheet.handle': 'Sheet handle',
+  'ui.sheet.handleHint': 'Expand or shrink the sheet',
+
   'ui.time.now': 'just now',
   'ui.time.minutes': '{n} min ago',
   'ui.time.hours': '{n} h ago',
