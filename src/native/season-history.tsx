@@ -20,9 +20,9 @@ import {
   type DivisionView,
   type RolloverOutcome,
 } from '../lib/ranking';
-import { font, radius, spacing, useE237Colors } from './core';
+import { radius, spacing, useE237Colors } from './core';
 import { DivisionBadge } from './division-badge';
-import { Txt as Text } from './text';
+import { Txt } from './text';
 
 /** Une saison du palmarès — `GET /rankings/history/:username`. */
 export interface SeasonHistoryEntry {
@@ -59,10 +59,10 @@ export function SeasonHistory({ entries, gameSlug, style }: SeasonHistoryProps) 
       // Le `style` reçu est un style de VUE : le poser sur un `Text` ne
       // compile pas (userSelect diverge entre ViewStyle et TextStyle).
       <View style={style}>
-        <Text style={[styles.empty, { color: c.textSecondary }]}>
+        <Txt variant="body" tone="secondary">
           Aucune saison jouée pour l’instant. Le premier duel validé ouvre ton
           palmarès.
-        </Text>
+        </Txt>
       </View>
     );
   }
@@ -81,17 +81,17 @@ export function SeasonHistory({ entries, gameSlug, style }: SeasonHistoryProps) 
             key={`${entry.seasonId}-${entry.game.slug}`}
             style={[styles.row, { borderBottomColor: c.border }]}>
             <View style={styles.main}>
-              <Text style={[styles.season, { color: c.textPrimary }]} numberOfLines={1}>
+              <Txt variant="label" numberOfLines={1}>
                 {entry.seasonName}
-              </Text>
-              <Text style={[styles.game, { color: c.textMuted }]} numberOfLines={1}>
+              </Txt>
+              <Txt variant="caption" tone="muted" numberOfLines={1}>
                 {entry.game.name}
-              </Text>
+              </Txt>
               <View style={styles.metaRow}>
-                <Text style={[styles.meta, { color: c.textSecondary }]}>
+                <Txt variant="caption" tone="secondary">
                   {entry.duelsPlayed} duel{entry.duelsPlayed > 1 ? 's' : ''} ·{' '}
                   {entry.wins}/{entry.losses} · {entry.points} pts
-                </Text>
+                </Txt>
               </View>
             </View>
 
@@ -105,15 +105,15 @@ export function SeasonHistory({ entries, gameSlug, style }: SeasonHistoryProps) 
               ) : null}
               <View style={styles.result}>
                 <Trophy color={c.gold} size={13} />
-                <Text style={[styles.position, { color: c.textPrimary }]}>
+                <Txt variant="bodyBold">
                   {seasonResultLabel(entry.state, entry.finalPosition)}
-                </Text>
+                </Txt>
               </View>
               {entry.finalOutcome && tone ? (
                 <View style={[styles.outcome, { backgroundColor: c.surfaceRaised }]}>
-                  <Text style={[styles.outcomeText, { color: toneColor(tone) }]}>
+                  <Txt variant="label" size={11} color={toneColor(tone)}>
                     {ROLLOVER_OUTCOME_LABEL[entry.finalOutcome]}
-                  </Text>
+                  </Txt>
                 </View>
               ) : null}
             </View>
@@ -126,7 +126,6 @@ export function SeasonHistory({ entries, gameSlug, style }: SeasonHistoryProps) 
 
 const styles = StyleSheet.create({
   list: { gap: 0 },
-  empty: { fontSize: font.size.sm },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -135,13 +134,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   main: { flex: 1, gap: 2 },
-  season: { fontSize: font.size.sm, fontWeight: font.weight.semibold },
-  game: { fontSize: font.size.xs },
   metaRow: { flexDirection: 'row', alignItems: 'center', gap: spacing['1'] },
-  meta: { fontSize: font.size.xs },
   side: { alignItems: 'flex-end', gap: spacing['1'] },
   result: { flexDirection: 'row', alignItems: 'center', gap: spacing['1'] },
-  position: { fontSize: font.size.sm, fontWeight: font.weight.bold },
   outcome: { borderRadius: radius.full, paddingHorizontal: spacing['2'], paddingVertical: 2 },
-  outcomeText: { fontSize: 11, fontWeight: font.weight.semibold },
 });

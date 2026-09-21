@@ -7,7 +7,6 @@ import type { ReactNode } from 'react';
 import {
   Pressable,
   StyleSheet,
-  Text,
   View,
   type StyleProp,
   type ViewStyle,
@@ -25,6 +24,7 @@ import {
   Card,
 } from './core';
 import { Skeleton } from './primitives';
+import { Txt } from './text';
 
 /* ------------------------------------------------------------------ */
 /* BalanceCard                                                         */
@@ -51,16 +51,16 @@ export function BalanceCard({
     <Card style={[styles.balance, style]}>
       <View style={styles.balanceHead}>
         <WalletIcon color={c.textSecondary} size={18} />
-        <Text style={[styles.balanceLabel, { color: c.textSecondary }]}>
+        <Txt variant="bodyMedium" tone="secondary">
           {label}
-        </Text>
+        </Txt>
       </View>
       {balanceXaf === null ? (
         <Skeleton height={36} />
       ) : (
-        <Text style={[styles.balanceValue, { color: c.accent }]}>
+        <Txt variant="numeric" tone="accent" size={font.size['2xl']}>
           {formatXaf(balanceXaf)}
-        </Text>
+        </Txt>
       )}
       {actions ? <View style={styles.balanceActions}>{actions}</View> : null}
     </Card>
@@ -109,15 +109,15 @@ export function TransactionRow({
         )}
       </View>
       <View style={styles.txBody}>
-        <Text style={[styles.txLabel, { color: c.textPrimary }]} numberOfLines={1}>
+        <Txt variant="bodyMedium" numberOfLines={1}>
           {label}
-        </Text>
-        <Text style={[styles.txDate, { color: c.textMuted }]}>{dateLabel}</Text>
+        </Txt>
+        <Txt variant="caption" tone="muted">{dateLabel}</Txt>
       </View>
-      <Text style={[styles.txAmount, { color: tone }]}>
+      <Txt variant="bodyBold" color={tone}>
         {credit ? '+' : '−'}
         {formatXaf(amountXaf)}
-      </Text>
+      </Txt>
     </View>
   );
 }
@@ -160,14 +160,9 @@ export function AmountPresets({
               pressed && styles.pressed,
             ]}
           >
-            <Text
-              style={[
-                styles.presetLabel,
-                { color: active ? c.onAccent : c.textPrimary },
-              ]}
-            >
+            <Txt variant="label" tone={active ? 'onAccent' : 'primary'}>
               {formatXaf(preset)}
-            </Text>
+            </Txt>
           </Pressable>
         );
       })}
@@ -178,8 +173,6 @@ export function AmountPresets({
 const styles = StyleSheet.create({
   balance: { gap: spacing['3'] },
   balanceHead: { flexDirection: 'row', alignItems: 'center', gap: spacing['2'] },
-  balanceLabel: { fontSize: font.size.sm, fontWeight: font.weight.medium },
-  balanceValue: { fontSize: font.size['2xl'], fontWeight: font.weight.bold },
   balanceActions: { flexDirection: 'row', gap: spacing['2'] },
   txRow: {
     flexDirection: 'row',
@@ -196,9 +189,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   txBody: { flex: 1, gap: 1 },
-  txLabel: { fontSize: font.size.sm, fontWeight: font.weight.medium },
-  txDate: { fontSize: font.size.xs },
-  txAmount: { fontSize: font.size.sm, fontWeight: font.weight.bold },
   presets: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing['2'] },
   preset: {
     borderWidth: 1,
@@ -208,6 +198,5 @@ const styles = StyleSheet.create({
     minHeight: 40,
     justifyContent: 'center',
   },
-  presetLabel: { fontSize: font.size.sm, fontWeight: font.weight.semibold },
   pressed: { opacity: 0.85 },
 });

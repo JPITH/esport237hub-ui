@@ -9,7 +9,6 @@ import { Lock, Star } from 'lucide-react-native';
 import {
   Pressable,
   StyleSheet,
-  Text,
   View,
   type StyleProp,
   type ViewStyle,
@@ -30,6 +29,7 @@ import {
   type RatingScore,
 } from '../lib/rating';
 import { font, radius, spacing, useE237Colors } from './core';
+import { Txt } from './text';
 
 /* ------------------------------------------------------------------ */
 /* StarRating — lecture                                                */
@@ -78,9 +78,9 @@ export function StarRating({ value, size = 16, showValue = false, style }: StarR
         ))}
       </View>
       {showValue ? (
-        <Text style={[styles.value, { color: c.textPrimary }]}>
+        <Txt variant="numeric" size={font.size.sm}>
           {formatRatingAverage(value)}
-        </Text>
+        </Txt>
       ) : null}
     </View>
   );
@@ -144,9 +144,9 @@ export function StarRatingInput({
         })}
       </View>
       {/* L'échelle en toutes lettres : « 3 étoiles » ne veut rien dire seul. */}
-      <Text style={[styles.hint, { color: c.textSecondary }]}>
+      <Txt variant="caption" tone="secondary">
         {value === null ? t('rating.input.choose') : RATING_LABELS[value]}
-      </Text>
+      </Txt>
     </View>
   );
 }
@@ -178,31 +178,37 @@ export function RatingSummary({ average, count, breakdown, axes, style }: Rating
     <View style={[styles.summary, style]}>
       <View style={styles.summaryTop}>
         <View style={styles.summaryScore}>
-          <Text style={[styles.average, { color: c.gold }]}>
+          <Txt variant="numeric" size={34} tone="gold" style={styles.average}>
             {formatRatingAverage(empty ? null : average)}
-          </Text>
+          </Txt>
           <StarRating value={empty ? 0 : average} size={13} />
-          <Text style={[styles.count, { color: c.textSecondary }]}>{ratingCountLabel(count)}</Text>
+          <Txt variant="caption" tone="secondary">
+            {ratingCountLabel(count)}
+          </Txt>
         </View>
 
         {bars && !empty ? (
           <View style={styles.bars}>
             {bars.map((bar) => (
               <View key={bar.score} style={styles.barRow}>
-                <Text style={[styles.barScore, { color: c.textSecondary }]}>{bar.score}</Text>
+                <Txt variant="caption" tone="secondary" style={styles.barScore}>
+                  {bar.score}
+                </Txt>
                 <View style={[styles.barTrack, { backgroundColor: c.surfaceRaised }]}>
                   <View
                     style={[styles.barFill, { backgroundColor: c.gold, width: `${bar.percent}%` }]}
                   />
                 </View>
-                <Text style={[styles.barCount, { color: c.textMuted }]}>{bar.count}</Text>
+                <Txt variant="caption" tone="muted" style={styles.barCount}>
+                  {bar.count}
+                </Txt>
               </View>
             ))}
           </View>
         ) : (
-          <Text style={[styles.emptyText, { color: c.textSecondary }]}>
+          <Txt variant="body" tone="secondary" style={styles.emptyText}>
             {t('rating.summary.empty')}
-          </Text>
+          </Txt>
         )}
       </View>
 
@@ -213,7 +219,7 @@ export function RatingSummary({ average, count, breakdown, axes, style }: Rating
             if (score === null || score === undefined) return null;
             return (
               <View key={axis.key} style={styles.axisRow}>
-                <Text style={[styles.axisLabel, { color: c.textSecondary }]}>{axis.label}</Text>
+                <Txt variant="caption" tone="secondary">{axis.label}</Txt>
                 <StarRating value={score} size={11} showValue />
               </View>
             );
@@ -252,18 +258,24 @@ export function VenueReview({
   return (
     <View style={[styles.review, { borderBottomColor: c.border }, style]}>
       <View style={styles.reviewHead}>
-        <Text style={[styles.author, { color: c.textPrimary }]}>{author}</Text>
+        <Txt variant="label">{author}</Txt>
         {verified ? (
           <View style={[styles.playedHere, { backgroundColor: c.accentSubtle }]}>
-            <Text style={[styles.playedHereText, { color: c.accent }]}>
+            <Txt variant="overline" size={10} tone="accent" style={styles.playedHereText}>
               {t('rating.review.played_here')}
-            </Text>
+            </Txt>
           </View>
         ) : null}
-        <Text style={[styles.when, { color: c.textMuted }]}>{when}</Text>
+        <Txt variant="caption" tone="muted" style={styles.when}>
+          {when}
+        </Txt>
       </View>
       <StarRating value={score} size={13} />
-      {comment ? <Text style={[styles.comment, { color: c.textSecondary }]}>{comment}</Text> : null}
+      {comment ? (
+        <Txt variant="body" tone="secondary">
+          {comment}
+        </Txt>
+      ) : null}
     </View>
   );
 }
@@ -289,9 +301,9 @@ export function RatingGateNotice({ gate, style }: RatingGateNoticeProps) {
         style,
       ]}>
       <Lock size={16} color={c.textMuted} />
-      <Text style={[styles.gateText, { color: c.textSecondary }]}>
+      <Txt variant="body" tone="secondary" style={styles.gateText}>
         {RATING_GATE_MESSAGE[gate]}
-      </Text>
+      </Txt>
     </View>
   );
 }
@@ -300,43 +312,35 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: spacing['1-5'] },
   stars: { flexDirection: 'row', alignItems: 'center' },
   overlay: { position: 'absolute', left: 0, top: 0, overflow: 'hidden' },
-  value: { fontSize: font.size.sm, fontWeight: font.weight.semibold },
 
   inputBlock: { gap: spacing['2'] },
   disabled: { opacity: 0.6 },
   starButton: { paddingHorizontal: 2, paddingVertical: spacing['1'] },
   pressed: { opacity: 0.7 },
-  hint: { fontSize: font.size.xs },
 
   summary: { gap: spacing['4'] },
   summaryTop: { flexDirection: 'row', alignItems: 'center', gap: spacing['4'] },
   summaryScore: { alignItems: 'center', gap: spacing['1'] },
-  average: { fontSize: 34, fontWeight: font.weight.bold, lineHeight: 36 },
-  count: { fontSize: font.size.xs },
+  // Interligne d'origine conservé : `numeric` en poserait un plus haut et
+  // le gros chiffre décollerait des étoiles.
+  average: { lineHeight: 36 },
   bars: { flex: 1, gap: spacing['1'] },
   barRow: { flexDirection: 'row', alignItems: 'center', gap: spacing['2'] },
-  barScore: { width: 12, fontSize: font.size.xs, fontVariant: ['tabular-nums'] },
+  barScore: { width: 12, fontVariant: ['tabular-nums'] as const },
   barTrack: { flex: 1, height: 6, borderRadius: radius.full, overflow: 'hidden' },
   barFill: { height: '100%', borderRadius: radius.full },
-  barCount: { width: 28, textAlign: 'right', fontSize: font.size.xs },
-  emptyText: { flex: 1, fontSize: font.size.sm },
+  barCount: { width: 28, textAlign: 'right' as const },
+  emptyText: { flex: 1 },
 
   axes: { gap: spacing['2'] },
   axisRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  axisLabel: { fontSize: font.size.xs },
 
   review: { gap: spacing['2'], paddingVertical: spacing['3'], borderBottomWidth: StyleSheet.hairlineWidth },
   reviewHead: { flexDirection: 'row', alignItems: 'center', gap: spacing['2'] },
-  author: { fontSize: font.size.sm, fontWeight: font.weight.semibold },
   playedHere: { borderRadius: radius.full, paddingHorizontal: spacing['2'], paddingVertical: 2 },
-  playedHereText: {
-    fontSize: 10,
-    fontWeight: font.weight.semibold,
-    letterSpacing: 0.4,
-    textTransform: 'uppercase',
-  },
-  when: { marginLeft: 'auto', fontSize: font.size.xs },
-  comment: { fontSize: font.size.sm },
+  // `overline` capitalise et espace déjà ; la pastille veut moins d'approche.
+  playedHereText: { letterSpacing: 0.4 },
+  when: { marginLeft: 'auto' },
 
   gate: {
     flexDirection: 'row',
@@ -346,5 +350,5 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     padding: spacing['3'],
   },
-  gateText: { flex: 1, fontSize: font.size.sm },
+  gateText: { flex: 1 },
 });

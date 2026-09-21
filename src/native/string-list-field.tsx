@@ -6,7 +6,6 @@ import { Plus, Trash2 } from 'lucide-react-native';
 import {
   Pressable,
   StyleSheet,
-  Text,
   View,
   type StyleProp,
   type ViewStyle,
@@ -14,6 +13,7 @@ import {
 
 import { font, radius, spacing, useE237Colors } from './core';
 import { Field } from './fields';
+import { Txt } from './text';
 
 export interface StringListFieldProps {
   /** Libellé du groupe (« Avantages », « Restrictions »…). */
@@ -44,7 +44,9 @@ export function StringListField({
 
   return (
     <View style={[styles.wrap, style]}>
-      <Text style={[styles.label, { color: c.textSecondary }]}>{label}</Text>
+      <Txt variant="bodyMedium" size={font.size.xs} tone="secondary">
+        {label}
+      </Txt>
       {values.map((value, index) => (
         <View key={index} style={styles.row}>
           <Field
@@ -82,7 +84,9 @@ export function StringListField({
           style={({ pressed }) => [styles.addBtn, pressed && styles.pressed]}
         >
           <Plus color={c.accent} size={16} />
-          <Text style={[styles.addLabel, { color: c.accent }]}>{addLabel}</Text>
+          <Txt variant="label" tone="accent">
+            {addLabel}
+          </Txt>
         </Pressable>
       ) : null}
     </View>
@@ -91,7 +95,6 @@ export function StringListField({
 
 const styles = StyleSheet.create({
   wrap: { gap: spacing['2'] },
-  label: { fontSize: font.size.xs, fontWeight: font.weight.medium },
   row: { flexDirection: 'row', alignItems: 'flex-end', gap: spacing['2'] },
   grow: { flex: 1 },
   iconBtn: {
@@ -109,6 +112,5 @@ const styles = StyleSheet.create({
     gap: spacing['1-5'],
     paddingVertical: spacing['1-5'],
   },
-  addLabel: { fontSize: font.size.sm, fontWeight: font.weight.semibold },
   pressed: { opacity: 0.85 },
 });

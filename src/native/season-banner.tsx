@@ -15,8 +15,8 @@ import {
   seasonProgress,
   seasonRemainingLabel,
 } from '../lib/ranking';
-import { Card, font, radius, spacing, useE237Colors } from './core';
-import { Txt as Text } from './text';
+import { Card, radius, spacing, useE237Colors } from './core';
+import { Txt } from './text';
 
 /** Une saison telle que l'API la rend (`GET /rankings/seasons`). */
 export interface SeasonView {
@@ -66,14 +66,16 @@ export function SeasonBanner({
     <Card style={[styles.card, style]}>
       <View style={styles.head}>
         <CalendarClock color={c.accent} size={16} />
-        <Text style={[styles.name, { color: c.textPrimary }]}>{season.name}</Text>
+        <Txt variant="label">{season.name}</Txt>
         <View style={[styles.state, { backgroundColor: c.surfaceRaised }]}>
-          <Text style={[styles.stateText, { color: c.textSecondary }]}>
+          <Txt variant="label" size={11} tone="secondary">
             {stateKey ? t(stateKey) : season.state}
-          </Text>
+          </Txt>
         </View>
         {remaining ? (
-          <Text style={[styles.remaining, { color: c.textSecondary }]}>{remaining}</Text>
+          <Txt variant="caption" tone="secondary" style={styles.remaining}>
+            {remaining}
+          </Txt>
         ) : null}
       </View>
 
@@ -85,14 +87,16 @@ export function SeasonBanner({
         </View>
       ) : null}
 
-      <Text style={[styles.hint, { color: c.textSecondary }]}>
+      <Txt variant="caption" tone="secondary">
         {RANKING_SCOPE_HINT.season}
-      </Text>
+      </Txt>
 
       {todo ? (
         <View style={[styles.todo, { backgroundColor: c.surfaceRaised }]}>
           <Info color={c.warning} size={14} />
-          <Text style={[styles.todoText, { color: c.warning }]}>{todo}</Text>
+          <Txt variant="caption" tone="warning" style={styles.todoText}>
+            {todo}
+          </Txt>
         </View>
       ) : null}
     </Card>
@@ -102,13 +106,10 @@ export function SeasonBanner({
 const styles = StyleSheet.create({
   card: { gap: spacing['2'] },
   head: { flexDirection: 'row', alignItems: 'center', gap: spacing['2'] },
-  name: { fontSize: font.size.sm, fontWeight: font.weight.bold },
   state: { borderRadius: radius.full, paddingHorizontal: spacing['2'], paddingVertical: 2 },
-  stateText: { fontSize: 11, fontWeight: font.weight.semibold },
-  remaining: { marginLeft: 'auto', fontSize: font.size.xs },
+  remaining: { marginLeft: 'auto' },
   track: { height: 6, borderRadius: radius.full, overflow: 'hidden' },
   fill: { height: '100%', borderRadius: radius.full },
-  hint: { fontSize: font.size.xs },
   todo: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -116,5 +117,5 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     padding: spacing['2'],
   },
-  todoText: { flex: 1, fontSize: font.size.xs },
+  todoText: { flex: 1 },
 });

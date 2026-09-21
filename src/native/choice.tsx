@@ -9,13 +9,13 @@ import type { ReactNode } from 'react';
 import {
   Pressable,
   StyleSheet,
-  Text,
   View,
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
 
-import { font, radius, spacing, useE237Colors } from './core';
+import { radius, spacing, useE237Colors } from './core';
+import { Txt } from './text';
 
 /* ------------------------------------------------------------------ */
 /* Checkbox                                                            */
@@ -68,9 +68,9 @@ export function Checkbox({
         {checked ? <Check color={c.onAccent} size={13} strokeWidth={3} /> : null}
       </View>
       <View style={styles.labelBox}>
-        <Text style={[styles.label, { color: c.textPrimary }]}>{label}</Text>
+        <Txt variant="body">{label}</Txt>
         {hint ? (
-          <Text style={[styles.hint, { color: c.textMuted }]}>{hint}</Text>
+          <Txt variant="caption" tone="muted">{hint}</Txt>
         ) : null}
       </View>
     </Pressable>
@@ -135,20 +135,18 @@ export function RadioGroup<T extends string>({
                 ) : null}
               </View>
               <View style={styles.labelBox}>
-                <Text style={[styles.label, { color: c.textPrimary }]}>
-                  {option.label}
-                </Text>
+                <Txt variant="body">{option.label}</Txt>
                 {option.hint ? (
-                  <Text style={[styles.hint, { color: c.textMuted }]}>
+                  <Txt variant="caption" tone="muted">
                     {option.hint}
-                  </Text>
+                  </Txt>
                 ) : null}
               </View>
             </View>
             {option.trailing ? (
-              <Text style={[styles.trailing, { color: c.accent }]}>
+              <Txt variant="label" tone="accent">
                 {option.trailing}
-              </Text>
+              </Txt>
             ) : null}
           </Pressable>
         );
@@ -168,8 +166,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   labelBox: { flex: 1, gap: 2 },
-  label: { fontSize: font.size.sm },
-  hint: { fontSize: font.size.xs },
   disabled: { opacity: 0.5 },
   pressed: { opacity: 0.85 },
   group: { gap: spacing['2'] },
@@ -192,5 +188,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   radioDot: { width: 10, height: 10, borderRadius: radius.full },
-  trailing: { fontSize: font.size.sm, fontWeight: font.weight.semibold },
 });

@@ -4,9 +4,10 @@
  * il se situe). Le nom reste porté par `accessibilityLabel` : l'information
  * n'est pas perdue pour les lecteurs d'écran.
  */
-import { StyleSheet, Text, View, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
+import { StyleSheet, View, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
 
 import { font, radius, useE237Colors, useToneSurface } from './core';
+import { Txt } from './text';
 
 export interface DivisionBadgeProps {
   /**
@@ -53,14 +54,19 @@ export function DivisionBadge({
       accessibilityLabel={divisionAccessibleLabel(rank, name)}
       style={[styles.badge, surface, style]}
     >
-      <Text
+      <Txt
+        variant="overline"
+        size={font.size.xs}
+        color={tone}
         numberOfLines={1}
         adjustsFontSizeToFit
         minimumFontScale={0.7}
-        style={[styles.label, { color: tone }, textStyle]}
+        // `textStyle` reste EN DERNIER : la carte joueur y pousse sa propre
+        // police et sa taille mise à l'échelle, qui doivent gagner.
+        style={[styles.label, textStyle]}
       >
         {divisionLabel(rank)}
-      </Text>
+      </Txt>
     </View>
   );
 }
@@ -73,9 +79,7 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     paddingHorizontal: 9,
   },
-  label: {
-    fontSize: font.size.xs,
-    fontWeight: font.weight.bold,
-    letterSpacing: 0.8,
-  },
+  // La famille et la taille viennent de `Txt` ; l'approche reste plus serrée
+  // que celle d'`overline`, la pilule est étroite.
+  label: { letterSpacing: 0.8 },
 });

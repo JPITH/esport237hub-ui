@@ -13,15 +13,15 @@
 import {
   Pressable,
   StyleSheet,
-  Text,
   View,
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
 
 import { BRAND_HOME_LABEL, BRAND_NAME_ACCENT, BRAND_NAME_REST } from '../lib/brand-name';
-import { font, spacing, useE237Colors } from './core';
+import { font, spacing } from './core';
 import { AppMark } from './mark';
+import { Txt } from './text';
 
 export interface BrandLockupProps {
   /** `sm` (32 px) pour les en-têtes, `md` (36 px) pour les écrans d'accueil. */
@@ -39,17 +39,21 @@ export function BrandLockup({
   onPress,
   style,
 }: BrandLockupProps) {
-  const c = useE237Colors();
   const box = size === 'md' ? 36 : 32;
 
   const content = (
     <View style={[styles.row, style]}>
       <AppMark size={box} />
       {compact ? null : (
-        <Text style={[styles.wordmark, { color: c.textPrimary }]}>
-          <Text style={{ color: c.accent }}>{BRAND_NAME_ACCENT}</Text>
+        // La variante est REPÉTÉE sur le fragment accentué : un `Txt` imbriqué
+        // repose sa propre variante par-dessus celle du parent, il n'hérite
+        // pas de la police comme le ferait un `Text` nu.
+        <Txt variant="title" size={font.size.sm} style={styles.wordmark}>
+          <Txt variant="title" size={font.size.sm} tone="accent">
+            {BRAND_NAME_ACCENT}
+          </Txt>
           {BRAND_NAME_REST}
-        </Text>
+        </Txt>
       )}
     </View>
   );
@@ -105,10 +109,7 @@ export function AppLogo({ size = 32, onPress, style }: AppLogoProps) {
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: spacing['2'] },
-  wordmark: {
-    fontSize: font.size.sm,
-    fontWeight: font.weight.bold,
-    letterSpacing: -0.2,
-  },
+  // Approche propre au mot-symbole, plus lâche que celle de la variante.
+  wordmark: { letterSpacing: -0.2 },
   pressed: { opacity: 0.85 },
 });

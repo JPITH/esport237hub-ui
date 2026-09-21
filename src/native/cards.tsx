@@ -16,7 +16,6 @@ import type { ReactNode } from 'react';
 import {
   Pressable,
   StyleSheet,
-  Text,
   View,
   type StyleProp,
   type ViewStyle,
@@ -35,6 +34,7 @@ import { formatRatingAverage, ratingCountLabel } from '../lib/rating';
 import { Badge, Card, font, radius, spacing, useE237Colors } from './core';
 import { MediaImage } from './media-image';
 import { PerkList } from './perk-list';
+import { Txt } from './text';
 
 /** Enveloppe pressable optionnelle — sans `onPress`, simple bloc. */
 function Clickable({
@@ -102,32 +102,27 @@ export function EventCard({
               <Badge tone={eventTypeTone(type)}>{eventTypeLabel(type)}</Badge>
               {gameName ? <Badge tone="neutral">{gameName}</Badge> : null}
             </View>
-            <Text style={[styles.title, { color: c.textPrimary }]}>{title}</Text>
+            <Txt variant="label">{title}</Txt>
           </View>
-          <Text
-            style={[
-              styles.price,
-              { color: isPaid ? c.accent : c.textSecondary },
-            ]}
-          >
+          <Txt variant="bodyBold" tone={isPaid ? 'accent' : 'secondary'}>
             {priceLabel}
-          </Text>
+          </Txt>
         </View>
         <View style={styles.metaRow}>
           <View style={styles.metaItem}>
             <CalendarDays color={c.textMuted} size={14} />
-            <Text style={[styles.meta, { color: c.textMuted }]}>{dateLabel}</Text>
+            <Txt variant="caption" tone="muted">{dateLabel}</Txt>
           </View>
           {placeLabel ? (
             <View style={styles.metaItem}>
               <MapPin color={c.textMuted} size={14} />
-              <Text style={[styles.meta, { color: c.textMuted }]}>{placeLabel}</Text>
+              <Txt variant="caption" tone="muted">{placeLabel}</Txt>
             </View>
           ) : null}
           {capacity ? (
-            <Text style={[styles.meta, { color: c.textMuted }]}>
+            <Txt variant="caption" tone="muted">
               · {capacity} places
-            </Text>
+            </Txt>
           ) : null}
         </View>
       </Card>
@@ -165,7 +160,6 @@ export function CompetitionCard({
   venueName,
   style,
 }: CompetitionCardProps) {
-  const c = useE237Colors();
   const parts = [
     competitionFormatLabel(format),
     isOnline ? 'En ligne' : (city ?? 'En salle'),
@@ -177,16 +171,16 @@ export function CompetitionCard({
     <Clickable onPress={onPress} style={style}>
       <Card style={styles.stack}>
         <View style={styles.headRow}>
-          <Text style={[styles.title, styles.grow, { color: c.textPrimary }]}>
+          <Txt variant="label" style={styles.grow}>
             {title}
-          </Text>
+          </Txt>
           <Badge tone={competitionStatusTone(status)}>
             {competitionStatusLabel(status)}
           </Badge>
         </View>
-        <Text style={[styles.meta, { color: c.textMuted }]}>
+        <Txt variant="caption" tone="muted">
           {parts.join(' · ')}
-        </Text>
+        </Txt>
       </Card>
     </Clickable>
   );
@@ -250,16 +244,13 @@ export function ProductCard({
             {soldOut ? <Badge tone="danger">Épuisé</Badge> : null}
           </View>
         </View>
-        <Text style={[styles.title, { color: c.textPrimary }]}>{name}</Text>
-        <Text
-          numberOfLines={2}
-          style={[styles.meta, { color: c.textSecondary, fontSize: font.size.sm }]}
-        >
+        <Txt variant="label">{name}</Txt>
+        <Txt variant="body" tone="secondary" numberOfLines={2}>
           {description || '—'}
-        </Text>
-        <Text style={[styles.bigPrice, { color: c.accent }]}>
+        </Txt>
+        <Txt variant="numeric" size={font.size.lg} tone="accent">
           {formatXaf(priceXaf)}
-        </Text>
+        </Txt>
       </Card>
     </Clickable>
   );
@@ -313,10 +304,10 @@ export function TicketCard({
 
   const title = (
     <View style={styles.grow}>
-      <Text style={[styles.title, { color: c.textPrimary }]}>{eventTitle}</Text>
-      <Text style={[styles.meta, { color: c.textMuted }]}>
+      <Txt variant="label">{eventTitle}</Txt>
+      <Txt variant="caption" tone="muted">
         {eventTypeLabel(eventType)}
-      </Text>
+      </Txt>
     </View>
   );
 
@@ -343,20 +334,20 @@ export function TicketCard({
       <View style={styles.metaRow}>
         <View style={styles.metaItem}>
           <CalendarDays color={c.textMuted} size={14} />
-          <Text style={[styles.meta, { color: c.textMuted }]}>{dateLabel}</Text>
+          <Txt variant="caption" tone="muted">{dateLabel}</Txt>
         </View>
         {city ? (
           <View style={styles.metaItem}>
             <MapPin color={c.textMuted} size={14} />
-            <Text style={[styles.meta, { color: c.textMuted }]}>{city}</Text>
+            <Txt variant="caption" tone="muted">{city}</Txt>
           </View>
         ) : null}
-        <Text style={[styles.meta, { color: c.textMuted }]}>
+        <Txt variant="caption" tone="muted">
           · {quantity} billet{quantity > 1 ? 's' : ''}
-        </Text>
-        <Text style={[styles.meta, { color: c.textSecondary, fontWeight: font.weight.semibold }]}>
+        </Txt>
+        <Txt variant="bodyBold" size={font.size.xs} tone="secondary">
           {priceOrFreeLabel(amountXaf)}
-        </Text>
+        </Txt>
       </View>
 
       {qr ? (
@@ -367,24 +358,24 @@ export function TicketCard({
               <>
                 <View style={styles.metaItem}>
                   <CheckCircle2 color={c.accent} size={16} />
-                  <Text style={[styles.qrTitle, { color: c.accent }]}>
+                  <Txt variant="label" tone="accent">
                     Déjà admis à l’entrée
-                  </Text>
+                  </Txt>
                 </View>
                 {checkedInAtLabel ? (
-                  <Text style={[styles.meta, { color: c.textMuted }]}>
+                  <Txt variant="caption" tone="muted">
                     Ce QR a déjà servi le {checkedInAtLabel}.
-                  </Text>
+                  </Txt>
                 ) : null}
               </>
             ) : (
               <>
-                <Text style={[styles.qrTitle, { color: c.textSecondary }]}>
+                <Txt variant="label" tone="secondary">
                   Présente ce QR à l’entrée
-                </Text>
-                <Text style={[styles.meta, { color: c.textMuted }]}>
+                </Txt>
+                <Txt variant="caption" tone="muted">
                   Le personnel le scanne pour valider ton accès.
-                </Text>
+                </Txt>
               </>
             )}
           </View>
@@ -434,11 +425,11 @@ export function SubscriptionCard({
         <View style={styles.grow}>
           <View style={styles.metaItem}>
             <Store color={c.accent} size={16} />
-            <Text style={[styles.title, { color: c.textPrimary }]}>
+            <Txt variant="label">
               {venueName}
-            </Text>
+            </Txt>
           </View>
-          <Text style={[styles.meta, { color: c.textMuted }]}>{planName}</Text>
+          <Txt variant="caption" tone="muted">{planName}</Txt>
         </View>
         <Badge tone={usable ? 'accent' : 'neutral'}>
           {usable ? 'Utilisable' : statusLabel}
@@ -448,22 +439,22 @@ export function SubscriptionCard({
       <View style={styles.metaRow}>
         <View style={styles.metaItem}>
           <Clock color={c.textMuted} size={14} />
-          <Text style={[styles.meta, { color: c.textSecondary }]}>
+          <Txt variant="caption" tone="secondary">
             {remainingLabel}
-          </Text>
+          </Txt>
         </View>
-        <Text style={[styles.meta, { color: c.textSecondary }]}>
+        <Txt variant="caption" tone="secondary">
           {expiresLabel ?? 'Sans péremption'}
-        </Text>
+        </Txt>
         {city ? (
           <View style={styles.metaItem}>
             <MapPin color={c.textMuted} size={14} />
-            <Text style={[styles.meta, { color: c.textSecondary }]}>{city}</Text>
+            <Txt variant="caption" tone="secondary">{city}</Txt>
           </View>
         ) : null}
-        <Text style={[styles.meta, { color: c.textSecondary }]}>
+        <Txt variant="caption" tone="secondary">
           Payé {formatXaf(pricePaidXaf)}
-        </Text>
+        </Txt>
       </View>
 
       <PerkList items={perks} />
@@ -554,40 +545,42 @@ export function VenueCard({
           ) : null}
           {rank !== undefined ? (
             <View style={[styles.rankPill, { backgroundColor: c.surfaceRaised }]}>
-              <Text style={[styles.rankText, { color: c.textPrimary }]}>{rank}</Text>
+              <Txt variant="numeric" size={font.size.xs}>
+                {rank}
+              </Txt>
             </View>
           ) : null}
         </View>
 
         <View style={styles.headRow}>
           <View style={styles.headMain}>
-            <Text style={[styles.title, { color: c.textPrimary }]} numberOfLines={1}>
+            <Txt variant="label" numberOfLines={1}>
               {name}
-            </Text>
+            </Txt>
             <View style={styles.metaItem}>
               <MapPin color={c.textMuted} size={14} />
-              <Text style={[styles.meta, { color: c.textMuted }]} numberOfLines={1}>
+              <Txt variant="caption" tone="muted" numberOfLines={1}>
                 {city}
                 {district ? ` · ${district}` : ''}
-              </Text>
+              </Txt>
             </View>
             {rated ? (
               <View style={styles.metaItem}>
                 <Star color={c.gold} fill={c.gold} size={13} strokeWidth={1.5} />
-                <Text style={[styles.ratingValue, { color: c.gold }]}>
+                <Txt variant="numeric" size={font.size.xs} tone="gold">
                   {formatRatingAverage(ratingAvg)}
-                </Text>
-                <Text style={[styles.meta, { color: c.textMuted }]}>
+                </Txt>
+                <Txt variant="caption" tone="muted">
                   {ratingCountLabel(ratingCount)}
-                </Text>
+                </Txt>
               </View>
             ) : null}
           </View>
           {pricePerHour != null ? (
-            <Text style={[styles.price, { color: c.accent }]}>
+            <Txt variant="bodyBold" tone="accent">
               {formatXaf(pricePerHour)}
-              <Text style={[styles.meta, { color: c.textMuted }]}> /h</Text>
-            </Text>
+              <Txt variant="caption" tone="muted"> /h</Txt>
+            </Txt>
           ) : null}
         </View>
 
@@ -619,8 +612,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: spacing['1'],
   },
-  rankText: { fontSize: font.size.xs, fontWeight: font.weight.bold },
-  ratingValue: { fontSize: font.size.xs, fontWeight: font.weight.semibold },
   stack: { gap: spacing['2'] },
   grow: { flex: 1 },
   headRow: {
@@ -631,9 +622,6 @@ const styles = StyleSheet.create({
   },
   headMain: { flex: 1, gap: spacing['1'] },
   badges: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing['1-5'] },
-  title: { fontSize: font.size.sm, fontWeight: font.weight.semibold },
-  price: { fontSize: font.size.sm, fontWeight: font.weight.bold },
-  bigPrice: { fontSize: font.size.lg, fontWeight: font.weight.bold },
   metaRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -641,7 +629,6 @@ const styles = StyleSheet.create({
     gap: spacing['2'],
   },
   metaItem: { flexDirection: 'row', alignItems: 'center', gap: spacing['1'] },
-  meta: { fontSize: font.size.xs },
   floatBadge: { position: 'absolute', top: spacing['2'], right: spacing['2'] },
   disabled: { opacity: 0.6 },
   qrRow: {
@@ -651,6 +638,5 @@ const styles = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
     paddingTop: spacing['3'],
   },
-  qrTitle: { fontSize: font.size.sm, fontWeight: font.weight.semibold },
   pressed: { opacity: 0.85 },
 });

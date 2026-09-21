@@ -12,14 +12,14 @@ import {
   ActivityIndicator,
   Image,
   StyleSheet,
-  Text,
   View,
   type ImageSourcePropType,
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
 
-import { font, radius, spacing, useE237Colors } from './core';
+import { radius, spacing, useE237Colors } from './core';
+import { Txt } from './text';
 
 /** Rayon d'arrondi, pris dans les tokens. */
 export type MediaRounded = 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
@@ -116,9 +116,9 @@ export function MediaImage({
         <View style={styles.overlay} pointerEvents="none">
           {fallbackIcon ?? <ImageOff color={c.textMuted} size={26} strokeWidth={1.25} />}
           {fallbackLabel ? (
-            <Text style={[styles.fallbackLabel, { color: c.textMuted }]} numberOfLines={2}>
+            <Txt variant="caption" tone="muted" align="center" numberOfLines={2}>
               {fallbackLabel}
-            </Text>
+            </Txt>
           ) : null}
         </View>
       ) : null}
@@ -143,9 +143,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: spacing['1'],
     padding: spacing['2'],
-  },
-  fallbackLabel: {
-    fontSize: font.size.xs,
-    textAlign: 'center',
   },
 });

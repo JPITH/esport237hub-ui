@@ -8,9 +8,10 @@
  * soit possible — le dire franchement vaut mieux que de masquer la ligne.
  */
 import { Gamepad2 } from 'lucide-react-native';
-import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { font, pill, radius, spacing, useE237Colors, withAlpha } from './core';
+import { Txt } from './text';
 
 /** Un jeu de l'inventaire d'une salle — forme rendue par `GET /venues/:id`. */
 export interface VenueGameItem {
@@ -33,7 +34,9 @@ export function VenueGameList({ items, emptyLabel, style }: VenueGameListProps) 
 
   if (!items || items.length === 0) {
     return emptyLabel ? (
-      <Text style={[styles.empty, { color: c.textMuted }]}>{emptyLabel}</Text>
+      <Txt variant="caption" tone="muted">
+        {emptyLabel}
+      </Txt>
     ) : null;
   }
 
@@ -49,12 +52,9 @@ export function VenueGameList({ items, emptyLabel, style }: VenueGameListProps) 
         >
           <View style={styles.name}>
             <Gamepad2 color={c.textMuted} size={16} strokeWidth={1.75} />
-            <Text
-              style={[styles.label, { color: c.textPrimary }]}
-              numberOfLines={1}
-            >
+            <Txt variant="body" style={styles.label} numberOfLines={1}>
               {game.name}
-            </Text>
+            </Txt>
           </View>
           <View
             style={[
@@ -64,14 +64,13 @@ export function VenueGameList({ items, emptyLabel, style }: VenueGameListProps) 
                 : { backgroundColor: c.surfaceRaised },
             ]}
           >
-            <Text
-              style={[
-                styles.tagLabel,
-                { color: game.duels_open ? c.accent : c.textMuted },
-              ]}
+            <Txt
+              variant="label"
+              size={font.size.xs}
+              tone={game.duels_open ? 'accent' : 'muted'}
             >
               {game.duels_open ? 'Duels ouverts' : 'Sur place'}
-            </Text>
+            </Txt>
           </View>
         </View>
       ))}
@@ -94,12 +93,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing['2'],
   },
-  label: { flex: 1, fontSize: font.size.sm },
+  label: { flex: 1 },
   tag: {
     borderRadius: radius.full,
     paddingHorizontal: spacing['2'],
     paddingVertical: 2,
   },
-  tagLabel: { fontSize: font.size.xs, fontWeight: font.weight.semibold },
-  empty: { fontSize: font.size.xs },
 });

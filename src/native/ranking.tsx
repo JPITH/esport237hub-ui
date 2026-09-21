@@ -12,7 +12,6 @@ import {
   ActivityIndicator,
   Pressable,
   StyleSheet,
-  Text,
   View,
   type StyleProp,
   type ViewStyle,
@@ -32,6 +31,7 @@ import {
 import { font, pill, radius, spacing, useE237Colors, withAlpha } from './core';
 import { DivisionBadge } from './division-badge';
 import { Skeleton, VerifiedMark } from './primitives';
+import { Txt } from './text';
 import { TrendArrow } from './trend-arrow';
 
 /* ------------------------------------------------------------------ */
@@ -83,16 +83,18 @@ export function LiveBar({
           ) : (
             <Icon color={live ? c.accent : c.textMuted} size={14} />
           )}
-          <Text
-            style={[styles.liveLabel, { color: live ? c.accent : c.textMuted }]}
+          <Txt
+            variant="bodyMedium"
+            size={font.size.xs}
+            tone={live ? 'accent' : 'muted'}
           >
             {LIVE_STATUS_LABEL[status]}
-          </Text>
+          </Txt>
         </View>
         {updatedAt ? (
-          <Text style={[styles.updatedAt, { color: c.textMuted }]}>
+          <Txt variant="caption" tone="muted" style={styles.updatedAt}>
             Mis à jour à {formatClock(updatedAt)}
-          </Text>
+          </Txt>
         ) : null}
       </View>
 
@@ -161,9 +163,8 @@ export interface DivisionCellProps {
 }
 
 export function DivisionCell({ division, movement = 'same' }: DivisionCellProps) {
-  const c = useE237Colors();
   if (!division) {
-    return <Text style={{ color: c.textMuted }}>—</Text>;
+    return <Txt tone="muted">—</Txt>;
   }
   return (
     <View style={styles.divisionCell}>
@@ -212,14 +213,9 @@ export function RankMedal({ rank, style }: RankMedalProps) {
         style,
       ]}
     >
-      <Text
-        style={[
-          styles.medalLabel,
-          { color: podium ? c.bg : c.textMuted },
-        ]}
-      >
+      <Txt variant="numeric" size={font.size.sm} color={podium ? c.bg : c.textMuted}>
         {rank}
-      </Text>
+      </Txt>
     </View>
   );
 }
@@ -236,18 +232,17 @@ export interface PlayerCellProps {
 
 /** Cellule « joueur » d'une ligne de classement : pseudo + ville. */
 export function PlayerCell({ username, city, verified }: PlayerCellProps) {
-  const c = useE237Colors();
   return (
     <View style={styles.playerCell}>
       <View style={styles.playerName}>
-        <Text style={[styles.username, { color: c.textPrimary }]} numberOfLines={1}>
+        <Txt variant="bodyMedium" numberOfLines={1}>
           {username}
-        </Text>
+        </Txt>
         {verified ? <VerifiedMark /> : null}
       </View>
-      <Text style={[styles.city, { color: c.textMuted }]} numberOfLines={1}>
+      <Txt variant="caption" tone="muted" numberOfLines={1}>
         {city ?? '—'}
-      </Text>
+      </Txt>
     </View>
   );
 }
@@ -283,9 +278,9 @@ export function ChampionSpotlight({
     >
       <View style={styles.spotlightHead}>
         <Crown color={c.gold} size={18} />
-        <Text style={[styles.spotlightTitle, { color: c.gold }]}>
+        <Txt variant="overline" size={font.size.sm} tone="gold" style={styles.spotlightTitle}>
           {`Champion${subtitle ? ` · ${subtitle}` : ''}`}
-        </Text>
+        </Txt>
       </View>
       <View style={styles.spotlightBody}>{children}</View>
     </View>
@@ -334,8 +329,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 10,
   },
-  liveLabel: { fontSize: font.size.xs, fontWeight: font.weight.medium },
-  updatedAt: { fontSize: font.size.xs, flexShrink: 1 },
+  updatedAt: { flexShrink: 1 },
   refreshBtn: {
     width: 36,
     height: 36,
@@ -355,11 +349,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  medalLabel: { fontSize: font.size.sm, fontWeight: font.weight.bold },
   playerCell: { flex: 1, gap: 1 },
   playerName: { flexDirection: 'row', alignItems: 'center', gap: spacing['1'] },
-  username: { fontSize: font.size.sm, fontWeight: font.weight.medium },
-  city: { fontSize: font.size.xs },
   spotlight: {
     alignItems: 'center',
     gap: spacing['3'],
@@ -368,12 +359,8 @@ const styles = StyleSheet.create({
     padding: spacing['5'],
   },
   spotlightHead: { flexDirection: 'row', alignItems: 'center', gap: spacing['2'] },
-  spotlightTitle: {
-    fontSize: font.size.sm,
-    fontWeight: font.weight.bold,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-  },
+  // `overline` capitalise déjà ; seule l'approche diffère de la variante.
+  spotlightTitle: { letterSpacing: 1 },
   spotlightBody: { width: '100%', maxWidth: 280 },
   skeleton: { gap: spacing['4'] },
 });

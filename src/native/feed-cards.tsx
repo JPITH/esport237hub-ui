@@ -42,7 +42,7 @@ import {
   Trophy,
   Users,
 } from 'lucide-react-native';
-import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { competitionFormatLabel, eventTypeLabel, eventTypeTone } from '../lib/catalog';
 import { useDsT } from '../i18n';
@@ -50,6 +50,7 @@ import { gameIconSource } from './game-assets';
 import { priceOrFreeLabel } from '../lib/money';
 import { Badge, Card, font, spacing, useE237Colors } from './core';
 import { MediaImage } from './media-image';
+import { Txt } from './text';
 
 /** Jeu tel qu'il apparaît sur une carte du fil. */
 export interface FeedCardGame {
@@ -93,15 +94,17 @@ function GameChips({ games, max = 3 }: { games: FeedCardGame[]; max?: number }) 
             {icon ? (
               <MediaImage source={icon} alt="" ratio={1} rounded="sm" style={styles.chipIcon} />
             ) : null}
-            <Text style={[styles.chipText, { color: c.textSecondary }]} numberOfLines={1}>
+            <Txt variant="bodyMedium" size={font.size.xs} tone="secondary" numberOfLines={1}>
               {game.name}
-            </Text>
+            </Txt>
           </View>
         );
       })}
       {reste > 0 ? (
         <View style={[styles.chip, { backgroundColor: c.frame, borderColor: c.border }]}>
-          <Text style={[styles.chipText, { color: c.textMuted }]}>+{reste}</Text>
+          <Txt variant="bodyMedium" size={font.size.xs} tone="muted">
+            +{reste}
+          </Txt>
         </View>
       ) : null}
     </View>
@@ -109,13 +112,12 @@ function GameChips({ games, max = 3 }: { games: FeedCardGame[]; max?: number }) 
 }
 
 function MetaLine({ icon, text }: { icon: React.ReactNode; text: string }) {
-  const c = useE237Colors();
   return (
     <View style={styles.metaItem}>
       {icon}
-      <Text style={[styles.meta, { color: c.textMuted }]} numberOfLines={1}>
+      <Txt variant="caption" tone="muted" numberOfLines={1}>
         {text}
-      </Text>
+      </Txt>
     </View>
   );
 }
@@ -182,13 +184,13 @@ export function FeedTournamentCard({
               <Badge tone="accent">Tournoi</Badge>
               <Badge tone="neutral">{competitionFormatLabel(format)}</Badge>
             </View>
-            <Text style={[styles.title, { color: c.textPrimary }]} numberOfLines={2}>
+            <Txt variant="heading" style={styles.title} numberOfLines={2}>
               {title}
-            </Text>
+            </Txt>
             {game ? (
-              <Text style={[styles.gameName, { color: c.textSecondary }]} numberOfLines={1}>
+              <Txt variant="bodyMedium" tone="secondary" numberOfLines={1}>
                 {game.name}
-              </Text>
+              </Txt>
             ) : null}
           </View>
         </View>
@@ -298,9 +300,9 @@ export function FeedEventCard({
             ) : null}
           </View>
 
-          <Text style={[styles.title, { color: c.textPrimary }]} numberOfLines={2}>
+          <Txt variant="heading" style={styles.title} numberOfLines={2}>
             {title}
-          </Text>
+          </Txt>
 
           <GameChips games={games} />
 
@@ -312,14 +314,14 @@ export function FeedEventCard({
           <View style={styles.footRow}>
             <View style={styles.metaItem}>
               <Ticket color={isPaid ? c.accent : c.textMuted} size={14} />
-              <Text
-                style={[styles.price, { color: isPaid ? c.accent : c.textSecondary }]}
-              >
+              <Txt variant="bodyBold" tone={isPaid ? 'accent' : 'secondary'}>
                 {priceOrFreeLabel(isPaid ? priceXaf : null)}
-              </Text>
+              </Txt>
             </View>
             {capacity !== null ? (
-              <Text style={[styles.meta, { color: c.textMuted }]}>{capacity} places</Text>
+              <Txt variant="caption" tone="muted">
+                {capacity} places
+              </Txt>
             ) : null}
           </View>
         </View>
@@ -337,7 +339,6 @@ const styles = StyleSheet.create({
   tournIcon: { width: 52, height: 52 },
   tournIconPh: { alignItems: 'center', justifyContent: 'center', borderRadius: 10 },
   tournHeadText: { flex: 1, gap: 4, minWidth: 0 },
-  gameName: { fontSize: font.size.sm, fontWeight: font.weight.medium },
 
   // ── Événement : la couverture touche les bords, donc le rembourrage
   // descend dans le corps plutôt que sur la carte.
@@ -347,7 +348,8 @@ const styles = StyleSheet.create({
 
   // ── Communs
   badges: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
-  title: { fontSize: font.size.md, fontWeight: font.weight.bold, lineHeight: 21 },
+  // Interligne serré d'origine : deux lignes de titre tiennent dans la carte.
+  title: { lineHeight: 21 },
   chipRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
   chip: {
     flexDirection: 'row',
@@ -360,10 +362,7 @@ const styles = StyleSheet.create({
     maxWidth: 160,
   },
   chipIcon: { width: 14, height: 14 },
-  chipText: { fontSize: font.size.xs, fontWeight: font.weight.medium },
   metaRow: { flexDirection: 'row', gap: spacing['4'], flexWrap: 'wrap' },
   metaItem: { flexDirection: 'row', alignItems: 'center', gap: 5, minWidth: 0 },
-  meta: { fontSize: font.size.xs, fontWeight: font.weight.regular },
   footRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing['2'] },
-  price: { fontSize: font.size.sm, fontWeight: font.weight.bold },
 });

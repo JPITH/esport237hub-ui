@@ -10,10 +10,11 @@ import {
   type LucideIcon,
 } from 'lucide-react-native';
 import type { ReactNode } from 'react';
-import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import type { Tone } from '../lib/tone';
-import { font, radius, spacing, useE237Colors, useToneColor, useToneSurface } from './core';
+import { radius, spacing, useE237Colors, useToneColor, useToneSurface } from './core';
+import { Txt } from './text';
 
 /** Icône par défaut de chaque ton — jamais d'emoji (règle DESIGN.md). */
 const DEFAULT_ICON: Record<Tone, LucideIcon> = {
@@ -56,11 +57,11 @@ export function Notice({
       {icon === null ? null : (icon ?? <Icon color={textColor} size={16} />)}
       <View style={styles.body}>
         {title ? (
-          <Text style={[styles.title, { color: textColor }]}>{title}</Text>
+          <Txt variant="label" color={textColor}>{title}</Txt>
         ) : null}
-        <Text selectable style={[styles.text, { color: textColor }]}>
+        <Txt selectable variant="body" size={13} color={textColor}>
           {children}
-        </Text>
+        </Txt>
       </View>
     </View>
   );
@@ -76,6 +77,4 @@ const styles = StyleSheet.create({
     padding: spacing['3'],
   },
   body: { flex: 1, gap: 2 },
-  title: { fontSize: font.size.sm, fontWeight: font.weight.semibold },
-  text: { fontSize: 13 },
 });

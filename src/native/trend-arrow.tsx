@@ -4,9 +4,10 @@
  * tiret discret (textMuted) s'il ne bouge pas. Icônes Lucide, jamais d'emoji.
  */
 import { ArrowDown, ArrowUp, Minus } from 'lucide-react-native';
-import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { font, useE237Colors } from './core';
+import { Txt } from './text';
 
 /** Sens du mouvement au classement. */
 export type TrendMovement = 'up' | 'down' | 'same';
@@ -60,9 +61,9 @@ export function TrendArrow({
     >
       <Icon color={tone} size={size} strokeWidth={2.5} />
       {delta != null ? (
-        <Text style={[styles.delta, { color: tone }]}>
+        <Txt variant="bodyBold" size={font.size.xs} color={tone} style={styles.delta}>
           {formatDelta(movement, delta)}
-        </Text>
+        </Txt>
       ) : null}
     </View>
   );
@@ -70,9 +71,7 @@ export function TrendArrow({
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 3 },
-  delta: {
-    fontSize: font.size.xs,
-    fontWeight: font.weight.bold,
-    fontVariant: ['tabular-nums'],
-  },
+  // La police et la taille viennent de `Txt` ; seul le chiffre tabulaire
+  // reste ici — sans lui la flèche danse quand le delta passe de 9 à 10.
+  delta: { fontVariant: ['tabular-nums'] as const },
 });

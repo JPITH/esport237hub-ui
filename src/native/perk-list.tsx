@@ -3,9 +3,10 @@
  * Icônes Lucide, jamais de puce typographique.
  */
 import { Check, Minus } from 'lucide-react-native';
-import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { spacing, useE237Colors } from './core';
+import { Txt } from './text';
 
 export interface PerkListProps {
   /** Lignes à afficher ; une liste vide ne rend rien. */
@@ -31,7 +32,9 @@ export function PerkList({ items, variant = 'perk', style }: PerkListProps) {
       {items.map((item, i) => (
         <View key={`${i}-${item}`} style={styles.row}>
           <Icon color={iconColor} size={14} style={styles.icon} />
-          <Text style={[styles.text, { color: textColor }]}>{item}</Text>
+          <Txt variant="caption" color={textColor} style={styles.text}>
+            {item}
+          </Txt>
         </View>
       ))}
     </View>
@@ -42,5 +45,5 @@ const styles = StyleSheet.create({
   list: { gap: spacing['1'] },
   row: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing['1-5'] },
   icon: { marginTop: 2 },
-  text: { flex: 1, fontSize: 12 },
+  text: { flex: 1 },
 });

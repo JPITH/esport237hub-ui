@@ -8,15 +8,15 @@
 import {
   Pressable,
   StyleSheet,
-  Text,
   View,
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
 
 import { useDsT } from '../i18n';
-import { Badge, font, radius, spacing, useE237Colors } from './core';
+import { Badge, radius, spacing, useE237Colors } from './core';
 import { PerkList } from './perk-list';
+import { Txt } from './text';
 
 export interface TierOption {
   id: string;
@@ -79,33 +79,33 @@ export function TierPicker({
               style={({ pressed }) => [styles.head, pressed && styles.pressed]}
             >
               <View style={styles.headMain}>
-                <Text style={[styles.name, { color: c.textPrimary }]} numberOfLines={1}>
+                <Txt variant="label" numberOfLines={1}>
                   {tier.name}
-                </Text>
+                </Txt>
                 {tier.availabilityLabel ? (
                   <Badge tone={tier.buyable ? 'neutral' : 'danger'}>
                     {tier.availabilityLabel}
                   </Badge>
                 ) : null}
               </View>
-              <Text style={[styles.price, { color: c.accent }]}>
+              <Txt variant="bodyBold" tone="accent">
                 {tier.priceLabel}
-              </Text>
+              </Txt>
             </Pressable>
 
             {selected ? (
               <View style={[styles.details, { borderTopColor: c.border }]}>
                 {tier.description ? (
-                  <Text style={[styles.description, { color: c.textSecondary }]}>
+                  <Txt variant="caption" tone="secondary">
                     {tier.description}
-                  </Text>
+                  </Txt>
                 ) : null}
                 <PerkList items={tier.perks} />
                 <PerkList items={tier.limitations} variant="limitation" />
                 {!hasDetails ? (
-                  <Text style={[styles.description, { color: c.textMuted }]}>
+                  <Txt variant="caption" tone="muted">
                     {t('form.tier.noDetails')}
-                  </Text>
+                  </Txt>
                 ) : null}
               </View>
             ) : null}
@@ -126,15 +126,12 @@ const styles = StyleSheet.create({
     gap: spacing['3'],
   },
   headMain: { flex: 1, gap: spacing['1'], alignItems: 'flex-start' },
-  name: { fontSize: font.size.sm, fontWeight: font.weight.semibold },
-  price: { fontSize: font.size.sm, fontWeight: font.weight.bold },
   details: {
     marginTop: spacing['3'],
     paddingTop: spacing['3'],
     borderTopWidth: StyleSheet.hairlineWidth,
     gap: spacing['2'],
   },
-  description: { fontSize: font.size.xs },
   disabled: { opacity: 0.6 },
   pressed: { opacity: 0.85 },
 });

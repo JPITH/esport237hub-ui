@@ -7,15 +7,15 @@ import type { ReactNode } from 'react';
 import {
   Pressable,
   StyleSheet,
-  Text,
   View,
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
 
 import { useDsT } from '../i18n';
-import { Badge, Card, font, radius, spacing, useE237Colors, useNeu } from './core';
+import { Badge, Card, font, radius, spacing, useNeu } from './core';
 import { DuelStatusBadge } from './duel-status-badge';
+import { Txt } from './text';
 
 /* ------------------------------------------------------------------ */
 /* DuelRow                                                             */
@@ -75,7 +75,6 @@ export function DuelRow({
   status,
   style,
 }: DuelRowProps) {
-  const c = useE237Colors();
   const neu = useNeu();
   const t = useDsT();
   const hasScore = challengerScore !== null && opponentScore !== null;
@@ -83,25 +82,19 @@ export function DuelRow({
   const body = (pressed: boolean) => (
     <Card style={[styles.row, pressed ? neu.pressedSm : null, style]}>
       <View style={styles.main}>
-        <Text
-          style={[styles.names, { color: c.textPrimary }]}
-          numberOfLines={1}
-        >
+        <Txt variant="label" numberOfLines={1}>
           {challengerName ?? '?'} vs {opponentName ?? t('ui.openOpponent')}
-        </Text>
-        <Text
-          style={[styles.meta, { color: c.textMuted }]}
-          numberOfLines={1}
-        >
+        </Txt>
+        <Txt variant="caption" tone="muted" numberOfLines={1}>
           {dateLabel} · {gameName ?? '—'} ·{' '}
           {isOnline ? t('ui.online') : t('ui.inVenue')}
-        </Text>
+        </Txt>
       </View>
       <View style={styles.trailing}>
         {hasScore ? (
-          <Text style={[styles.score, { color: c.textPrimary }]}>
+          <Txt variant="numeric" size={15}>
             {challengerScore}–{opponentScore}
-          </Text>
+          </Txt>
         ) : null}
         <DuelStatusBadge status={status} />
       </View>
@@ -155,19 +148,16 @@ export function ScoreSide({
   children,
   style,
 }: ScoreSideProps) {
-  const c = useE237Colors();
   const t = useDsT();
   const label = (
-    <Text style={[styles.username, { color: c.textPrimary }]}>
-      {username ?? t('ui.waiting')}
-    </Text>
+    <Txt variant="label">{username ?? t('ui.waiting')}</Txt>
   );
 
   return (
     <View style={[styles.side, style]}>
-      <Text style={[styles.bigScore, { color: c.textPrimary }]}>
+      <Txt variant="numeric" size={font.size['3xl']}>
         {score ?? '–'}
-      </Text>
+      </Txt>
       {onPress && username ? (
         <Pressable
           accessibilityRole="button"
@@ -180,7 +170,7 @@ export function ScoreSide({
         label
       )}
       {name ? (
-        <Text style={[styles.meta, { color: c.textMuted }]}>{name}</Text>
+        <Txt variant="caption" tone="muted">{name}</Txt>
       ) : null}
       {winner ? <Badge tone="gold">{t('ui.winner')}</Badge> : null}
       {children}
@@ -199,8 +189,6 @@ const styles = StyleSheet.create({
     minHeight: 72,
   },
   main: { flex: 1, gap: 2, minWidth: 0 },
-  names: { fontSize: font.size.sm, fontWeight: font.weight.semibold },
-  meta: { fontSize: font.size.xs },
   trailing: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -209,9 +197,6 @@ const styles = StyleSheet.create({
     // Colonne de statuts alignée — voir la règle 2.
     minWidth: 108,
   },
-  score: { fontSize: 15, fontWeight: font.weight.bold },
   side: { alignItems: 'center', gap: spacing['1'] },
-  bigScore: { fontSize: font.size['3xl'], fontWeight: font.weight.bold },
-  username: { fontSize: font.size.sm, fontWeight: font.weight.semibold },
   pressed: { opacity: 0.85 },
 });

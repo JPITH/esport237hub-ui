@@ -13,14 +13,12 @@ import type { ReactNode } from 'react';
 import {
   Pressable,
   StyleSheet,
-  Text,
   View,
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
 
 import {
-  font,
   pill,
   radius,
   spacing,
@@ -28,6 +26,7 @@ import {
   useE237Mode,
   withAlpha,
 } from './core';
+import { Txt } from './text';
 
 export interface FilterChipProps {
   label: string;
@@ -77,15 +76,14 @@ export function FilterChip({
       ]}
     >
       {icon}
-      <Text
+      <Txt
+        variant={active ? 'bodyBold' : 'bodyMedium'}
+        size={13}
+        color={ink}
         numberOfLines={1}
-        style={[
-          styles.label,
-          { color: ink, fontWeight: active ? font.weight.bold : font.weight.medium },
-        ]}
       >
         {label}
-      </Text>
+      </Txt>
       {count != null ? (
         <View
           style={[
@@ -97,7 +95,9 @@ export function FilterChip({
             },
           ]}
         >
-          <Text style={[styles.countText, { color: ink }]}>{count}</Text>
+          <Txt variant="bodyBold" size={11} color={ink} style={styles.countText}>
+            {count}
+          </Txt>
         </View>
       ) : null}
     </Pressable>
@@ -116,7 +116,6 @@ const styles = StyleSheet.create({
   },
   pressed: { opacity: 0.85 },
   disabled: { opacity: 0.5 },
-  label: { fontSize: 13 },
   count: {
     minWidth: 20,
     alignItems: 'center',
@@ -124,9 +123,6 @@ const styles = StyleSheet.create({
     paddingVertical: 1,
     paddingHorizontal: 6,
   },
-  countText: {
-    fontSize: 11,
-    fontWeight: font.weight.bold,
-    fontVariant: ['tabular-nums'],
-  },
+  // Chiffre tabulaire : la pastille garde la même largeur de 8 à 9.
+  countText: { fontVariant: ['tabular-nums'] as const },
 });

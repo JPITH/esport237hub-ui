@@ -6,12 +6,13 @@
  * `POST …/payout` ; ici il ne reçoit que `onPayout`, `busy` et `error`.
  */
 import type { ReactNode } from 'react';
-import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { useDsT } from '../i18n';
 import { formatXaf } from '../lib/money';
-import { Button, Card, font, spacing, useE237Colors } from './core';
+import { Button, Card, font, spacing } from './core';
 import { Notice } from './notice';
+import { Txt } from './text';
 
 /* ------------------------------------------------------------------ */
 /* LabelValueRow                                                       */
@@ -32,20 +33,18 @@ export function LabelValueRow({
   strong = false,
   style,
 }: LabelValueRowProps) {
-  const c = useE237Colors();
   return (
     <View style={[styles.row, style]}>
-      <Text style={[styles.label, { color: c.textSecondary }]}>{label}</Text>
-      <Text
-        style={[
-          styles.value,
-          strong
-            ? { color: c.gold, fontWeight: font.weight.bold }
-            : { color: c.textPrimary },
-        ]}
+      <Txt variant="body" size={13} tone="secondary">
+        {label}
+      </Txt>
+      <Txt
+        variant={strong ? 'bodyBold' : 'bodyMedium'}
+        size={font.size.md}
+        tone={strong ? 'gold' : 'primary'}
       >
         {value}
-      </Text>
+      </Txt>
     </View>
   );
 }
@@ -79,7 +78,6 @@ export function PayoutCard({
   payableLabel,
   style,
 }: PayoutCardProps) {
-  const c = useE237Colors();
   const t = useDsT();
   return (
     <Card style={[styles.card, style]}>
@@ -104,9 +102,9 @@ export function PayoutCard({
           />
         </>
       ) : (
-        <Text style={[styles.upToDate, { color: c.textMuted }]}>
+        <Txt variant="caption" tone="muted">
           {t('money.payout.upToDate')}
-        </Text>
+        </Txt>
       )}
     </Card>
   );
@@ -120,8 +118,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing['2'],
   },
-  label: { fontSize: 13 },
-  value: { fontSize: font.size.md, fontWeight: font.weight.semibold },
   btn: { minHeight: 44 },
-  upToDate: { fontSize: font.size.xs },
 });
