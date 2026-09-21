@@ -9,7 +9,7 @@
  * Tailles pilotées par l'échelle de CardChrome (équivalent natif des `cqw`
  * du web) ; polices Space Grotesk / Chivo (comme le web).
  */
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 
 import { BRAND_NAME } from '../lib/brand-name';
@@ -120,15 +120,29 @@ export function DivisionChip({
   );
 }
 
-/** Photo du joueur ou silhouette IA de repli. */
+/**
+ * Photo du joueur ou silhouette IA de repli.
+ *
+ * Le repli couvre DEUX cas, pas un seul : pas d'URL du tout (le cas courant —
+ * la photo d'un joueur reste privée tant qu'un administrateur ne l'a pas
+ * approuvée) **et** une URL qui ne charge pas. Sans ce second repli, un média
+ * retiré ou un réseau coupé laissait un trou au milieu de la carte, là où
+ * l'œil cherche le joueur.
+ */
 export function CardPortrait({ imageUrl }: { imageUrl?: string | null }) {
   const s = useCardStyles();
+  // L'URL en échec, pas un booléen : changer de photo doit retenter le
+  // chargement sans effet de synchronisation.
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  const usable = imageUrl && failedUrl !== imageUrl ? imageUrl : null;
+
   return (
     <View style={s.img}>
       <Image
-        source={imageUrl ? { uri: imageUrl } : FALLBACK_AVATAR}
+        source={usable ? { uri: usable } : FALLBACK_AVATAR}
         style={s.portrait}
         resizeMode="contain"
+        onError={() => setFailedUrl(imageUrl ?? null)}
         accessibilityIgnoresInvertColors
       />
     </View>

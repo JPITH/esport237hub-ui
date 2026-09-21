@@ -5,6 +5,9 @@ export const enForms: Record<keyof typeof frForms, string> = {
   'form.field.password.hide': 'Hide password',
   'form.field.number.decrease': 'Decrease',
   'form.field.number.increase': 'Increase',
+  // Accessible name of a required field: a lone « * » reads as « star »
+  // or not at all, so the visible asterisk stays silent to screen readers.
+  'form.field.required': '{label} (required)',
   'form.field.phone.label': 'Phone',
   'form.field.search.placeholder': 'Search…',
   'form.action.clear': 'Clear',

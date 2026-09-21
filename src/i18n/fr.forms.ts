@@ -10,6 +10,9 @@ export const frForms = {
   'form.field.password.hide': 'Masquer le mot de passe',
   'form.field.number.decrease': 'Diminuer',
   'form.field.number.increase': 'Augmenter',
+  // Nom accessible d'un champ obligatoire : « * » se lit « étoile » ou
+  // ne se lit pas — l'astérisque visible reste donc muet à l'oral.
+  'form.field.required': '{label} (obligatoire)',
   'form.field.phone.label': 'Téléphone',
   'form.field.search.placeholder': 'Rechercher…',
   'form.action.clear': 'Effacer',

@@ -5,8 +5,8 @@ import { Host, Picker } from '@expo/ui';
 import { View } from 'react-native';
 
 import { spacing } from '../core';
+import { FieldLabel } from '../fields';
 import type { SelectOption } from '../select-sheet';
-import { Txt } from '../text';
 
 export type { SelectOption };
 
@@ -14,12 +14,15 @@ const EMPTY = '__e237_none__';
 
 export function SelectSheet({
   label,
+  required,
   placeholder = 'Choisir…',
   options,
   value,
   onChange,
 }: {
   label?: string;
+  /** Champ obligatoire : un astérisque suit le libellé (parité `../fields`). */
+  required?: boolean;
   placeholder?: string;
   options: SelectOption[];
   value: string | null;
@@ -29,11 +32,7 @@ export function SelectSheet({
 
   return (
     <View style={{ gap: spacing['1'] }}>
-      {label ? (
-        <Txt variant="subtitle" size={12} tone="secondary">
-          {label}
-        </Txt>
-      ) : null}
+      {label ? <FieldLabel label={label} required={required} /> : null}
       <Host matchContents>
         <Picker
           selectedValue={selected}

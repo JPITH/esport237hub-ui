@@ -3,8 +3,10 @@ import { Check, ChevronDown } from 'lucide-react-native';
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { FieldLabel, requiredFieldLabel } from './fields';
 import { Sheet } from './sheet';
 import { Txt } from './text';
+import { useDsT } from '../i18n';
 
 export interface SelectOption {
   value: string;
@@ -17,31 +19,32 @@ export interface SelectOption {
  */
 export function SelectSheet({
   label,
+  required,
   placeholder = 'Choisir…',
   options,
   value,
   onChange,
 }: {
   label?: string;
+  /** Champ obligatoire : un astérisque suit le libellé (`FieldLabel`). */
+  required?: boolean;
   placeholder?: string;
   options: SelectOption[];
   value: string | null;
   onChange: (value: string) => void;
 }) {
   const c = useE237Colors();
+  const t = useDsT();
   const [open, setOpen] = useState(false);
   const selected = options.find((o) => o.value === value) ?? null;
 
   return (
     <View style={{ gap: spacing['1'] }}>
-      {label ? (
-        <Txt variant="subtitle" size={12} tone="secondary">
-          {label}
-        </Txt>
-      ) : null}
+      {label ? <FieldLabel label={label} required={required} /> : null}
 
       <Pressable
         accessibilityRole="button"
+        accessibilityLabel={requiredFieldLabel(t, label, required)}
         onPress={() => setOpen(true)}
         style={[styles.trigger, { backgroundColor: c.surface, borderColor: c.border }]}>
         <Txt

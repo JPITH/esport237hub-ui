@@ -8,7 +8,9 @@ import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { radius, spacing, useE237Colors } from '../core';
+import { FieldLabel, requiredFieldLabel } from '../fields';
 import { Txt } from '../text';
+import { useDsT } from '../../i18n';
 import { Sheet } from './sheet';
 
 function toISODate(d: Date): string {
@@ -36,27 +38,27 @@ function parseTime(hhmm: string | null): Date {
 
 function Trigger({
   label,
+  required,
   icon: Icon,
   text,
   filled,
   onPress,
 }: {
   label?: string;
+  required?: boolean;
   icon: typeof CalendarDays;
   text: string;
   filled: boolean;
   onPress: () => void;
 }) {
   const c = useE237Colors();
+  const t = useDsT();
   return (
     <View style={{ gap: spacing['1'] }}>
-      {label ? (
-        <Txt variant="subtitle" size={12} tone="secondary">
-          {label}
-        </Txt>
-      ) : null}
+      {label ? <FieldLabel label={label} required={required} /> : null}
       <Pressable
         accessibilityRole="button"
+        accessibilityLabel={requiredFieldLabel(t, label, required)}
         onPress={onPress}
         style={{
           minHeight: 44,
@@ -87,11 +89,14 @@ function Trigger({
 
 export function DateField({
   label,
+  required,
   value,
   onChange,
   placeholder = 'Choisir une date…',
 }: {
   label?: string;
+  /** Champ obligatoire : un astérisque suit le libellé. */
+  required?: boolean;
   value: string | null;
   onChange: (value: string | null) => void;
   placeholder?: string;
@@ -112,6 +117,7 @@ export function DateField({
     <>
       <Trigger
         label={label}
+        required={required}
         icon={CalendarDays}
         text={display}
         filled={!!value}
@@ -135,11 +141,14 @@ export function DateField({
 
 export function TimeField({
   label,
+  required,
   value,
   onChange,
   placeholder = 'Choisir une heure…',
 }: {
   label?: string;
+  /** Champ obligatoire : un astérisque suit le libellé. */
+  required?: boolean;
   value: string | null;
   onChange: (value: string | null) => void;
   placeholder?: string;
@@ -153,6 +162,7 @@ export function TimeField({
     <>
       <Trigger
         label={label}
+        required={required}
         icon={Clock}
         text={display}
         filled={!!value}
