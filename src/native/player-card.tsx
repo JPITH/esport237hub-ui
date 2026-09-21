@@ -124,10 +124,9 @@ export function DivisionChip({
  * Photo du joueur ou silhouette IA de repli.
  *
  * Le repli couvre DEUX cas, pas un seul : pas d'URL du tout (le cas courant —
- * la photo d'un joueur reste privée tant qu'un administrateur ne l'a pas
- * approuvée) **et** une URL qui ne charge pas. Sans ce second repli, un média
- * retiré ou un réseau coupé laissait un trou au milieu de la carte, là où
- * l'œil cherche le joueur.
+ * la plupart des joueurs n'ont pas de photo) **et** une URL qui ne charge pas.
+ * Sans ce second repli, un média retiré ou un réseau coupé laissait un trou au
+ * milieu de la carte, là où l'œil cherche le joueur.
  */
 export function CardPortrait({ imageUrl }: { imageUrl?: string | null }) {
   const s = useCardStyles();

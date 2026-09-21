@@ -1,8 +1,7 @@
 /**
- * Les initiales sont ce qu'un joueur voit à la place de sa photo tant qu'elle
- * n'est pas approuvée : c'est le cas NORMAL, pas un incident. Une pastille
- * vide, ou deux pastilles identiques dans une même liste, se voient à chaque
- * écran.
+ * Les initiales sont ce qu'un joueur voit à la place d'une photo qu'il n'a
+ * pas mise : c'est le cas NORMAL, pas un incident. Une pastille vide, ou deux
+ * pastilles identiques dans une même liste, se voient à chaque écran.
  */
 import { describe, expect, it } from 'bun:test';
 

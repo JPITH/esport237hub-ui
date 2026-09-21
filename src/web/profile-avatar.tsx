@@ -18,8 +18,8 @@ export interface ProfileAvatarProps {
  * Photo de profil d'un joueur, avec repli sur l'initiale du design system.
  *
  * Le repli n'est PAS l'icône « image cassée » de `MediaImage` : sur un profil,
- * l'absence de photo est la normale (une photo reste privée tant qu'un
- * administrateur ne l'a pas approuvée), pas un incident. Une URL qui casse
+ * l'absence de photo est la normale (la plupart des joueurs n'en mettent
+ * pas), pas un incident. Une URL qui casse
  * (média retiré, réseau) retombe donc elle aussi sur la pastille à initiale.
  *
  * Jumeau natif : `ProfileAvatar` de `@esport237hub/ui/native`, mêmes props.
