@@ -2,8 +2,8 @@
  * Avatar de joueur (natif) — photo si l'API en résout une, initiales sinon.
  *
  * Le repli n'est PAS l'icône « image cassée » de `MediaImage` : sur un profil,
- * l'absence de photo est la normale (une photo de joueur reste privée tant
- * qu'un administrateur ne l'a pas approuvée), pas un incident. On garde donc
+ * l'absence de photo est la normale (la plupart des joueurs n'en mettent
+ * pas), pas un incident. On garde donc
  * la pastille à initiales du design system — et c'est `Avatar` qui la peint,
  * avec la MÊME règle d'initiales que le web (`../lib/initials`).
  *
