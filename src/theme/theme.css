@@ -545,6 +545,16 @@
   color: var(--e237-text-secondary);
 }
 
+/*
+ * Astérisque des champs obligatoires — le SEUL marqueur d'obligation.
+ * `danger` et non l'accent : l'accent est interactif (DESIGN.md), un libellé
+ * ne l'est pas. L'espace insécable colle l'astérisque au dernier mot, pour
+ * qu'un retour à la ligne ne le laisse pas seul sur sa ligne.
+ */
+.e237-field-label__req {
+  color: var(--e237-danger);
+}
+
 .e237-field-hint {
   font-size: 11px;
   color: var(--e237-text-muted);

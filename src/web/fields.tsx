@@ -108,10 +108,36 @@ function IconPlus({ className }: IconProps) {
 /* Label                                                               */
 /* ------------------------------------------------------------------ */
 
-function Label({ id, children }: { id: string; children: ReactNode }) {
+/**
+ * Libellé d'un champ, et l'astérisque quand il est obligatoire.
+ *
+ * C'est le SEUL marqueur d'obligation de l'interface — pas de phrase
+ * « tel champ est obligatoire » sous le formulaire, pas de légende : la
+ * convention se comprend sans mode d'emploi, et l'astérisque est à l'endroit
+ * où la question se pose.
+ *
+ * L'astérisque visible est `aria-hidden` : « * » se lit « étoile » ou ne se
+ * lit pas du tout. Ce qui porte l'information à l'oral, c'est `required` sur
+ * le champ lui-même (donc `aria-required`), que les appelants passent déjà à
+ * l'élément natif.
+ */
+function Label({
+  id,
+  required,
+  children,
+}: {
+  id: string;
+  required?: boolean;
+  children: ReactNode;
+}) {
   return (
     <label htmlFor={id} className="e237-field-label">
       {children}
+      {required ? (
+        <span aria-hidden className="e237-field-label__req">
+          {'\u00a0*'}
+        </span>
+      ) : null}
     </label>
   );
 }
@@ -142,7 +168,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const effectiveType = isPassword && revealed ? 'text' : type;
     return (
       <div className="e237-field-group">
-        {label ? <Label id={fieldId}>{label}</Label> : null}
+        {label ? (
+          /* `rest.required` : l'astérisque suit l'attribut natif déjà posé sur
+             l'input, donc il ne peut pas mentir sur ce que le champ exige. */
+          <Label id={fieldId} required={rest.required}>
+            {label}
+          </Label>
+        ) : null}
         <div className="e237-field-box">
           {icon ? <span className="e237-field-icon">{icon}</span> : null}
           <input
@@ -196,7 +228,11 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     const fieldId = id ?? autoId;
     return (
       <div className="e237-field-group">
-        {label ? <Label id={fieldId}>{label}</Label> : null}
+        {label ? (
+          <Label id={fieldId} required={rest.required}>
+            {label}
+          </Label>
+        ) : null}
         <textarea
           ref={ref}
           id={fieldId}
@@ -217,6 +253,8 @@ Textarea.displayName = 'Textarea';
 
 export interface NumberInputProps {
   label?: string;
+  /** Champ obligatoire : un astérisque suit le libellé. */
+  required?: boolean;
   hint?: string;
   /** null = champ vide (le placeholder s'affiche). */
   value: number | null;
@@ -236,6 +274,7 @@ export interface NumberInputProps {
  */
 export function NumberInput({
   label,
+  required,
   hint,
   value,
   onChange,
@@ -286,7 +325,11 @@ export function NumberInput({
 
   return (
     <div className={cx('e237-field-group', className)}>
-      {label ? <Label id={fieldId}>{label}</Label> : null}
+      {label ? (
+        <Label id={fieldId} required={required}>
+          {label}
+        </Label>
+      ) : null}
       <div
         className={cx(
           'e237-field',
@@ -354,6 +397,8 @@ function formatCmPhone(digits: string): string {
 
 export interface PhoneInputProps {
   label?: string;
+  /** Champ obligatoire : un astérisque suit le libellé. */
+  required?: boolean;
   hint?: string;
   /** Chiffres du numéro national (9 max), sans le préfixe. */
   value: string;
@@ -370,6 +415,7 @@ export interface PhoneInputProps {
  */
 export function PhoneInput({
   label,
+  required,
   hint,
   value,
   onChange,
@@ -384,7 +430,11 @@ export function PhoneInput({
   const fieldLabel = label ?? t('form.field.phone.label');
   return (
     <div className={cx('e237-field-group', className)}>
-      {fieldLabel ? <Label id={fieldId}>{fieldLabel}</Label> : null}
+      {fieldLabel ? (
+        <Label id={fieldId} required={required}>
+          {fieldLabel}
+        </Label>
+      ) : null}
       <div
         className={cx(
           'e237-field',

@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { useDsT, type DsKey } from '../i18n';
+import { FieldLabel, requiredFieldLabel } from './fields';
 import { Sheet } from './sheet';
 import { Txt } from './text';
 
@@ -44,28 +45,28 @@ function toISO(y: number, m: number, d: number): string {
 
 function Trigger({
   label,
+  required,
   icon,
   text,
   filled,
   onPress,
 }: {
   label?: string;
+  required?: boolean;
   icon: ReactNodeIcon;
   text: string;
   filled: boolean;
   onPress: () => void;
 }) {
   const c = useE237Colors();
+  const t = useDsT();
   const Icon = icon;
   return (
     <View style={{ gap: spacing['1'] }}>
-      {label ? (
-        <Txt variant="subtitle" size={12} tone="secondary">
-          {label}
-        </Txt>
-      ) : null}
+      {label ? <FieldLabel label={label} required={required} /> : null}
       <Pressable
         accessibilityRole="button"
+        accessibilityLabel={requiredFieldLabel(t, label, required)}
         onPress={onPress}
         style={[styles.trigger, { backgroundColor: c.surface, borderColor: c.border }]}>
         <Icon color={c.textSecondary} size={18} />
@@ -86,11 +87,14 @@ type ReactNodeIcon = typeof CalendarDays;
 /** Champ date : calendrier mensuel en feuille. Valeur ISO `YYYY-MM-DD` ou null. */
 export function DateField({
   label,
+  required,
   value,
   onChange,
   placeholder,
 }: {
   label?: string;
+  /** Champ obligatoire : un astérisque suit le libellé. */
+  required?: boolean;
   value: string | null;
   onChange: (value: string | null) => void;
   placeholder?: string;
@@ -135,6 +139,7 @@ export function DateField({
     <>
       <Trigger
         label={label}
+        required={required}
         icon={CalendarDays}
         text={display}
         filled={!!value}
@@ -233,12 +238,15 @@ export function DateField({
 /** Champ heure : colonnes heures/minutes en feuille. Valeur `HH:MM` ou null. */
 export function TimeField({
   label,
+  required,
   value,
   onChange,
   minuteStep = 15,
   placeholder = '--:--',
 }: {
   label?: string;
+  /** Champ obligatoire : un astérisque suit le libellé. */
+  required?: boolean;
   value: string | null;
   onChange: (value: string) => void;
   minuteStep?: number;
@@ -262,6 +270,7 @@ export function TimeField({
     <>
       <Trigger
         label={label}
+        required={required}
         icon={Clock}
         text={value ?? placeholder}
         filled={!!value}

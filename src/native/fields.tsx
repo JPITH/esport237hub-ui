@@ -149,16 +149,87 @@ function CameroonFlagMini() {
 }
 
 /* ------------------------------------------------------------------ */
+/* Libellé de champ (+ astérisque des champs obligatoires)             */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Libellé d'un champ, et l'astérisque quand il est obligatoire.
+ *
+ * C'est le SEUL marqueur d'obligation de l'interface. Les formulaires de
+ * création écrivaient auparavant, sous le bouton, « Titre et type sont
+ * obligatoires. » : une phrase à relire à chaque étape, qui nommait les
+ * champs une seconde fois sans jamais désigner celui qu'on regarde. Un
+ * astérisque collé au libellé dit la même chose à l'endroit où la question se
+ * pose, et la convention est comprise sans légende.
+ *
+ * L'astérisque est peint en `danger` — la seule couleur que le système réserve
+ * à « ça bloque ». Pas l'accent : `DESIGN.md` le garde pour l'interactif, et
+ * un libellé n'est pas un bouton.
+ *
+ * Pour un lecteur d'écran, « * » se lit « étoile » ou ne se lit pas du tout :
+ * le champ porte donc un nom accessible complet (« Titre (obligatoire) »),
+ * et l'astérisque visible est masqué à l'oral.
+ */
+export function FieldLabel({
+  label,
+  required = false,
+}: {
+  label: string;
+  required?: boolean;
+}) {
+  const c = useColors();
+  const t = useDsT();
+  return (
+    <Text
+      style={[styles.fieldLabel, { color: c.textSecondary }]}
+      accessibilityLabel={required ? t('form.field.required', { label }) : label}
+    >
+      {label}
+      {required ? (
+        <Text
+          accessibilityElementsHidden
+          importantForAccessibility="no"
+          style={{ color: c.danger }}
+        >
+          {' *'}
+        </Text>
+      ) : null}
+    </Text>
+  );
+}
+
+/**
+ * Nom accessible d'un champ sans libellé visible propre (déclencheur de
+ * feuille, saisie composée) : le `*` visible ne suffit jamais à l'oral.
+ */
+export function requiredFieldLabel(
+  t: ReturnType<typeof useDsT>,
+  label: string | undefined,
+  required: boolean | undefined,
+): string | undefined {
+  if (!label) return undefined;
+  return required ? t('form.field.required', { label }) : label;
+}
+
+/* ------------------------------------------------------------------ */
 /* Field (+ œil automatique sur secureTextEntry)                       */
 /* ------------------------------------------------------------------ */
 
 export type FieldProps = TextInputProps & {
   label?: string;
+  /** Champ obligatoire : un astérisque suit le libellé (`FieldLabel`). */
+  required?: boolean;
   style?: StyleProp<ViewStyle>;
 };
 
 /** Champ de saisie. Jamais de TextInput natif brut dans les écrans. */
-export function Field({ label, style, secureTextEntry, ...props }: FieldProps) {
+export function Field({
+  label,
+  required,
+  style,
+  secureTextEntry,
+  ...props
+}: FieldProps) {
   const c = useColors();
   const t = useDsT();
   const isPassword = !!secureTextEntry;
@@ -169,12 +240,11 @@ export function Field({ label, style, secureTextEntry, ...props }: FieldProps) {
 
   return (
     <View style={[{ gap: spacing['1'] }, style]}>
-      {label ? (
-        <Text style={[styles.fieldLabel, { color: c.textSecondary }]}>{label}</Text>
-      ) : null}
+      {label ? <FieldLabel label={label} required={required} /> : null}
       <View style={styles.fieldRow}>
         <TextInput
           placeholderTextColor={c.textMuted}
+          accessibilityLabel={requiredFieldLabel(t, label, required)}
           {...props}
           onFocus={(e) => {
             setFocused(true);
@@ -222,17 +292,17 @@ export function Field({ label, style, secureTextEntry, ...props }: FieldProps) {
 /* ------------------------------------------------------------------ */
 
 /** Zone de texte multiligne — même identité que Field. */
-export function Textarea({ label, style, ...props }: FieldProps) {
+export function Textarea({ label, required, style, ...props }: FieldProps) {
   const c = useColors();
+  const t = useDsT();
   const neu = useNeu();
   const [focused, setFocused] = useState(false);
   return (
     <View style={[{ gap: spacing['1'] }, style]}>
-      {label ? (
-        <Text style={[styles.fieldLabel, { color: c.textSecondary }]}>{label}</Text>
-      ) : null}
+      {label ? <FieldLabel label={label} required={required} /> : null}
       <TextInput
         placeholderTextColor={c.textMuted}
+        accessibilityLabel={requiredFieldLabel(t, label, required)}
         multiline
         textAlignVertical="top"
         {...props}
@@ -266,6 +336,7 @@ export function Textarea({ label, style, ...props }: FieldProps) {
  */
 export function Stepper({
   label,
+  required,
   value,
   onChange,
   min = 0,
@@ -274,6 +345,8 @@ export function Stepper({
   style,
 }: {
   label?: string;
+  /** Champ obligatoire : un astérisque suit le libellé. */
+  required?: boolean;
   value: number;
   onChange: (next: number) => void;
   min?: number;
@@ -325,9 +398,7 @@ export function Stepper({
 
   return (
     <View style={[{ gap: spacing['1'] }, style]}>
-      {label ? (
-        <Text style={[styles.fieldLabel, { color: c.textSecondary }]}>{label}</Text>
-      ) : null}
+      {label ? <FieldLabel label={label} required={required} /> : null}
       <View style={[styles.stepper, fieldSurface(c, neu, focused)]}>
         {side(-1)}
         <TextInput
@@ -363,12 +434,15 @@ function formatCmPhone(digits: string): string {
  */
 export function PhoneField({
   label,
+  required,
   value,
   onChange,
   placeholder = '6XX XX XX XX',
   style,
 }: {
   label?: string;
+  /** Champ obligatoire : un astérisque suit le libellé. */
+  required?: boolean;
   /** Chiffres du numéro national (9 max), sans le préfixe. */
   value: string;
   onChange: (digits: string) => void;
@@ -382,9 +456,7 @@ export function PhoneField({
   const fieldLabel = label ?? t('form.field.phone.label');
   return (
     <View style={[{ gap: spacing['1'] }, style]}>
-      {fieldLabel ? (
-        <Text style={[styles.fieldLabel, { color: c.textSecondary }]}>{fieldLabel}</Text>
-      ) : null}
+      {fieldLabel ? <FieldLabel label={fieldLabel} required={required} /> : null}
       <View style={[styles.phoneWrap, fieldSurface(c, neu, focused)]}>
         <View
           style={[

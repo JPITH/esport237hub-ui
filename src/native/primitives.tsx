@@ -15,13 +15,13 @@ import {
 } from 'react-native';
 import Animated, {
   Easing,
+  cancelAnimation,
+  makeMutable,
   useAnimatedStyle,
-  useSharedValue,
   withRepeat,
   withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
 import {
   pill,
@@ -33,6 +33,7 @@ import {
   withAlpha,
 } from './core';
 import { dsLocale, useDsT } from '../i18n';
+import { initials } from '../lib/initials';
 import { haptic } from './haptics';
 import { Txt } from './text';
 
@@ -131,7 +132,7 @@ export function EmptyState({ children }: { children: ReactNode }) {
 }
 
 /**
- * Bloc fantôme AVEC balayage lumineux (« shimmer »).
+ * Bloc fantôme avec balayage lumineux (« shimmer »).
  *
  * Le shimmer n'est pas décoratif : il distingue « ça charge » de « c'est vide
  * et ça restera vide ». Un bloc figé ressemble à une carte cassée ; un bloc qui
@@ -139,29 +140,70 @@ export function EmptyState({ children }: { children: ReactNode }) {
  * contenu (changement de discipline sur le classement) : la liste ne saute pas
  * d'un état à l'autre, elle passe par un état de chargement lisible.
  *
+ * Réécrit le 21/09/2026 pour le coût, pas pour l'allure. Chaque bloc montait
+ * son propre `<Svg>` avec un `<LinearGradient>` — et TOUS sous le même
+ * `id="e237Shimmer"` : sur react-native-web, les identifiants SVG sont
+ * globaux au document, donc huit squelettes se disputaient une définition
+ * unique. Chaque bloc lançait en plus sa propre boucle Reanimated : une liste
+ * en chargement, sur l'Android d'entrée de gamme qui est la cible du produit,
+ * en allumait une dizaine.
+ *
+ * Désormais : UNE seule horloge partagée par tout l'écran (module-level
+ * `SharedValue`, démarrée au premier squelette monté, arrêtée au dernier), et
+ * une bande peinte par trois `View` superposées plutôt que par un dégradé SVG.
+ * Même lecture à l'œil, sans SVG ni boucle par bloc.
+ *
  * La bande est en `pointerEvents="none"` et l'animation est purement visuelle :
  * elle ne retarde ni ne bloque l'affichage des données quand elles arrivent.
  */
+
+/** Durée d'un balayage, en ms — assez lent pour ne pas scintiller. */
+const SHIMMER_DURATION = 1400;
+
+/**
+ * Horloge unique : 0 → 1 en boucle, partagée par tous les squelettes montés.
+ * Un compteur de montages évite qu'un écran qui se démonte laisse tourner une
+ * animation pour personne (batterie, cas typique d'un onglet quitté).
+ */
+const shimmerClock = makeMutable(0);
+let shimmerMounts = 0;
+
+function retainShimmerClock(): () => void {
+  shimmerMounts += 1;
+  if (shimmerMounts === 1) {
+    shimmerClock.value = 0;
+    shimmerClock.value = withRepeat(
+      withTiming(1, { duration: SHIMMER_DURATION, easing: Easing.linear }),
+      -1,
+      false,
+    );
+  }
+  return () => {
+    shimmerMounts -= 1;
+    if (shimmerMounts === 0) {
+      cancelAnimation(shimmerClock);
+      shimmerClock.value = 0;
+    }
+  };
+}
+
 export function Skeleton({ height = 64 }: { height?: number }) {
   const c = useE237Colors();
   // Largeur mesurée : la bande se déplace d'une largeur d'écran à l'autre, il
   // faut donc la connaître. Tant qu'elle vaut 0, seul le fond est peint.
   const [width, setWidth] = useState(0);
-  const progress = useSharedValue(0);
 
-  useEffect(() => {
-    if (width === 0) return;
-    progress.value = 0;
-    progress.value = withRepeat(
-      withTiming(1, { duration: 1400, easing: Easing.linear }),
-      -1,
-      false,
-    );
-  }, [width, progress]);
+  useEffect(retainShimmerClock, []);
 
   const bandStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: -width + progress.value * 2 * width }],
+    transform: [{ translateX: -width + shimmerClock.value * 2 * width }],
   }));
+
+  // Le dégradé SVG remplacé par trois bandes de la même encre, d'opacité
+  // croissante puis décroissante : à 7 % sur fond de surface, l'œil ne fait
+  // pas la différence, et il n'y a plus ni SVG ni `<Defs>` par squelette.
+  const band = withAlpha(c.textPrimary, 0.07);
+  const bandSoft = withAlpha(c.textPrimary, 0.035);
 
   return (
     <View
@@ -181,42 +223,53 @@ export function Skeleton({ height = 64 }: { height?: number }) {
               position: 'absolute',
               top: 0,
               bottom: 0,
+              flexDirection: 'row',
               width: width * 0.6,
             },
             bandStyle,
           ]}
         >
-          <Svg width="100%" height="100%">
-            <Defs>
-              <LinearGradient id="e237Shimmer" x1="0" y1="0" x2="1" y2="0">
-                <Stop offset="0" stopColor={c.textPrimary} stopOpacity={0} />
-                <Stop offset="0.5" stopColor={c.textPrimary} stopOpacity={0.07} />
-                <Stop offset="1" stopColor={c.textPrimary} stopOpacity={0} />
-              </LinearGradient>
-            </Defs>
-            <Rect x="0" y="0" width="100%" height="100%" fill="url(#e237Shimmer)" />
-          </Svg>
+          <View style={{ flex: 1, backgroundColor: bandSoft }} />
+          <View style={{ flex: 1, backgroundColor: band }} />
+          <View style={{ flex: 1, backgroundColor: bandSoft }} />
         </Animated.View>
       ) : null}
     </View>
   );
 }
 
-/** Avatar à initiale ou photo — même dosage de fond que les autres pilules natives. */
+/**
+ * Avatar à initiales ou photo — même dosage de fond que les autres pilules.
+ *
+ * Deux garanties, qui manquaient toutes deux :
+ *  - les initiales viennent de `initials()` (`../lib`), la MÊME règle que le
+ *    web ; `name.charAt(0)` rendait une pastille vide sur un pseudo commençant
+ *    par un emoji, et une seule lettre là où le web en affichait deux ;
+ *  - une URL qui casse (média retiré, réseau coupé, 403) RETOMBE sur les
+ *    initiales. Sans ce repli, l'avatar devenait un rond vide, indiscernable
+ *    d'un bug d'affichage.
+ */
 export function Avatar({
   name,
   size = 44,
   src,
 }: {
-  name: string;
+  name: string | null | undefined;
   size?: number;
-  /** URI locale ou URL distante (sinon initiale). */
+  /** URI locale ou URL distante (sinon initiales). */
   src?: string | null;
 }) {
   const c = useE237Colors();
   const surface = useToneSurface(c.accent);
+  // On mémorise l'URL qui a échoué, pas un booléen : changer de photo doit
+  // retenter le chargement sans effet de synchronisation (parité web).
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const showPhoto = !!src && failedSrc !== src;
+  const letters = initials(name);
+
   return (
     <View
+      accessibilityLabel={name ?? undefined}
       style={{
         width: size,
         height: size,
@@ -228,15 +281,23 @@ export function Avatar({
         ...surface,
       }}
     >
-      {src ? (
+      {showPhoto ? (
         <Image
           source={{ uri: src }}
           style={{ width: size, height: size }}
-          accessibilityLabel={name}
+          resizeMode="cover"
+          onError={() => setFailedSrc(src)}
+          accessibilityLabel={name ?? undefined}
         />
       ) : (
-        <Txt variant="title" tone="accent" size={size * 0.4}>
-          {name.charAt(0).toUpperCase()}
+        /* Deux lettres dans un rond de 24 px débordent à 0.4 × la taille :
+           l'échelle suit le NOMBRE de lettres, pas la seule taille. */
+        <Txt
+          variant="title"
+          tone="accent"
+          size={size * (letters.length > 1 ? 0.34 : 0.42)}
+        >
+          {letters}
         </Txt>
       )}
     </View>

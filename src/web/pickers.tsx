@@ -52,10 +52,31 @@ function useDismiss(
   }, [ref, open, onClose]);
 }
 
-function FieldLabel({ id, children }: { id: string; children: ReactNode }) {
+/**
+ * Libellé d'un déclencheur de liste, et l'astérisque quand il est
+ * obligatoire — même convention que `./fields` : l'astérisque SEUL marque
+ * l'obligation, jamais une phrase sous le formulaire.
+ *
+ * L'astérisque visible est `aria-hidden` (« * » se lit « étoile » ou pas du
+ * tout) ; c'est `aria-required` sur le déclencheur qui porte l'information.
+ */
+function FieldLabel({
+  id,
+  required,
+  children,
+}: {
+  id: string;
+  required?: boolean;
+  children: ReactNode;
+}) {
   return (
     <label htmlFor={id} className="text-xs font-medium text-secondary">
       {children}
+      {required ? (
+        <span aria-hidden className="e237-field-label__req">
+          {"\u00a0*"}
+        </span>
+      ) : null}
     </label>
   );
 }
@@ -111,6 +132,8 @@ function OptionRow({
 
 export interface SelectProps {
   label?: string;
+  /** Champ obligatoire : un astérisque suit le libellé. */
+  required?: boolean;
   options: SelectOption[];
   value: string;
   onChange: (value: string) => void;
@@ -122,6 +145,7 @@ export interface SelectProps {
 
 export function Select({
   label,
+  required,
   options,
   value,
   onChange,
@@ -180,13 +204,18 @@ export function Select({
 
   return (
     <div className={`flex flex-col gap-1.5 ${className}`}>
-      {label ? <FieldLabel id={fieldId}>{label}</FieldLabel> : null}
+      {label ? (
+        <FieldLabel id={fieldId} required={required}>
+          {label}
+        </FieldLabel>
+      ) : null}
       <div ref={wrapRef} className="relative">
         <button
           type="button"
           id={fieldId}
           disabled={disabled}
           aria-haspopup="listbox"
+          aria-required={required || undefined}
           aria-expanded={open}
           onClick={() => (open ? setOpen(false) : openAt())}
           onKeyDown={onKeyDown}
@@ -236,6 +265,7 @@ export interface ComboboxProps extends Omit<SelectProps, "placeholder"> {
 
 export function Combobox({
   label,
+  required,
   options,
   value,
   onChange,
@@ -298,13 +328,18 @@ export function Combobox({
 
   return (
     <div className={`flex flex-col gap-1.5 ${className}`}>
-      {label ? <FieldLabel id={fieldId}>{label}</FieldLabel> : null}
+      {label ? (
+        <FieldLabel id={fieldId} required={required}>
+          {label}
+        </FieldLabel>
+      ) : null}
       <div ref={wrapRef} className="relative">
         <button
           type="button"
           id={fieldId}
           disabled={disabled}
           aria-haspopup="listbox"
+          aria-required={required || undefined}
           aria-expanded={open}
           onClick={() => setOpen((o) => !o)}
           className="ui-field flex h-11 w-full cursor-pointer items-center justify-between gap-2 px-3.5 text-left text-base"
@@ -399,6 +434,8 @@ function toISO(y: number, m: number, d: number): string {
 
 export interface DatePickerProps {
   label?: string;
+  /** Champ obligatoire : un astérisque suit le libellé. */
+  required?: boolean;
   /** ISO `YYYY-MM-DD`, ou null si vide. */
   value: string | null;
   onChange: (value: string | null) => void;
@@ -412,6 +449,7 @@ export interface DatePickerProps {
 
 export function DatePicker({
   label,
+  required,
   value,
   onChange,
   placeholder,
@@ -462,13 +500,18 @@ export function DatePicker({
 
   return (
     <div className={`flex flex-col gap-1.5 ${className}`}>
-      {label ? <FieldLabel id={fieldId}>{label}</FieldLabel> : null}
+      {label ? (
+        <FieldLabel id={fieldId} required={required}>
+          {label}
+        </FieldLabel>
+      ) : null}
       <div ref={wrapRef} className="relative">
         <button
           type="button"
           id={fieldId}
           disabled={disabled}
           aria-haspopup="dialog"
+          aria-required={required || undefined}
           aria-expanded={open}
           onClick={() => setOpen((o) => !o)}
           className="ui-field flex h-11 w-full cursor-pointer items-center gap-2.5 px-3.5 text-left text-base"
@@ -577,6 +620,8 @@ export function DatePicker({
 
 export interface TimePickerProps {
   label?: string;
+  /** Champ obligatoire : un astérisque suit le libellé. */
+  required?: boolean;
   /** `HH:MM` (24 h), ou null si vide. */
   value: string | null;
   onChange: (value: string) => void;
@@ -590,6 +635,7 @@ export interface TimePickerProps {
 
 export function TimePicker({
   label,
+  required,
   value,
   onChange,
   minuteStep = 15,
@@ -625,13 +671,18 @@ export function TimePicker({
 
   return (
     <div className={`flex flex-col gap-1.5 ${className}`}>
-      {label ? <FieldLabel id={fieldId}>{label}</FieldLabel> : null}
+      {label ? (
+        <FieldLabel id={fieldId} required={required}>
+          {label}
+        </FieldLabel>
+      ) : null}
       <div ref={wrapRef} className="relative">
         <button
           type="button"
           id={fieldId}
           disabled={disabled}
           aria-haspopup="dialog"
+          aria-required={required || undefined}
           aria-expanded={open}
           onClick={() => setOpen((o) => !o)}
           className="ui-field flex h-11 w-full cursor-pointer items-center gap-2.5 px-3.5 text-left text-base"

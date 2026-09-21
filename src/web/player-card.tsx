@@ -1,4 +1,11 @@
-import type { CSSProperties } from "react";
+/*
+ * `"use client"` : le repli d'image tient un état (l'URL qui a échoué).
+ * `CardChrome`, rendu juste en dessous, est déjà une frontière client — la
+ * directive ne déplace donc aucune frontière, elle la nomme.
+ */
+"use client";
+
+import { useState, type CSSProperties } from "react";
 import { UserRound } from "lucide-react";
 
 import { useDsT } from "../i18n";
@@ -38,6 +45,11 @@ export const SKIN_LABELS: Record<BuiltinSkinKey, string> = Object.fromEntries(
 /**
  * Photo du joueur ; sinon PNG de fallback (silhouette IA fournie par l'app) ;
  * sinon icône silhouette.
+ *
+ * Une photo qui ne CHARGE pas redescend la même échelle : d'abord la
+ * silhouette de l'app, puis l'icône. Sans cela, un média retiré ou un 403 sur
+ * un média redevenu privé laissait l'icône « image cassée » du navigateur au
+ * milieu de la carte — exactement là où l'œil cherche le joueur.
  */
 function CardImage({
   imageUrl,
@@ -48,7 +60,13 @@ function CardImage({
   fallbackImageUrl?: string | null;
   alt: string;
 }) {
-  const src = imageUrl ?? fallbackImageUrl;
+  // L'URL en échec, pas un booléen : changer de photo doit retenter le
+  // chargement sans effet de synchronisation.
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const photo = imageUrl && failedSrc !== imageUrl ? imageUrl : null;
+  const fallback =
+    fallbackImageUrl && failedSrc !== fallbackImageUrl ? fallbackImageUrl : null;
+  const src = photo ?? fallback;
   if (src) {
     /*
      * Décliné en AVIF / WebP quand le fichier est local (`Picture` s'en charge
@@ -62,9 +80,10 @@ function CardImage({
       <Picture
         className="pcard__photo"
         src={src}
-        alt={imageUrl ? alt : ""}
+        alt={photo ? alt : ""}
         width={180}
         height={150}
+        onError={() => setFailedSrc(src)}
       />
     );
   }
