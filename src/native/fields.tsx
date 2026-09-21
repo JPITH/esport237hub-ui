@@ -487,6 +487,7 @@ const styles = StyleSheet.create({
     // placeholder ; on le neutralise et on centre nous-mêmes.
     paddingVertical: 0,
     textAlignVertical: 'center',
+    fontFamily: fontFamily.bodyMedium,
     fontSize: 15,
   },
   textarea: {
@@ -546,6 +547,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing['3'],
     paddingVertical: 0,
     textAlignVertical: 'center',
+    fontFamily: fontFamily.bodyMedium,
     fontSize: 15,
   },
   searchWrap: {
@@ -566,6 +568,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 0,
     textAlignVertical: 'center',
+    fontFamily: fontFamily.bodyMedium,
     fontSize: 15,
   },
   searchClear: {

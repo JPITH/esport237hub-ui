@@ -43,7 +43,11 @@ import { font, radius, spacing, useE237Colors } from './core';
 import { haptic } from './haptics';
 import { Txt } from './text';
 
-const BAR_HEIGHT = 64;
+// 88 et non 64 depuis que chaque onglet porte son libellé ET son point d'état
+// sous le pictogramme : la rangée est alignée en bas (`flex-end`) et le fond
+// peint commence `FAB_OVERHANG` plus bas que le haut de la rangée. Sous 88, le
+// haut des icônes sortait de la barre et se lisait sur le contenu qui défile.
+const BAR_HEIGHT = 88;
 const FAB_SIZE = 58;
 /**
  * De combien le FAB déborde au-dessus de la barre.
@@ -170,16 +174,29 @@ function TabItem({
       style={styles.tabItem}
     >
       <Animated.View style={[styles.tabInner, animatedStyle]}>
-        {/* Point d'état : sans libellé, c'est lui qui dit « vous êtes ici ».
-            Toujours présent, transparent au repos — la rangée d'icônes ne
-            saute donc pas d'un pixel au changement d'onglet. */}
+        <Icon color={tint} size={22} strokeWidth={focused ? 2.4 : 2} />
+        {/* Le titre de l'écran, sous son pictogramme : une icône seule se
+            devine, elle ne se lit pas — et la barre est le seul endroit où
+            l'on nomme les cinq destinations du produit. */}
+        <Txt
+          variant="label"
+          size={font.size.xs - 1}
+          color={tint}
+          numberOfLines={1}
+          style={styles.tabLabel}
+        >
+          {label}
+        </Txt>
+        {/* Point d'état SOUS le libellé (demande porteur du 21/09/2026) :
+            l'œil descend l'onglet de haut en bas, la marque « vous êtes ici »
+            clôt la lecture au lieu de l'ouvrir. Toujours présent, transparent
+            au repos — la rangée ne saute pas d'un pixel au changement. */}
         <View
           style={[
             styles.dot,
             { backgroundColor: focused ? c.accent : 'transparent' },
           ]}
         />
-        <Icon color={tint} size={24} strokeWidth={focused ? 2.4 : 2} />
       </Animated.View>
     </Pressable>
   );
@@ -443,7 +460,10 @@ const styles = StyleSheet.create({
   },
   tabInner: {
     alignItems: 'center',
-    gap: 5,
+    gap: 2,
+  },
+  tabLabel: {
+    letterSpacing: 0.2,
   },
   dot: {
     width: 5,
