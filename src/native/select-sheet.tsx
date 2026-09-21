@@ -1,7 +1,7 @@
 import { radius, spacing, useE237Colors } from './core';
 import { Check, ChevronDown } from 'lucide-react-native';
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Sheet } from './sheet';
 import { Txt } from './text';
@@ -55,8 +55,12 @@ export function SelectSheet({
         <ChevronDown color={c.textSecondary} size={18} />
       </Pressable>
 
+      {/* Pas de vue défilante ici : la feuille défile d'elle-même depuis le
+          21/09/2026, et deux défilements verticaux imbriqués se disputent le
+          doigt. Le plafond de 360 px disparaissait aussi la liste sous l'écran
+          quand elle était longue — c'est la feuille qui plafonne, maintenant. */}
       <Sheet open={open} onClose={() => setOpen(false)} title={label}>
-        <ScrollView style={{ maxHeight: 360 }}>
+        <>
           {options.map((o) => {
             const active = o.value === value;
             return (
@@ -80,7 +84,7 @@ export function SelectSheet({
               </Pressable>
             );
           })}
-        </ScrollView>
+        </>
       </Sheet>
     </View>
   );

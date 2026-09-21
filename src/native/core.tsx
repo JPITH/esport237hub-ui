@@ -296,6 +296,10 @@ const styles = StyleSheet.create({
   btnLabel: {
     fontFamily: fontFamily.displaySemi,
     fontSize: font.size.sm,
+    // Beaucoup de libellés portent un montant (« Payer 4 000 FCFA », « Billet à
+    // partir de 2 000 FCFA ») et il change sous le doigt quand on règle une
+    // quantité : sans chasse fixe, le bouton danse à chaque chiffre.
+    fontVariant: ['tabular-nums'] as const,
   },
   pressed: {
     opacity: 0.85,

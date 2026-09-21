@@ -268,7 +268,13 @@ export function TimeField({
         onPress={() => setOpen(true)}
       />
 
-      <Sheet open={open} onClose={() => setOpen(false)} title={label ?? t('form.date.sheetTitle.time')}>
+      {/* `scrollable={false}` : les deux colonnes défilent déjà, chacune de son
+          côté. Un troisième défilement par-dessus leur volerait le doigt. */}
+      <Sheet
+        open={open}
+        onClose={() => setOpen(false)}
+        title={label ?? t('form.date.sheetTitle.time')}
+        scrollable={false}>
         <View style={{ flexDirection: 'row', gap: spacing['3'] }}>
           <TimeColumn heading={t('form.date.hours')} items={hours} active={h} onPick={(n) => set(n, null)} />
           <TimeColumn
