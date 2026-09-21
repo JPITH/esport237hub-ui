@@ -114,6 +114,7 @@ export type {
 export { StatTile, QuickAction } from './dashboard';
 export type { StatTileProps, StatTileTrend, QuickActionProps } from './dashboard';
 
+export * from './dialog';
 export { Sheet } from './sheet';
 export type { SheetProps } from './sheet';
 export { SelectSheet } from './select-sheet';
