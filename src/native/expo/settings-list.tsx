@@ -49,9 +49,16 @@ export function SettingsGroup({
   footer?: string;
   children: ReactNode;
 }) {
+  // La marge se pose À L'EXTÉRIEUR de `Host`. Placée dedans, sa `View`
+  // s'intercalait entre l'hôte Compose et le `FieldGroup`, ce que Compose
+  // refuse : « inserting another <View> between <Host> and this component
+  // breaks the Compose composition boundary ». Le groupe ne se rendait pas du
+  // tout, et ses enfants — de simples chaînes — remontaient à React Native,
+  // qui se plaignait à son tour d'un texte hors d'un `<Text>`. Deux erreurs à
+  // chaque rendu de l'écran Profil, pour une `View` mal placée.
   return (
-    <Host matchContents>
-      <View style={{ marginBottom: spacing['3'] }}>
+    <View style={{ marginBottom: spacing['3'] }}>
+      <Host matchContents>
         <FieldGroup>
           <FieldGroup.Section title={header}>
             {footer ? (
@@ -60,7 +67,7 @@ export function SettingsGroup({
             {children}
           </FieldGroup.Section>
         </FieldGroup>
-      </View>
-    </Host>
+      </Host>
+    </View>
   );
 }
