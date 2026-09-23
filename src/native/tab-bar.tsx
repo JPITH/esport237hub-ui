@@ -270,7 +270,17 @@ function DuelsFab({
               fill="url(#duelsFabGrad)"
             />
           </Svg>
-          <Swords color={c.onAccent} size={28} strokeWidth={2.4} />
+          {/*
+            Enveloppé, et pas posé nu : sur le web, le disque dégradé est en
+            `position: absolute` et le CSS peint TOUT élément positionné
+            au-dessus des éléments du flux, quel que soit l'ordre du DOM. Le
+            `<svg>` de l'icône, lui, n'est pas positionné — il passait sous le
+            disque et le FAB s'affichait vide. Une `View` (relative sur le
+            web) le remet au premier plan ; en natif, l'ordre suffisait déjà.
+          */}
+          <View style={styles.fabIcon}>
+            <Swords color={c.onAccent} size={28} strokeWidth={2.4} />
+          </View>
         </Animated.View>
       </Pressable>
 
@@ -502,6 +512,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     gap: 1,
   },
+  fabIcon: { alignItems: 'center', justifyContent: 'center' },
   fabLabel: {
     letterSpacing: 0.4,
     marginTop: spacing['1-5'],
