@@ -25,7 +25,7 @@ export const frRanking = {
   // Portées du classement (§4 : saison vs national)
   'ranking.scope_label.season': 'Saison',
   'ranking.scope_label.national': 'National',
-  'ranking.scope_hint.season': 'Points du mois en cours. Les divisions se jouent ici.',
+  'ranking.scope_hint.season': 'Points de la saison en cours. Les divisions se jouent ici.',
   'ranking.scope_hint.national':
     'Ta position parmi tous les joueurs. Indépendante de ta division.',
 

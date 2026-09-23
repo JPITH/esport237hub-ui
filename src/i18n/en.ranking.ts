@@ -17,7 +17,7 @@ export const enRanking: Record<keyof typeof frRanking, string> = {
 
   'ranking.scope_label.season': 'Season',
   'ranking.scope_label.national': 'National',
-  'ranking.scope_hint.season': 'Points earned this month. Divisions are decided here.',
+  'ranking.scope_hint.season': 'Points earned this season. Divisions are decided here.',
   'ranking.scope_hint.national': 'Your position among all players. Independent of your division.',
 
   'ranking.duels_until_ranked_one': 'One more duel to get ranked this season',
