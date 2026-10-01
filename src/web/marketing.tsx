@@ -33,6 +33,8 @@ import {
   Camera,
   Check,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Clock,
   Coins,
   Crown,
@@ -49,8 +51,11 @@ import {
   Medal,
   MonitorPlay,
   Newspaper,
+  Pause,
   Percent,
   Phone,
+  Play,
+  Plus,
   Puzzle,
   QrCode,
   Radar,
@@ -69,6 +74,7 @@ import {
   Users,
   Video,
   Wallet,
+  X,
   Zap,
   type LucideIcon,
 } from 'lucide-react';
@@ -91,6 +97,8 @@ const ICONS = {
   Camera,
   Check,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Clock,
   Coins,
   Crown,
@@ -107,8 +115,11 @@ const ICONS = {
   Medal,
   MonitorPlay,
   Newspaper,
+  Pause,
   Percent,
   Phone,
+  Play,
+  Plus,
   Puzzle,
   QrCode,
   Radar,
@@ -127,6 +138,7 @@ const ICONS = {
   Users,
   Video,
   Wallet,
+  X,
   Zap,
 } satisfies Record<string, LucideIcon>;
 
@@ -734,6 +746,14 @@ export function MarketingHeader({
         </nav>
 
         <div className="mkt-header__actions">
+          {/*
+            Soleil en thème clair, lune en sombre : l'icône dit le thème
+            ACTUEL, et se transforme de l'un à l'autre (cœur qui grossit,
+            croissant qui mord, rayons qui rentrent). L'état est lu en CSS
+            seul — `data-theme` sur <html>, ou la préférence système quand
+            il est absent — donc juste dès la première peinture.
+            Le clic (et la View Transition circulaire) est câblé par l'app.
+          */}
           <button
             id="theme-toggle"
             type="button"
@@ -741,7 +761,35 @@ export function MarketingHeader({
             title="Changer de thème"
             aria-label="Changer de thème"
           >
-            <Sparkles size={16} aria-hidden />
+            <svg viewBox="0 0 24 24" className="mkt-themetoggle__icon" aria-hidden focusable="false">
+              <mask id="mkt-themetoggle-bite">
+                <rect x="0" y="0" width="24" height="24" fill="#fff" />
+                <circle className="mkt-themetoggle__bite" cx="24" cy="6" r="7" fill="#000" />
+              </mask>
+              <circle
+                className="mkt-themetoggle__core"
+                cx="12"
+                cy="12"
+                r="5"
+                fill="currentColor"
+                mask="url(#mkt-themetoggle-bite)"
+              />
+              <g
+                className="mkt-themetoggle__rays"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              >
+                <line x1="12" y1="1.5" x2="12" y2="3.5" />
+                <line x1="12" y1="20.5" x2="12" y2="22.5" />
+                <line x1="1.5" y1="12" x2="3.5" y2="12" />
+                <line x1="20.5" y1="12" x2="22.5" y2="12" />
+                <line x1="4.6" y1="4.6" x2="6" y2="6" />
+                <line x1="18" y1="18" x2="19.4" y2="19.4" />
+                <line x1="4.6" y1="19.4" x2="6" y2="18" />
+                <line x1="18" y1="6" x2="19.4" y2="4.6" />
+              </g>
+            </svg>
           </button>
           <a className="btn btn--primary btn--sm mkt-header__cta" href={ctaHref}>
             {ctaLabel}
@@ -956,10 +1004,20 @@ export function MarketingFooter({
             ) : null}
           </div>
 
+          {/*
+            Colonnes en accordéon sur téléphone, comme le pied de page
+            d'apple.com : quatre titres au lieu de vingt liens empilés.
+            `<details open>` : sans script, tout est visible. L'app replie
+            sous 720 px et garde ouvert au large (`data-footer-fold`).
+          */}
           <div className="mkt-footer__cols">
             {columns.map((col) => (
-              <nav key={col.title} className="mkt-footer__col" aria-label={col.title}>
-                <span className="mkt-footer__coltitle">{col.title}</span>
+              <details key={col.title} className="mkt-footer__col" open data-footer-fold>
+                <summary className="mkt-footer__coltitle">
+                  {col.title}
+                  <ChevronDown size={16} aria-hidden className="mkt-footer__colchevron" />
+                </summary>
+                <nav className="mkt-footer__links" aria-label={col.title}>
                 {col.links.map((link) =>
                   link.href ? (
                     <a
@@ -978,33 +1036,91 @@ export function MarketingFooter({
                     </span>
                   ),
                 )}
-              </nav>
+                </nav>
+              </details>
             ))}
           </div>
         </div>
 
         <div className="mkt-footer__legal">
           <span>{legal}</span>
-          <a className="mkt-footer__top" href="#" data-footer-top aria-label="Revenir en haut de la page">
-            <svg viewBox="0 0 44 44" className="mkt-footer__top-ring" aria-hidden focusable="false">
-              <circle cx="22" cy="22" r="20" pathLength={1} className="mkt-footer__top-track" />
-              <circle cx="22" cy="22" r="20" pathLength={1} className="mkt-footer__top-progress" data-footer-progress />
-            </svg>
-            <ArrowUp size={16} aria-hidden strokeWidth={2.25} />
-          </a>
+          {/*
+            L'emplacement garde sa place dans la ligne légale : le bouton peut
+            s'en DÉTACHER (il flotte en bas à droite une fois la page bien
+            entamée) puis y RENTRER quand le pied de page arrive à l'écran —
+            comportement posé par l'app (`data-footer-top-slot`). Sans script,
+            il reste simplement ici.
+          */}
+          <span className="mkt-footer__top-slot" data-footer-top-slot>
+            <a className="mkt-footer__top" href="#" data-footer-top aria-label="Revenir en haut de la page">
+              <svg viewBox="0 0 44 44" className="mkt-footer__top-ring" aria-hidden focusable="false">
+                <circle cx="22" cy="22" r="20" pathLength={1} className="mkt-footer__top-track" />
+                <circle cx="22" cy="22" r="20" pathLength={1} className="mkt-footer__top-progress" data-footer-progress />
+              </svg>
+              <ArrowUp size={16} aria-hidden strokeWidth={2.25} />
+            </a>
+          </span>
         </div>
       </div>
 
-      {/* Mot-symbole géant, décoratif : le nom est déjà porté par le logo. */}
+      {/*
+        Mot-symbole géant, décoratif : le nom est déjà porté par le logo.
+
+        En SVG, pas en texte CSS masqué : la première version (texte HTML +
+        `mask-image` dont le centre était une propriété animée en continu)
+        était repeinte à chaque image, et Chrome la rastérisait en basse
+        résolution pendant l'animation — le mot paraissait pixelisé. Ici le
+        contour est un trait vectoriel (`vector-effect: non-scaling-stroke`,
+        1,5 px à toute taille) et le projecteur un dégradé radial SVG dont
+        l'app déplace le centre (`data-footer-spot`) : rien n'est rastérisé.
+        `textLength` cale le mot sur toute la largeur quelle que soit la
+        police chargée ; le `viewBox` (206 de haut, ligne de base à 222)
+        rogne le pied des lettres — le mot « sort » de la page sans déborder
+        du pied de page.
+      */}
       <div className="mkt-footer__giant" aria-hidden data-footer-giant>
-        <span className="mkt-footer__giant-outline">
-          <span className="mkt-footer__giant-g">{BRAND_NAME_ACCENT}</span>
-          {BRAND_NAME_REST}
-        </span>
-        <span className="mkt-footer__giant-fill">
-          {BRAND_NAME_ACCENT}
-          {BRAND_NAME_REST}
-        </span>
+        <svg
+          className="mkt-footer__giant-svg"
+          viewBox="0 0 1000 206"
+          preserveAspectRatio="xMidYMax meet"
+          focusable="false"
+        >
+          <defs>
+            <radialGradient
+              id="mkt-footer-spot"
+              gradientUnits="userSpaceOnUse"
+              cx="500"
+              cy="150"
+              r="230"
+              data-footer-spot
+            >
+              <stop offset="0" className="mkt-footer__spot-stop" />
+              <stop offset="1" className="mkt-footer__spot-stop mkt-footer__spot-stop--end" />
+            </radialGradient>
+          </defs>
+          <text
+            x="500"
+            y="222"
+            textAnchor="middle"
+            textLength="980"
+            lengthAdjust="spacingAndGlyphs"
+            className="mkt-footer__giant-outline"
+          >
+            <tspan className="mkt-footer__giant-g">{BRAND_NAME_ACCENT}</tspan>
+            {BRAND_NAME_REST}
+          </text>
+          <text
+            x="500"
+            y="222"
+            textAnchor="middle"
+            textLength="980"
+            lengthAdjust="spacingAndGlyphs"
+            className="mkt-footer__giant-fill"
+          >
+            {BRAND_NAME_ACCENT}
+            {BRAND_NAME_REST}
+          </text>
+        </svg>
       </div>
     </footer>
   );

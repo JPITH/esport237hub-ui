@@ -14,6 +14,7 @@ export * from './external-url';
 export * from './brand-mark';
 export * from './brand-name';
 export * from './initials';
+export * from './phone-countries';
 /*
  * Le STORE seul, pas les hooks.
  *
