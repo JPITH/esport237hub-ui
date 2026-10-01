@@ -57,7 +57,9 @@ export function PageHeader({
 
 /**
  * Conteneur de page — deux tiers de largeur.
- * - `wide` (défaut) : consoles, listes, tableaux de bord → remplit le desktop.
+ * - `wide` (défaut) : consoles, listes, tableaux de bord → remplit le desktop,
+ *   jusqu'à 1 600 px (1 440 avant le 01/10/2026 : le shell de l'app va
+ *   désormais jusqu'aux bords de l'écran, c'est le CONTENU qui se borne).
  * - `readable` : formulaires et pages de lecture → longueur de ligne confortable.
  */
 export function PageContainer({
@@ -69,7 +71,7 @@ export function PageContainer({
   className?: string;
   children: ReactNode;
 }) {
-  const max = width === "readable" ? "max-w-[760px]" : "max-w-[1440px]";
+  const max = width === "readable" ? "max-w-[760px]" : "max-w-[1600px]";
   return (
     <div className={`mx-auto flex w-full flex-col gap-6 ${max} ${className}`}>
       {children}
