@@ -43,6 +43,7 @@ export {
   SectionHead,
   StatBand,
   StepCard,
+  StoreBadge,
 } from './marketing';
 export type {
   AudienceCardProps,
@@ -56,7 +57,10 @@ export type {
   GlyphProps,
   IconName,
   MarketingFooterColumn,
+  MarketingFooterLink,
   MarketingFooterProps,
+  MarketingSocialLink,
+  MarketingStoreLink,
   MarketingHeaderProps,
   MarketingNavItem,
   NoteCardProps,
@@ -67,7 +71,12 @@ export type {
   StatBandItem,
   StatBandProps,
   StepCardProps,
+  StoreBadgeProps,
+  StoreId,
 } from './marketing';
+
+export { BrandIcon, BRAND_ICON_PATHS } from './brand-icons';
+export type { BrandIconName, BrandIconProps } from './brand-icons';
 
 export { Flag, CameroonFlag } from './flag';
 export { Table } from './table';

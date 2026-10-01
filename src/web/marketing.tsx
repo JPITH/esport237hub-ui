@@ -19,9 +19,12 @@
  */
 import type { HTMLAttributes, ReactNode } from 'react';
 
+import { BrandIcon, type BrandIconName } from './brand-icons';
+import { AppMark } from './mark';
 import { Picture } from './picture';
 import {
   ArrowRight,
+  ArrowUp,
   BadgeCheck,
   BarChart3,
   Building2,
@@ -155,7 +158,16 @@ export function Glyph({ name, size = 20, className }: GlyphProps) {
 export interface BrandLogoProps {
   /** Cible du lien ; omis → rendu en simple `<span>` (footer). */
   href?: string;
-  /** Chemin du logo servi par l'app (`/brand/logo.png`). */
+  /**
+   * Image de repli servie par l'app. **Omis par défaut, et c'est voulu** : le
+   * signe est alors dessiné en SVG en ligne (`AppMark`), aux encres du thème.
+   *
+   * Servi en `<img>`, le fichier `mark.svg` perdait son monogramme en mode
+   * sombre : son tracé « G/H » est en `currentColor`, et un SVG chargé comme
+   * image n'hérite d'AUCUNE couleur de la page — il retombe sur le noir. Sur
+   * fond nuit, il ne restait qu'un hexagone vert autour d'un trou (rapport
+   * de corrections du 01/10/2026, §5.1).
+   */
   src?: string;
   size?: number;
   /** Masque le mot-clé texte sous le seuil `sm` (header mobile). */
@@ -164,29 +176,32 @@ export interface BrandLogoProps {
 }
 
 /**
- * Logo + mot-symbole, identiques au dashboard
- * (`apps/web/src/components/app-shell.tsx`) : image réelle, jamais une
- * initiale dessinée en CSS.
+ * Signe + mot-symbole, aux MÊMES proportions dans l'en-tête et le pied de
+ * page (36 px par défaut, les deux coquilles n'en passent pas d'autre).
  */
 export function BrandLogo({
   href,
-  src = '/brand/logo.png',
+  src,
   size = 36,
   compactWordmark = false,
   className,
 }: BrandLogoProps) {
   const inner = (
     <>
-      <Picture
-        src={src}
-        alt=""
-        width={size}
-        height={size}
-        className="mkt-brand__img"
-        style={{ width: size, height: size }}
-        loading="eager"
-        decoding="async"
-      />
+      {src ? (
+        <Picture
+          src={src}
+          alt=""
+          width={size}
+          height={size}
+          className="mkt-brand__img"
+          style={{ width: size, height: size }}
+          loading="eager"
+          decoding="async"
+        />
+      ) : (
+        <AppMark size={size} className="mkt-brand__img mkt-brand__mark" />
+      )}
       <span className={cx('mkt-brand__word', compactWordmark && 'mkt-brand__word--compact')}>
         <span className="mkt-brand__accent">{BRAND_NAME_ACCENT}</span>
         {BRAND_NAME_REST}
@@ -737,44 +752,260 @@ export function MarketingHeader({
   );
 }
 
+/* ------------------------------------------------------------------ */
+/* Boutons des stores                                                  */
+/* ------------------------------------------------------------------ */
+
+export type StoreId = 'appstore' | 'googleplay';
+
+const STORE_COPY: Record<StoreId, { icon: BrandIconName; kicker: string; name: string }> = {
+  appstore: { icon: 'apple', kicker: 'Télécharger dans', name: "l'App Store" },
+  googleplay: { icon: 'googleplay', kicker: 'Disponible sur', name: 'Google Play' },
+};
+
+export interface StoreBadgeProps {
+  store: StoreId;
+  /**
+   * Lien de la fiche. **Absent = pas encore publiée** : le bouton est rendu
+   * inerte, marqué « Bientôt », et n'est pas un lien. Un badge cliquable qui
+   * mène nulle part coûte plus cher qu'un badge qui dit la vérité (rapport du
+   * 01/10/2026, §6 : « tous les CTA mènent vers une action disponible »).
+   */
+  href?: string;
+  /** Mention du badge inerte. */
+  soonLabel?: string;
+  className?: string;
+}
+
+/**
+ * Bouton de store maison — inversé sur le thème (encre forte en fond, fond de
+ * page en texte) : noir en clair, blanc en sombre, comme les badges officiels.
+ *
+ * Pas le badge officiel en image : il n'existe qu'en noir ou blanc figés, et
+ * l'image d'Apple n'est pas atteignable depuis la chaîne de build.
+ */
+export function StoreBadge({ store, href, soonLabel = 'Bientôt', className }: StoreBadgeProps) {
+  const copy = STORE_COPY[store];
+  const body = (
+    <>
+      <BrandIcon name={copy.icon} size={22} className="mkt-store__icon" />
+      <span className="mkt-store__text">
+        <span className="mkt-store__kicker">{copy.kicker}</span>
+        <span className="mkt-store__name">{copy.name}</span>
+      </span>
+    </>
+  );
+  if (!href) {
+    return (
+      <span
+        className={cx('mkt-store mkt-store--soon', className)}
+        aria-label={`${copy.kicker} ${copy.name} — ${soonLabel.toLowerCase()}`}
+        data-store={store}
+      >
+        {body}
+        <span className="mkt-store__soon" aria-hidden>
+          {soonLabel}
+        </span>
+      </span>
+    );
+  }
+  return (
+    <a
+      className={cx('mkt-store', className)}
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      data-store={store}
+    >
+      {body}
+    </a>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Pied de page                                                        */
+/* ------------------------------------------------------------------ */
+
+export interface MarketingFooterLink {
+  label: string;
+  /** Absent → rubrique annoncée mais pas encore en ligne (« Bientôt »). */
+  href?: string;
+  /** Lien hors du site vitrine (dashboard, mail) : nouvel onglet. */
+  external?: boolean;
+}
+
 export interface MarketingFooterColumn {
   title: string;
-  links: MarketingNavItem[];
+  links: MarketingFooterLink[];
+}
+
+export interface MarketingSocialLink {
+  network: BrandIconName;
+  /** Nom affiché à l'infobulle et lu par les lecteurs d'écran. */
+  label: string;
+  /** Absent → compte pas encore ouvert : pastille inerte « Bientôt ». */
+  href?: string;
+}
+
+export interface MarketingStoreLink {
+  store: StoreId;
+  href?: string;
 }
 
 export interface MarketingFooterProps {
   columns: MarketingFooterColumn[];
   /** Ligne légale, sous le séparateur. */
   legal?: ReactNode;
+  /** Image de repli du signe ; omis = SVG aux encres du thème (défaut). */
   logoSrc?: string;
+  /** Phrase d'identité sous le logo. */
+  tagline?: ReactNode;
+  socials?: MarketingSocialLink[];
+  stores?: MarketingStoreLink[];
+  /** Titre et texte du bandeau « télécharger l'app » en tête du pied. */
+  appTitle?: ReactNode;
+  appText?: ReactNode;
   className?: string;
 }
 
-export function MarketingFooter({ columns, legal, logoSrc, className }: MarketingFooterProps) {
+/**
+ * Pied de page complet : bandeau des stores, identité + réseaux, quatre
+ * colonnes, ligne légale, retour en haut et grand mot-symbole.
+ *
+ * Rendu statique comme le reste de la vitrine. Ce qui bouge — projecteur qui
+ * suit le pointeur sur le mot-symbole, anneau de défilement du bouton « haut
+ * de page », aimantation des réseaux — est posé par le script de l'app sur
+ * les attributs `data-footer-*` ; sans lui, tout reste lisible et cliquable.
+ */
+export function MarketingFooter({
+  columns,
+  legal,
+  logoSrc,
+  tagline = 'Chaque match construit une carrière.',
+  socials = [],
+  stores = [],
+  appTitle,
+  appText,
+  className,
+}: MarketingFooterProps) {
+  const anySocial = socials.some((s) => s.href);
   return (
-    <footer className={cx('mkt-footer', className)}>
-      <div className="mkt-footer__inner">
-        <div className="mkt-footer__brand">
-          <BrandLogo src={logoSrc} />
-          <p className="mkt-footer__slogan">Chaque match construit une carrière.</p>
-          <p className="mkt-footer__place">
-            <MapPin size={14} aria-hidden strokeWidth={2} />
-            <span>Yaoundé · Douala · Cameroun</span>
-          </p>
+    <footer className={cx('mkt-footer', className)} data-footer>
+      <div className="mkt-footer__shell">
+        {stores.length ? (
+          <div className="mkt-footer__app" data-reveal>
+            <div className="mkt-footer__app-copy">
+              <span className="mkt-footer__app-icon">
+                <Smartphone size={20} aria-hidden strokeWidth={1.75} />
+              </span>
+              <div>
+                <p className="mkt-footer__app-title">{appTitle ?? "L'app G-HUB, dans ta poche."}</p>
+                {appText ? <p className="mkt-footer__app-text">{appText}</p> : null}
+              </div>
+            </div>
+            <div className="mkt-footer__stores">
+              {stores.map((s) => (
+                <StoreBadge key={s.store} store={s.store} href={s.href} />
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        <div className="mkt-footer__inner">
+          <div className="mkt-footer__brand">
+            <BrandLogo src={logoSrc} />
+            <p className="mkt-footer__slogan">{tagline}</p>
+            <p className="mkt-footer__place">
+              <MapPin size={14} aria-hidden strokeWidth={2} />
+              <span>Yaoundé · Douala · Cameroun</span>
+            </p>
+            {socials.length ? (
+              <div className="mkt-footer__social">
+                <span className="mkt-footer__coltitle">Suis G-HUB</span>
+                <ul className="mkt-footer__socials" aria-label="Réseaux sociaux">
+                  {socials.map((s) => (
+                    <li key={s.network}>
+                      {s.href ? (
+                        <a
+                          className="mkt-social"
+                          href={s.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={s.label}
+                          data-tip={s.label}
+                          data-footer-magnet
+                        >
+                          <BrandIcon name={s.network} size={18} />
+                        </a>
+                      ) : (
+                        <span
+                          className="mkt-social mkt-social--soon"
+                          aria-label={`${s.label} — bientôt`}
+                          data-tip={`${s.label} · bientôt`}
+                        >
+                          <BrandIcon name={s.network} size={18} />
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+                {anySocial ? null : (
+                  <span className="mkt-footer__hint">Comptes officiels bientôt en ligne.</span>
+                )}
+              </div>
+            ) : null}
+          </div>
+
+          <div className="mkt-footer__cols">
+            {columns.map((col) => (
+              <nav key={col.title} className="mkt-footer__col" aria-label={col.title}>
+                <span className="mkt-footer__coltitle">{col.title}</span>
+                {col.links.map((link) =>
+                  link.href ? (
+                    <a
+                      key={link.label}
+                      href={link.href}
+                      className="mkt-footer__link"
+                      {...(link.external ? { target: '_blank', rel: 'noopener' } : {})}
+                    >
+                      <span>{link.label}</span>
+                      <ArrowRight size={13} aria-hidden className="mkt-footer__link-arrow" />
+                    </a>
+                  ) : (
+                    <span key={link.label} className="mkt-footer__link mkt-footer__link--soon">
+                      <span>{link.label}</span>
+                      <span className="mkt-footer__soon">Bientôt</span>
+                    </span>
+                  ),
+                )}
+              </nav>
+            ))}
+          </div>
         </div>
 
-        {columns.map((col) => (
-          <nav key={col.title} className="mkt-footer__col" aria-label={col.title}>
-            <span className="mkt-footer__coltitle">{col.title}</span>
-            {col.links.map((link) => (
-              <a key={link.href} href={link.href} className="mkt-footer__link">
-                {link.label}
-              </a>
-            ))}
-          </nav>
-        ))}
+        <div className="mkt-footer__legal">
+          <span>{legal}</span>
+          <a className="mkt-footer__top" href="#" data-footer-top aria-label="Revenir en haut de la page">
+            <svg viewBox="0 0 44 44" className="mkt-footer__top-ring" aria-hidden focusable="false">
+              <circle cx="22" cy="22" r="20" pathLength={1} className="mkt-footer__top-track" />
+              <circle cx="22" cy="22" r="20" pathLength={1} className="mkt-footer__top-progress" data-footer-progress />
+            </svg>
+            <ArrowUp size={16} aria-hidden strokeWidth={2.25} />
+          </a>
+        </div>
       </div>
-      {legal ? <div className="mkt-footer__legal">{legal}</div> : null}
+
+      {/* Mot-symbole géant, décoratif : le nom est déjà porté par le logo. */}
+      <div className="mkt-footer__giant" aria-hidden data-footer-giant>
+        <span className="mkt-footer__giant-outline">
+          <span className="mkt-footer__giant-g">{BRAND_NAME_ACCENT}</span>
+          {BRAND_NAME_REST}
+        </span>
+        <span className="mkt-footer__giant-fill">
+          {BRAND_NAME_ACCENT}
+          {BRAND_NAME_REST}
+        </span>
+      </div>
     </footer>
   );
 }
