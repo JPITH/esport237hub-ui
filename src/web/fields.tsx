@@ -23,8 +23,14 @@ import {
 } from 'react';
 
 // Le drapeau était recopié à l'identique ici : une seule source, './flag'.
-import { CameroonFlag } from './flag';
+import { CameroonFlag, Flag } from './flag';
 import { useDsT } from '../i18n';
+import {
+  findPhoneCountry,
+  formatPhoneDigits,
+  phoneDigits,
+  type PhoneCountry,
+} from '../lib/phone-countries';
 
 function cx(...parts: Array<string | false | null | undefined>): string {
   return parts.filter(Boolean).join(' ');
@@ -91,6 +97,22 @@ function IconMinus({ className }: IconProps) {
   return (
     <svg {...svgProps(className)}>
       <path d="M5 12h14" />
+    </svg>
+  );
+}
+
+function IconChevronDown({ className }: IconProps) {
+  return (
+    <svg {...svgProps(className)}>
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  );
+}
+
+function IconCheck({ className }: IconProps) {
+  return (
+    <svg {...svgProps(className)}>
+      <path d="M20 6 9 17l-5-5" />
     </svg>
   );
 }
@@ -388,30 +410,44 @@ export function NumberInput({
 /* PhoneInput                                                          */
 /* ------------------------------------------------------------------ */
 
-/** Groupes d'affichage d'un numéro camerounais : 6XX XX XX XX. */
-function formatCmPhone(digits: string): string {
-  const d = digits.slice(0, 9);
-  const parts = [d.slice(0, 3), d.slice(3, 5), d.slice(5, 7), d.slice(7, 9)];
-  return parts.filter(Boolean).join(' ');
-}
-
 export interface PhoneInputProps {
   label?: string;
   /** Champ obligatoire : un astérisque suit le libellé. */
   required?: boolean;
   hint?: string;
-  /** Chiffres du numéro national (9 max), sans le préfixe. */
+  /** Chiffres du numéro national, sans l'indicatif. */
   value: string;
   onChange: (digits: string) => void;
   placeholder?: string;
   disabled?: boolean;
   className?: string;
   id?: string;
+  /**
+   * Pays proposés dans le menu d'indicatif (`PHONE_COUNTRIES` de `./lib`).
+   * ABSENT = comportement historique : préfixe verrouillé sur +237 — c'est ce
+   * que veut le Mobile Money, qui n'opère qu'au Cameroun.
+   */
+  countries?: PhoneCountry[];
+  /** Code ISO du pays choisi (« CM » par défaut). */
+  country?: string;
+  onCountryChange?: (code: string) => void;
+  /** Erreur affichée par le parent : bordure d'erreur + `aria-invalid`. */
+  invalid?: boolean;
+  /** Identifiants d'éléments qui décrivent le champ (erreur, aide). */
+  describedBy?: string;
+  onBlur?: () => void;
 }
 
 /**
- * Téléphone — préfixe VERROUILLÉ sur +237 (Cameroun) pour l'instant ;
- * l'indicatif deviendra sélectionnable à l'ouverture d'autres pays.
+ * Téléphone — indicatif + numéro national formaté au fil de la frappe.
+ *
+ * Avec `countries`, l'indicatif devient un menu déroulant maison (drapeau,
+ * pays, indicatif ; flèches, Entrée, Échap, saisie d'une lettre pour sauter
+ * au pays) — jamais un `<select>` natif. Le panneau vit HORS du conteneur
+ * composite, qui coupe ce qui déborde (`overflow: hidden`).
+ *
+ * Parité native : le jumeau `./native` reste verrouillé sur +237 tant que
+ * l'app mobile n'en a pas l'usage (seul le Mobile Money y saisit un numéro).
  */
 export function PhoneInput({
   label,
@@ -419,15 +455,90 @@ export function PhoneInput({
   hint,
   value,
   onChange,
-  placeholder = '6XX XX XX XX',
+  placeholder,
   disabled,
   className,
   id,
+  countries,
+  country = 'CM',
+  onCountryChange,
+  invalid,
+  describedBy,
+  onBlur,
 }: PhoneInputProps) {
   const t = useDsT();
   const autoId = useId();
   const fieldId = id ?? autoId;
+  const listId = `${fieldId}-pays`;
   const fieldLabel = label ?? t('form.field.phone.label');
+  const selectable = !!countries && countries.length > 1;
+  const current = selectable
+    ? (countries.find((c) => c.code === country) ?? countries[0]!)
+    : findPhoneCountry('CM');
+
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const [open, setOpen] = useState(false);
+  const [hi, setHi] = useState(0);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: PointerEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('pointerdown', onDown);
+    return () => document.removeEventListener('pointerdown', onDown);
+  }, [open]);
+
+  const list = countries ?? [];
+  const openMenu = () => {
+    setHi(Math.max(0, list.findIndex((c) => c.code === current.code)));
+    setOpen(true);
+  };
+  const pick = (c: PhoneCountry) => {
+    onCountryChange?.(c.code);
+    // Le numéro saisi est recoupé à la longueur du nouveau pays.
+    onChange(phoneDigits(value, c));
+    setOpen(false);
+    triggerRef.current?.focus();
+  };
+
+  const onMenuKey = (e: React.KeyboardEvent) => {
+    if (!open && (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      openMenu();
+      return;
+    }
+    if (!open) return;
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      setOpen(false);
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setHi((h) => Math.min(list.length - 1, h + 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setHi((h) => Math.max(0, h - 1));
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      setHi(0);
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      setHi(list.length - 1);
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (list[hi]) pick(list[hi]);
+    } else if (e.key === 'Tab') {
+      setOpen(false);
+    } else if (/^[a-z]$/i.test(e.key)) {
+      // Une lettre saute au premier pays qui commence par elle.
+      const at = list.findIndex((c) =>
+        c.name.normalize('NFD').toLowerCase().startsWith(e.key.toLowerCase()),
+      );
+      if (at >= 0) setHi(at);
+    }
+  };
+
   return (
     <div className={cx('e237-field-group', className)}>
       {fieldLabel ? (
@@ -435,28 +546,85 @@ export function PhoneInput({
           {fieldLabel}
         </Label>
       ) : null}
-      <div
-        className={cx(
-          'e237-field',
-          'e237-field-composite',
-          disabled && 'e237-field--muted',
-        )}
-      >
-        <span className="e237-field-affix">
-          <CameroonFlag className="e237-affix-flag" />
-          +237
-        </span>
-        <input
-          id={fieldId}
-          type="tel"
-          inputMode="tel"
-          autoComplete="tel-national"
-          disabled={disabled}
-          value={formatCmPhone(value)}
-          placeholder={placeholder}
-          onChange={(e) => onChange(e.target.value.replace(/\D/g, '').slice(0, 9))}
-          className="e237-field-inner"
-        />
+      <div ref={wrapRef} className="e237-phone">
+        <div
+          className={cx(
+            'e237-field',
+            'e237-field-composite',
+            disabled && 'e237-field--muted',
+            invalid && 'e237-field--invalid',
+          )}
+        >
+          {selectable ? (
+            <button
+              ref={triggerRef}
+              type="button"
+              className="e237-field-affix e237-field-affix--button"
+              aria-haspopup="listbox"
+              aria-expanded={open}
+              aria-controls={open ? listId : undefined}
+              aria-activedescendant={open && list[hi] ? `${listId}-${list[hi].code}` : undefined}
+              aria-label={`Indicatif : ${current.name} (+${current.dial})`}
+              disabled={disabled}
+              onClick={() => (open ? setOpen(false) : openMenu())}
+              onKeyDown={onMenuKey}
+            >
+              <Flag country={current.code} className="e237-affix-flag" decorative />
+              +{current.dial}
+              <IconChevronDown
+                className={cx('e237-affix-chevron', open && 'e237-affix-chevron--open')}
+              />
+            </button>
+          ) : (
+            <span className="e237-field-affix">
+              <CameroonFlag className="e237-affix-flag" />
+              +237
+            </span>
+          )}
+          <input
+            id={fieldId}
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel-national"
+            disabled={disabled}
+            value={formatPhoneDigits(value, current)}
+            placeholder={placeholder ?? current.placeholder}
+            onChange={(e) => onChange(phoneDigits(e.target.value, current))}
+            onBlur={onBlur}
+            aria-invalid={invalid || undefined}
+            aria-describedby={describedBy}
+            className="e237-field-inner"
+          />
+        </div>
+
+        {selectable && open ? (
+          <div className="ui-popover ui-animate-pop e237-phone__menu">
+            <div id={listId} role="listbox" aria-label="Indicatif du pays" className="e237-phone__list">
+              {list.map((c, i) => (
+                <button
+                  key={c.code}
+                  id={`${listId}-${c.code}`}
+                  type="button"
+                  role="option"
+                  aria-selected={c.code === current.code}
+                  tabIndex={-1}
+                  className={cx(
+                    'e237-phone__option',
+                    i === hi && 'e237-phone__option--hi',
+                    c.code === current.code && 'e237-phone__option--on',
+                  )}
+                  onClick={() => pick(c)}
+                  onPointerMove={() => setHi(i)}
+                >
+                  <Flag country={c.code} className="e237-affix-flag" decorative />
+                  <span className="e237-phone__name">{c.name}</span>
+                  <span className="e237-phone__dial">+{c.dial}</span>
+                  {c.code === current.code ? <IconCheck className="e237-phone__check" /> : null}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : null}
       </div>
       {hint ? <span className="e237-field-hint">{hint}</span> : null}
     </div>

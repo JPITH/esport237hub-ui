@@ -33,6 +33,8 @@ import {
   Camera,
   Check,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Clock,
   Coins,
   Crown,
@@ -49,8 +51,11 @@ import {
   Medal,
   MonitorPlay,
   Newspaper,
+  Pause,
   Percent,
   Phone,
+  Play,
+  Plus,
   Puzzle,
   QrCode,
   Radar,
@@ -69,6 +74,7 @@ import {
   Users,
   Video,
   Wallet,
+  X,
   Zap,
   type LucideIcon,
 } from 'lucide-react';
@@ -91,6 +97,8 @@ const ICONS = {
   Camera,
   Check,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Clock,
   Coins,
   Crown,
@@ -107,8 +115,11 @@ const ICONS = {
   Medal,
   MonitorPlay,
   Newspaper,
+  Pause,
   Percent,
   Phone,
+  Play,
+  Plus,
   Puzzle,
   QrCode,
   Radar,
@@ -127,6 +138,7 @@ const ICONS = {
   Users,
   Video,
   Wallet,
+  X,
   Zap,
 } satisfies Record<string, LucideIcon>;
 
@@ -992,10 +1004,20 @@ export function MarketingFooter({
             ) : null}
           </div>
 
+          {/*
+            Colonnes en accordéon sur téléphone, comme le pied de page
+            d'apple.com : quatre titres au lieu de vingt liens empilés.
+            `<details open>` : sans script, tout est visible. L'app replie
+            sous 720 px et garde ouvert au large (`data-footer-fold`).
+          */}
           <div className="mkt-footer__cols">
             {columns.map((col) => (
-              <nav key={col.title} className="mkt-footer__col" aria-label={col.title}>
-                <span className="mkt-footer__coltitle">{col.title}</span>
+              <details key={col.title} className="mkt-footer__col" open data-footer-fold>
+                <summary className="mkt-footer__coltitle">
+                  {col.title}
+                  <ChevronDown size={16} aria-hidden className="mkt-footer__colchevron" />
+                </summary>
+                <nav className="mkt-footer__links" aria-label={col.title}>
                 {col.links.map((link) =>
                   link.href ? (
                     <a
@@ -1014,7 +1036,8 @@ export function MarketingFooter({
                     </span>
                   ),
                 )}
-              </nav>
+                </nav>
+              </details>
             ))}
           </div>
         </div>
