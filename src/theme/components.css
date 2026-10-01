@@ -3497,31 +3497,202 @@ a.mkt-brand:active {
 
 /* ---------------------------------------------------------------- */
 /* Pied de page                                                      */
+/*                                                                   */
+/* Lecture de haut en bas : bandeau des stores (l'action), identité  */
+/* et réseaux (la confiance), quatre colonnes (la navigation), ligne */
+/* légale + retour en haut, puis le mot-symbole géant qui ferme la   */
+/* page. Inspirations relevées sur Mobbin : Discord (mot-symbole),   */
+/* Linktree et Miro (stores + réseaux sur une même rangée).          */
 /* ---------------------------------------------------------------- */
 .mkt-footer {
+  position: relative;
   margin-top: var(--e237-spacing-12);
-  padding-block: var(--e237-spacing-10) var(--e237-spacing-6);
+  padding-top: var(--e237-spacing-10);
+  overflow: hidden;
+  background: var(--e237-frame);
+  border-top: 1px solid var(--e237-border);
 }
-/*
- * Flex et non grid : `repeat(auto-fit, …)` ne peut se combiner qu'avec des
- * pistes de taille DÉFINIE. Associé à un `1.4fr` flexible, toute la
- * déclaration `grid-template-columns` était invalide et le pied de page
- * retombait sur une seule colonne. Flex s'adapte en plus à un nombre
- * quelconque de colonnes passées au composant.
- */
-.mkt-footer__inner {
+/* Halo d'accent très bas, posé derrière le mot-symbole. */
+.mkt-footer::before {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 70%;
+  pointer-events: none;
+  background: radial-gradient(
+    60% 70% at 50% 100%,
+    color-mix(in srgb, var(--e237-accent) 10%, transparent),
+    transparent 70%
+  );
+}
+.mkt-footer__shell {
+  position: relative;
   width: 100%;
   max-width: 1140px;
   margin-inline: auto;
   padding-inline: var(--e237-spacing-5);
+}
+
+/* --- Bandeau « l'app dans ta poche » ------------------------------ */
+.mkt-footer__app {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--e237-spacing-8) var(--e237-spacing-6);
-  align-items: flex-start;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e237-spacing-5);
+  padding: var(--e237-spacing-5) var(--e237-spacing-6);
+  border-radius: var(--e237-radius-xl);
+  border: 1px solid var(--e237-border);
+  background:
+    radial-gradient(
+      120% 160% at 0% 0%,
+      color-mix(in srgb, var(--e237-accent) 9%, transparent),
+      transparent 55%
+    ),
+    var(--e237-surface);
+}
+.mkt-footer__app-copy {
+  display: flex;
+  align-items: center;
+  gap: var(--e237-spacing-4);
+  min-width: 0;
+}
+.mkt-footer__app-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--e237-radius-md);
+  color: var(--e237-accent);
+  background: var(--e237-accent-subtle);
+  border: 1px solid var(--e237-accent-border);
+}
+.mkt-footer__app-title {
+  margin: 0;
+  font-family: var(--e237-font-display);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--e237-text-strong);
+}
+.mkt-footer__app-text {
+  margin: 2px 0 0;
+  max-width: 52ch;
+  color: var(--e237-text-secondary);
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+.mkt-footer__stores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e237-spacing-3);
+}
+
+/* --- Boutons des stores ------------------------------------------ */
+/*
+ * Inversés sur le thème : encre forte en fond, fond de page en texte —
+ * noir en clair, blanc en sombre, comme les badges officiels.
+ */
+.mkt-store {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 50px;
+  padding: 6px 18px 6px 14px;
+  border-radius: 12px;
+  background: var(--e237-text-strong);
+  color: var(--e237-bg);
+  text-decoration: none;
+  overflow: hidden;
+  transition:
+    transform var(--e237-dur) var(--e237-ease-out),
+    box-shadow var(--e237-dur) var(--e237-ease-out);
+}
+/* Reflet qui balaie le bouton au survol. */
+.mkt-store::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    110deg,
+    transparent 30%,
+    color-mix(in srgb, var(--e237-bg) 22%, transparent) 50%,
+    transparent 70%
+  );
+  transform: translateX(-120%);
+  transition: transform var(--e237-dur-slow) var(--e237-ease-out);
+}
+a.mkt-store:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--e237-shadow-pop);
+}
+a.mkt-store:hover::after {
+  transform: translateX(120%);
+}
+a.mkt-store:active {
+  transform: translateY(0) scale(0.98);
+}
+.mkt-store__icon {
+  flex-shrink: 0;
+}
+.mkt-store__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  text-align: left;
+}
+.mkt-store__kicker {
+  font-size: 10.5px;
+  font-weight: 500;
+  opacity: 0.8;
+}
+.mkt-store__name {
+  font-family: var(--e237-font-display);
+  font-size: 16.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+/* Pas encore publié : même dessin, en retrait, avec sa mention. */
+.mkt-store--soon {
+  cursor: default;
+  background: var(--e237-surface-raised);
+  color: var(--e237-text-secondary);
+  box-shadow: inset 0 0 0 1px var(--e237-border-strong);
+}
+.mkt-store__soon {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+  padding: 1px 6px;
+  border-radius: var(--e237-radius-full);
+  background: var(--e237-cyan-subtle);
+  color: var(--e237-cyan);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.mkt-store--soon .mkt-store__text {
+  padding-right: 42px;
+}
+
+/* --- Colonnes ----------------------------------------------------- */
+.mkt-footer__inner {
+  display: grid;
+  gap: var(--e237-spacing-10) var(--e237-spacing-8);
+  padding-top: var(--e237-spacing-10);
+  grid-template-columns: 1fr;
+}
+@media (min-width: 960px) {
+  .mkt-footer__inner {
+    grid-template-columns: minmax(260px, 1.1fr) 2.4fr;
+  }
 }
 .mkt-footer__brand {
-  flex: 1 1 260px;
-  max-width: 380px;
   display: flex;
   flex-direction: column;
   gap: var(--e237-spacing-3);
@@ -3529,7 +3700,7 @@ a.mkt-brand:active {
 }
 .mkt-footer__slogan {
   margin: 0;
-  max-width: 34ch;
+  max-width: 36ch;
   color: var(--e237-text-secondary);
   font-size: 14px;
   line-height: 1.6;
@@ -3546,14 +3717,24 @@ a.mkt-brand:active {
   flex-shrink: 0;
   color: var(--e237-cyan);
 }
+.mkt-footer__cols {
+  display: grid;
+  gap: var(--e237-spacing-8) var(--e237-spacing-5);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+@media (min-width: 720px) {
+  .mkt-footer__cols {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
 .mkt-footer__col {
-  flex: 1 1 150px;
-  min-width: 140px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 4px;
+  min-width: 0;
 }
 .mkt-footer__coltitle {
+  margin-bottom: 6px;
   font-family: var(--e237-font-display);
   font-size: 11px;
   font-weight: 700;
@@ -3562,30 +3743,248 @@ a.mkt-brand:active {
   color: var(--e237-text-muted);
 }
 .mkt-footer__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  /* Cible tactile : 40 px de haut, sans encadrer le lien. */
+  min-height: 40px;
+  width: fit-content;
   color: var(--e237-text-secondary);
   font-size: 14px;
   text-decoration: none;
-  width: fit-content;
+  transition: color var(--e237-dur) var(--e237-ease-out);
+}
+.mkt-footer__link-arrow {
+  opacity: 0;
+  transform: translateX(-6px);
+  transition:
+    opacity var(--e237-dur) var(--e237-ease-out),
+    transform var(--e237-dur) var(--e237-ease-out);
+}
+a.mkt-footer__link:hover {
+  color: var(--e237-accent);
+}
+a.mkt-footer__link:hover .mkt-footer__link-arrow,
+a.mkt-footer__link:focus-visible .mkt-footer__link-arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+.mkt-footer__link--soon {
+  color: var(--e237-text-muted);
+  cursor: default;
+}
+.mkt-footer__soon {
+  padding: 1px 7px;
+  border-radius: var(--e237-radius-full);
+  border: 1px solid var(--e237-border);
+  color: var(--e237-text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* --- Réseaux sociaux --------------------------------------------- */
+.mkt-footer__social {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: var(--e237-spacing-3);
+}
+.mkt-footer__socials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e237-spacing-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mkt-social {
+  position: relative;
+  display: grid;
+  place-items: center;
+  /* 40 px à la souris (sept réseaux tiennent sur une ligne), 44 au doigt. */
+  width: 40px;
+  height: 40px;
+  border-radius: var(--e237-radius-full);
+  border: 1px solid var(--e237-border);
+  background: var(--e237-surface);
+  color: var(--e237-text-secondary);
+  transition:
+    color var(--e237-dur) var(--e237-ease-out),
+    border-color var(--e237-dur) var(--e237-ease-out),
+    background var(--e237-dur) var(--e237-ease-out);
+}
+a.mkt-social:hover,
+a.mkt-social:focus-visible {
+  color: var(--e237-accent);
+  border-color: var(--e237-accent-border);
+  background: var(--e237-accent-subtle);
+}
+.mkt-social--soon {
+  opacity: 0.55;
+  cursor: default;
+}
+@media (pointer: coarse) {
+  .mkt-social {
+    width: 44px;
+    height: 44px;
+  }
+}
+/* Infobulle CSS : le nom du réseau, au survol comme au focus. */
+.mkt-social[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  translate: -50% 4px;
+  padding: 4px 8px;
+  border-radius: var(--e237-radius-sm);
+  background: var(--e237-surface-raised);
+  box-shadow: var(--e237-shadow-pop);
+  color: var(--e237-text-primary);
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity var(--e237-dur-fast) var(--e237-ease-out),
+    translate var(--e237-dur-fast) var(--e237-ease-out);
+}
+.mkt-social:hover::after,
+.mkt-social:focus-visible::after {
+  opacity: 1;
+  translate: -50% 0;
+}
+.mkt-footer__hint {
+  color: var(--e237-text-muted);
+  font-size: 12px;
+}
+
+/* --- Ligne légale + retour en haut -------------------------------- */
+.mkt-footer__legal {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e237-spacing-3);
+  margin-top: var(--e237-spacing-10);
+  padding-top: var(--e237-spacing-5);
+  border-top: 1px solid var(--e237-border);
+  color: var(--e237-text-muted);
+  font-size: 12.5px;
+}
+.mkt-footer__top {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--e237-radius-full);
+  background: var(--e237-surface);
+  color: var(--e237-text-primary);
   transition:
     color var(--e237-dur) var(--e237-ease-out),
     transform var(--e237-dur) var(--e237-ease-out);
 }
-.mkt-footer__link:hover {
+.mkt-footer__top:hover {
   color: var(--e237-accent);
-  transform: translateX(3px);
+  transform: translateY(-2px);
 }
-.mkt-footer__legal {
+.mkt-footer__top-ring {
+  position: absolute;
+  inset: 0;
+  rotate: -90deg;
+}
+.mkt-footer__top-ring circle {
+  fill: none;
+  stroke-width: 2;
+}
+.mkt-footer__top-track {
+  stroke: var(--e237-border);
+}
+/* Anneau de défilement : plein par défaut (sans script), piloté sinon. */
+.mkt-footer__top-progress {
+  stroke: var(--e237-accent);
+  stroke-linecap: round;
+  stroke-dasharray: 1 1;
+}
+
+/* --- Mot-symbole géant -------------------------------------------- */
+@property --mkt-mx {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 50%;
+}
+.mkt-footer__giant {
+  --mkt-mx: 50%;
+  --mkt-my: 55%;
+  position: relative;
+  display: grid;
   width: 100%;
   max-width: 1140px;
-  margin: var(--e237-spacing-8) auto 0;
-  padding: var(--e237-spacing-5) var(--e237-spacing-5) 0;
-  border-top: 1px solid var(--e237-border);
-  color: var(--e237-text-muted);
-  font-size: 12.5px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--e237-spacing-3);
-  justify-content: space-between;
+  margin: var(--e237-spacing-6) auto 0;
+  padding-inline: var(--e237-spacing-5);
+  font-family: var(--e237-font-display);
+  font-weight: 800;
+  font-size: clamp(84px, 23vw, 288px);
+  line-height: 0.78;
+  letter-spacing: -0.05em;
+  text-align: center;
+  user-select: none;
+  /* Le bas des lettres est coupé par le bord : le mot « sort » de la page. */
+  margin-bottom: -0.1em;
+  /* Balayage lent tant que personne ne pointe (téléphone, clavier). */
+  animation: mkt-footer-sweep 9s var(--e237-ease-out) infinite alternate;
+}
+.mkt-footer__giant > span {
+  grid-area: 1 / 1;
+}
+.mkt-footer__giant-outline {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--e237-border-strong);
+}
+.mkt-footer__giant-g {
+  -webkit-text-stroke-color: var(--e237-accent-border);
+}
+/* Le projecteur : la même lettre, pleine, révélée sous le pointeur. */
+.mkt-footer__giant-fill {
+  color: var(--e237-accent);
+  -webkit-mask-image: radial-gradient(
+    circle clamp(120px, 18vw, 240px) at var(--mkt-mx) var(--mkt-my),
+    #000 0%,
+    transparent 72%
+  );
+  mask-image: radial-gradient(
+    circle clamp(120px, 18vw, 240px) at var(--mkt-mx) var(--mkt-my),
+    #000 0%,
+    transparent 72%
+  );
+  opacity: 0.85;
+}
+.mkt-footer__giant.is-tracking {
+  animation: none;
+}
+@keyframes mkt-footer-sweep {
+  from {
+    --mkt-mx: 8%;
+  }
+  to {
+    --mkt-mx: 92%;
+  }
+}
+@media (max-width: 719px) {
+  .mkt-footer__app {
+    padding: var(--e237-spacing-5);
+  }
+  .mkt-footer__stores {
+    width: 100%;
+  }
+  .mkt-footer__stores > .mkt-store {
+    flex: 1 1 150px;
+    justify-content: center;
+  }
 }
 
 /* Reduced-motion : animations décoratives UI (pas le feedback focus). */
@@ -3601,7 +4000,8 @@ a.mkt-brand:active {
   .pcard--animated,
   .ui-overlay[data-state="closing"],
   .ui-modal[data-state="closing"],
-  .mkt-faq__item[open] .mkt-faq__a {
+  .mkt-faq__item[open] .mkt-faq__a,
+  .mkt-footer__giant {
     animation: none !important;
   }
 
@@ -3641,9 +4041,17 @@ a.mkt-brand:active {
   .mkt-faq__item,
   .mkt-faq__q,
   .mkt-faq__chevron,
-  .mkt-footer__link {
+  .mkt-footer__link,
+  .mkt-footer__link-arrow,
+  .mkt-store,
+  .mkt-social,
+  .mkt-social::after,
+  .mkt-footer__top {
     transition: none !important;
     transform: none !important;
+  }
+  .mkt-store::after {
+    display: none;
   }
 }
 

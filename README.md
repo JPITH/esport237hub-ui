@@ -36,7 +36,7 @@ import { Button, Card, PlayerCard, SectionLabel } from '@esport237hub/ui/web';
 
 <Card>
   <SectionLabel>Duel rapide</SectionLabel>
-  <PlayerCard name="Sopgwi Armel" rating={87} division="Elite" meta="EA SPORTS FC 27 · Yaoundé" />
+  <PlayerCard name="Sando Pascal" rating={87} division="Division 1" meta="EA SPORTS FC 27 · Yaoundé" />
   <Button>Trouver un duel</Button>
 </Card>;
 ```
