@@ -4290,14 +4290,21 @@ a.mkt-social:focus-visible {
   font-size: 300px;
   font-weight: 800;
 }
+/*
+ * Contour lisible SANS le projecteur, dans les deux thèmes. Il utilisait
+ * `--e237-border-strong` : visible sur fond nuit (#4a525e sur #0e1116), mais
+ * #ccd1d8 sur #f4f6f9 en clair — le mot disparaissait tant que le halo ne
+ * passait pas (retour du 02/10/2026). Mélange au fond plutôt qu'un jeton de
+ * bordure : même contraste relatif en clair et en sombre.
+ */
 .mkt-footer__giant-outline {
   fill: none;
-  stroke: var(--e237-border-strong);
+  stroke: color-mix(in srgb, var(--e237-text-muted) 60%, var(--e237-bg));
   stroke-width: 1.5;
   vector-effect: non-scaling-stroke;
 }
 .mkt-footer__giant-g {
-  stroke: var(--e237-accent-border);
+  stroke: color-mix(in srgb, var(--e237-accent) 70%, var(--e237-bg));
 }
 .mkt-footer__giant-fill {
   fill: url(#mkt-footer-spot);
