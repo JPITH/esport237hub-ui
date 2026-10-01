@@ -49,6 +49,7 @@ import {
   Mail,
   MapPin,
   Medal,
+  Menu,
   MonitorPlay,
   Newspaper,
   Pause,
@@ -701,6 +702,11 @@ export interface MarketingNavItem {
 
 export interface MarketingHeaderProps {
   navItems: MarketingNavItem[];
+  /**
+   * Liens de second rang, montrés seulement dans le menu du téléphone, sous
+   * la navigation principale (« Comment ça marche », « Contact »…).
+   */
+  menuItems?: MarketingNavItem[];
   ctaLabel: string;
   ctaHref: string;
   /** Chemin courant (`Astro.url.pathname`) pour marquer le lien actif. */
@@ -718,6 +724,7 @@ export interface MarketingHeaderProps {
  */
 export function MarketingHeader({
   navItems,
+  menuItems = [],
   ctaLabel,
   ctaHref,
   currentPath = '/',
@@ -794,7 +801,61 @@ export function MarketingHeader({
           <a className="btn btn--primary btn--sm mkt-header__cta" href={ctaHref}>
             {ctaLabel}
           </a>
+          {/*
+            Menu du téléphone et de la tablette — sous 1 080 px, la pilule de
+            navigation disparaît : sans ce bouton, un visiteur sur téléphone
+            n'avait AUCUN moyen d'atteindre le classement ou les tournois
+            (retour du 01/10/2026). API Popover native : aucun script, Échap
+            et le toucher hors du panneau le referment.
+          */}
+          <button
+            type="button"
+            className="mkt-menubtn"
+            popoverTarget="mkt-menu"
+            aria-label="Ouvrir le menu"
+          >
+            <Menu size={22} aria-hidden />
+          </button>
         </div>
+      </div>
+
+      <div id="mkt-menu" popover="auto" className="mkt-menu">
+        <div className="mkt-menu__top">
+          <BrandLogo href="/" src={logoSrc} compactWordmark />
+          <button
+            type="button"
+            className="mkt-menu__close"
+            popoverTarget="mkt-menu"
+            popoverTargetAction="hide"
+            aria-label="Fermer le menu"
+          >
+            <X size={22} aria-hidden />
+          </button>
+        </div>
+        <nav className="mkt-menu__nav" aria-label="Menu">
+          {navItems.map((item) => (
+            <a
+              key={item.href}
+              href={item.href}
+              className={cx('mkt-menu__link', isActive(item.href) && 'mkt-menu__link--on')}
+              aria-current={isActive(item.href) ? 'page' : undefined}
+            >
+              {item.label}
+            </a>
+          ))}
+        </nav>
+        {menuItems.length ? (
+          <nav className="mkt-menu__more" aria-label="Plus de liens">
+            {menuItems.map((item) => (
+              <a key={item.href} href={item.href} className="mkt-menu__sublink">
+                {item.label}
+              </a>
+            ))}
+          </nav>
+        ) : null}
+        <a className="btn btn--primary btn--lg btn--block mkt-menu__cta" href={ctaHref}>
+          {ctaLabel}
+        </a>
       </div>
     </header>
   );
@@ -1005,18 +1066,15 @@ export function MarketingFooter({
           </div>
 
           {/*
-            Colonnes en accordéon sur téléphone, comme le pied de page
-            d'apple.com : quatre titres au lieu de vingt liens empilés.
-            `<details open>` : sans script, tout est visible. L'app replie
-            sous 720 px et garde ouvert au large (`data-footer-fold`).
+            Toujours dépliées, sur téléphone aussi (retour du 01/10/2026 :
+            repliées en accordéon, les quatre colonnes ne montraient que
+            quatre titres, et le pied de page passait pour « trop simple »).
+            Deux colonnes sur téléphone, quatre au large.
           */}
           <div className="mkt-footer__cols">
             {columns.map((col) => (
-              <details key={col.title} className="mkt-footer__col" open data-footer-fold>
-                <summary className="mkt-footer__coltitle">
-                  {col.title}
-                  <ChevronDown size={16} aria-hidden className="mkt-footer__colchevron" />
-                </summary>
+              <div key={col.title} className="mkt-footer__col">
+                <h2 className="mkt-footer__coltitle">{col.title}</h2>
                 <nav className="mkt-footer__links" aria-label={col.title}>
                 {col.links.map((link) =>
                   link.href ? (
@@ -1037,7 +1095,7 @@ export function MarketingFooter({
                   ),
                 )}
                 </nav>
-              </details>
+              </div>
             ))}
           </div>
         </div>

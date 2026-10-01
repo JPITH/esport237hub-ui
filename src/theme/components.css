@@ -2784,7 +2784,9 @@ a.mkt-brand:active {
   background: var(--e237-surface);
   box-shadow: var(--e237-neu-raised-sm);
 }
-@media (min-width: 900px) {
+/* Six entrées depuis le 01/10/2026 : la pilule n'apparaît qu'à partir de
+   1 080 px ; en dessous, le bouton « menu » prend le relais. */
+@media (min-width: 1080px) {
   .mkt-nav {
     display: flex;
   }
@@ -2909,6 +2911,131 @@ a.mkt-brand:active {
 @media (max-width: 479px) {
   .mkt-header__cta {
     display: none;
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* Menu du téléphone (popover natif)                                */
+/* ---------------------------------------------------------------- */
+.mkt-menubtn {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: var(--e237-radius-full);
+  background: var(--e237-surface);
+  color: var(--e237-text-primary);
+  box-shadow: var(--e237-neu-raised-sm);
+  cursor: pointer;
+}
+.mkt-menubtn:active {
+  transform: scale(0.94);
+  box-shadow: var(--e237-neu-pressed-sm);
+}
+.mkt-menubtn:focus-visible,
+.mkt-menu__close:focus-visible {
+  outline: 2px solid var(--e237-accent);
+  outline-offset: 2px;
+}
+@media (min-width: 1080px) {
+  .mkt-menubtn {
+    display: none;
+  }
+}
+/* Panneau plein écran, le fond de page derrière un voile flouté. */
+.mkt-menu {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 14px var(--mkt-gutter, 20px) calc(24px + env(safe-area-inset-bottom, 0px));
+  border: 0;
+  background: color-mix(in srgb, var(--e237-bg) 94%, transparent);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  color: var(--e237-text-primary);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.mkt-menu:popover-open {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e237-spacing-6);
+  animation: mkt-menu-in 260ms var(--e237-ease-out);
+}
+@keyframes mkt-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+}
+.mkt-menu__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 46px;
+}
+.mkt-menu__close {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: var(--e237-radius-full);
+  background: var(--e237-surface);
+  color: var(--e237-text-primary);
+  box-shadow: var(--e237-neu-raised-sm);
+  cursor: pointer;
+}
+.mkt-menu__nav {
+  display: flex;
+  flex-direction: column;
+}
+.mkt-menu__link {
+  display: flex;
+  align-items: center;
+  min-height: 56px;
+  border-bottom: 1px solid var(--e237-border);
+  color: var(--e237-text-strong);
+  font-family: var(--e237-font-display);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+.mkt-menu__link--on {
+  color: var(--e237-accent);
+}
+.mkt-menu__more {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+}
+.mkt-menu__sublink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  color: var(--e237-text-secondary);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.mkt-menu__cta {
+  margin-top: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mkt-menu:popover-open {
+    animation: none;
+  }
+}
+@media (min-width: 1080px) {
+  .mkt-menu {
+    display: none !important;
   }
 }
 
@@ -3916,70 +4043,33 @@ a.mkt-store:active {
   flex-shrink: 0;
   color: var(--e237-cyan);
 }
-/* Téléphone : une pile d'accordéons (titre + chevron, filet entre deux). */
+/* Téléphone : deux colonnes de liens, toujours dépliées ; quatre au large. */
 .mkt-footer__cols {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  gap: var(--e237-spacing-6) var(--e237-spacing-4);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 .mkt-footer__col {
   min-width: 0;
-  border-bottom: 1px solid var(--e237-border);
 }
 .mkt-footer__coltitle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--e237-spacing-3);
-  min-height: 52px;
+  margin: 0 0 6px;
   font-family: var(--e237-font-display);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--e237-text-muted);
-  list-style: none;
-  cursor: pointer;
-}
-.mkt-footer__coltitle::-webkit-details-marker {
-  display: none;
-}
-.mkt-footer__coltitle:focus-visible {
-  outline: 2px solid var(--e237-accent);
-  outline-offset: 2px;
-  border-radius: var(--e237-radius-sm);
-}
-.mkt-footer__colchevron {
-  flex-shrink: 0;
-  transition: transform var(--e237-dur) var(--e237-ease-out);
-}
-.mkt-footer__col[open] .mkt-footer__colchevron {
-  transform: rotate(180deg);
 }
 .mkt-footer__links {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding-bottom: var(--e237-spacing-4);
 }
-/* Au large : quatre colonnes, toujours ouvertes — le titre n'est qu'un titre. */
 @media (min-width: 720px) {
   .mkt-footer__cols {
     gap: var(--e237-spacing-8) var(--e237-spacing-5);
     grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-  .mkt-footer__col {
-    border-bottom: 0;
-  }
-  .mkt-footer__coltitle {
-    min-height: 0;
-    margin-bottom: 6px;
-    cursor: default;
-  }
-  .mkt-footer__colchevron {
-    display: none;
-  }
-  .mkt-footer__links {
-    padding-bottom: 0;
   }
 }
 .mkt-footer__link {
@@ -4292,11 +4382,6 @@ a.mkt-social:focus-visible {
   .mkt-footer__top {
     transition: none !important;
     transform: none !important;
-  }
-  /* Le chevron garde son ÉTAT (tourné quand la colonne est ouverte) : on
-     ne retire que la transition, jamais la transformation. */
-  .mkt-footer__colchevron {
-    transition: none;
   }
   .mkt-store::after {
     display: none;
