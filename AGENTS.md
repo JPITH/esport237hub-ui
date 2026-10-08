@@ -145,10 +145,11 @@ src/native/    React Native : core, fields, cards/skins, sheets, pickers, ScoreI
 src/icons/     Jeu d'icônes G-HUB : svg/ (sources), generated/ (NE PAS ÉDITER), README.md
 ```
 
-Icônes : `<Icon name=…>` du jeu maison (`src/icons/README.md`) avant Lucide ;
-après toute retouche d'un SVG, `bun run icons` puis `bun run icons:check`.
+Icônes : `<Icon name=…>` du jeu maison (`src/icons/README.md`), seul jeu
+d'icônes du DS sur les deux plateformes (Lucide est retiré) ; après toute
+retouche d'un SVG, `bun run icons` puis `bun run icons:check`.
 
-Peers optionnels : `lucide-react`, `lucide-react-native`, `react-native-reanimated`,
+Peers optionnels : `react-native-reanimated`,
 `react-native-gesture-handler`, `@expo/ui`, `@esport237hub/types`. Pas de `next` /
 `expo-router` dans le package.
 
