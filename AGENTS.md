@@ -91,6 +91,47 @@ is what forced ramp step 700 down to lightness 0.50.
     literal, never a template or a concatenation — and after any change to the
     shape, run `bun run brand:icons` in the monorepo and commit the PNGs.
 
+## Avant de créer un composant : chercher dans le DS, étendre plutôt que dupliquer
+
+Retour du porteur (08/10/2026, back-office Analytics) : « il faut réutiliser
+les composants, même dans le back-office ». Le panel avait recréé ses onglets
+soulignés, son sélecteur de période, ses tuiles de KPI… alors que tout
+existait ici. La règle, pour les applications comme pour ce dépôt :
+
+1. **Chercher d'abord** : `src/web/index.tsx` et `src/native/index.tsx`
+   listent tout ce qui est exporté. Un `<button>` stylé à la main, une
+   pastille `rounded-full border px-2 text-xs`, un intitulé
+   `uppercase tracking-wider` sont presque toujours un composant existant.
+2. **Si une variante manque, étendre** le composant du DS : prop optionnelle,
+   rétrocompatible, web ET natif (parité), CSS dans ce dépôt. Jamais de copie
+   locale, jamais de surcharge `!px-…` (la feuille du DS, hors `@layer`, bat
+   Tailwind de toute façon — règle 6).
+3. Un composite d'application (ex. `KpiTile` du panel) reste permis s'il ne
+   fait qu'**assembler** des composants du DS avec une logique métier.
+
+Quel composant pour quel besoin :
+
+| Besoin | Web | Natif |
+|---|---|---|
+| Changer de VUE dans la page (contenu remplacé) | `Tabs` (pilule glissante, `role="tablist"`) ; `fill` pour 2-3 onglets pleine largeur | `SegmentedTabs` |
+| Changer de ROUTE (sous-pages d'une section) | `Tabs` avec `href` sur chaque onglet + `linkAs={Link}` (`aria-current="page"`) | — (navigation de l'app) |
+| FILTRER une liste (cumulable, relâchable, compteur) | `FilterChip` (`aria-pressed`) | `FilterChip` |
+| Choisir UNE option parmi peu (période 7/30/90 j, mode, ville) | `RadioGroup variant="inline"` (puces, `role="radio"`) | `RadioGroup variant="inline"` |
+| Choisir UNE option qui mérite une explication | `RadioGroup` (cartes : `hint`, `icon`, `badge`, `trailing`) ; `TierPicker` pour des billets | `RadioGroup`, `TierPicker` |
+| Activer / désactiver un réglage (effet immédiat) | `Switch` | `SwitchRow` (`./native/expo`) |
+| Cocher (formulaire, consentement) | `Checkbox` | `Checkbox` |
+| Chiffre clé / tuile de KPI | `Card` + `Stat` (`aside` pour une mini-courbe, enfants pour variation et précision) | `Stat`, `StatTile` |
+| Statut | `Badge tone=…` (`size="sm"` en case dense), `DuelStatusBadge`, `OrderStatusBadge` | idem |
+| Intitulé de section / de bloc | `SectionLabel` (`tone="muted"` dans une carte, `gold` palmarès) | `SectionLabel`, `SectionTitle`, `SectionHeader` |
+| En-tête de page | `PageHeader` (+ `PageContainer`) | `TopBar`, `Screen` |
+| Vide, erreur, chargement | `EmptyState`, `ErrorNote` / `Notice`, `Skeleton` / `Spinner` | idem |
+| Tableau, pagination | `Table`, `Pagination` | `ListRow` |
+| Boutons | `Button` (`ghost` pour une action secondaire), `LinkButton`, `IconButton` | `Button`, `IconButton`, `PillButton` |
+| Champs | `Input`, `Select` (prop `label`), `SearchField`, `NumberInput`, `DatePicker` | `Field`, `SelectSheet`, `DateField` |
+| Fenêtres | `Modal`, `Drawer`, `DropdownMenu`, `Tooltip` | `Sheet`, `SelectSheet` |
+| Personnes | `Avatar`, `AvatarGroup`, `PlayerCell` | `Avatar`, `ProfileAvatar` |
+| Barre d'onglets, carrousel, confettis | — | `FloatingTabBar`, `Carousel` / `PromoSlideCard`, `ConfettiBurst` |
+
 ## Structure
 
 ```
@@ -114,7 +155,7 @@ Peers optionnels : `lucide-react`, `lucide-react-native`, `react-native-reanimat
 ## Expo UI vs RN (native)
 
 - **`@esport237hub/ui/native`** — RN + tokens E237 (marque) : `Button`, `Card`,
-  `GradientButton`, `PlayerCard`, `E237TabBar`, auth chrome, etc. Zéro import Expo.
+  `GradientButton`, `PlayerCard`, `FloatingTabBar`, auth chrome, etc. Zéro import Expo.
 - **`@esport237hub/ui/native/expo`** — bridge `@expo/ui` (SwiftUI / Compose / web)
   pour les **contrôles** : `Sheet`, `SelectSheet`, `DateField`/`TimeField`,
   `SwitchRow`, `SettingsList`. Même API de props que les équivalents RN quand
