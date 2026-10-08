@@ -4,15 +4,11 @@
  */
 import { DateTimePicker } from '@expo/ui/community/datetime-picker';
 import { useState } from 'react';
-import { Pressable, View } from 'react-native';
 
-import { radius, spacing, useE237Colors } from '../core';
-import { FieldLabel, requiredFieldLabel } from '../fields';
-import { Txt } from '../text';
-import { useDsT } from '../../i18n';
-import { Sheet } from './sheet';
-import { Icon } from '../../icons/generated/native';
 import type { IconName } from '../../icons/names';
+import { useE237Colors } from '../core';
+import { FieldTrigger } from '../date-time';
+import { Sheet } from './sheet';
 
 function toISODate(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -37,54 +33,55 @@ function parseTime(hhmm: string | null): Date {
   return base;
 }
 
-function Trigger({
+/**
+ * Le corps commun aux deux champs : le déclencheur partagé avec la version
+ * React Native, puis une feuille avec le sélecteur natif de la plateforme.
+ * Choisir referme la feuille.
+ */
+function NativePickerField({
   label,
   required,
   icon,
+  mode,
   text,
   filled,
-  onPress,
+  current,
+  onPick,
 }: {
   label?: string;
   required?: boolean;
   icon: IconName;
+  mode: 'date' | 'time';
   text: string;
   filled: boolean;
-  onPress: () => void;
+  current: Date;
+  onPick: (date: Date) => void;
 }) {
   const c = useE237Colors();
-  const t = useDsT();
+  const [open, setOpen] = useState(false);
   return (
-    <View style={{ gap: spacing['1'] }}>
-      {label ? <FieldLabel label={label} required={required} /> : null}
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={requiredFieldLabel(t, label, required)}
-        onPress={onPress}
-        style={{
-          minHeight: 44,
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: spacing['2'],
-          borderWidth: 1,
-          borderRadius: radius.md,
-          paddingHorizontal: spacing['3'],
-          backgroundColor: c.surface,
-          borderColor: c.border,
-        }}
-      >
-        <Icon name={icon} color={c.textSecondary} size={18} />
-        <Txt
-          numberOfLines={1}
-          variant="body"
-          size={15}
-          tone={filled ? 'primary' : 'muted'}
-          style={{ flex: 1 }}
-        >
-          {text}
-        </Txt>
-      </Pressable>
-    </View>
+    <>
+      <FieldTrigger
+        label={label}
+        required={required}
+        icon={icon}
+        text={text}
+        filled={filled}
+        onPress={() => setOpen(true)}
+      />
+      <Sheet open={open} onClose={() => setOpen(false)} title={label}>
+        <DateTimePicker
+          mode={mode}
+          value={current}
+          accentColor={c.accent}
+          is24Hour
+          onValueChange={(_e, date) => {
+            onPick(date);
+            setOpen(false);
+          }}
+        />
+      </Sheet>
+    </>
   );
 }
 
@@ -102,8 +99,6 @@ export function DateField({
   onChange: (value: string | null) => void;
   placeholder?: string;
 }) {
-  const c = useE237Colors();
-  const [open, setOpen] = useState(false);
   const current = parseDate(value);
   const display = value
     ? current.toLocaleDateString('fr-FR', {
@@ -115,28 +110,16 @@ export function DateField({
     : placeholder;
 
   return (
-    <>
-      <Trigger
-        label={label}
-        required={required}
-        icon="calendar"
-        text={display}
-        filled={!!value}
-        onPress={() => setOpen(true)}
-      />
-      <Sheet open={open} onClose={() => setOpen(false)} title={label}>
-        <DateTimePicker
-          mode="date"
-          value={current}
-          accentColor={c.accent}
-          is24Hour
-          onValueChange={(_e, date) => {
-            onChange(toISODate(date));
-            setOpen(false);
-          }}
-        />
-      </Sheet>
-    </>
+    <NativePickerField
+      label={label}
+      required={required}
+      icon="calendar"
+      mode="date"
+      text={display}
+      filled={!!value}
+      current={current}
+      onPick={(date) => onChange(toISODate(date))}
+    />
   );
 }
 
@@ -154,33 +137,16 @@ export function TimeField({
   onChange: (value: string | null) => void;
   placeholder?: string;
 }) {
-  const c = useE237Colors();
-  const [open, setOpen] = useState(false);
-  const current = parseTime(value);
-  const display = value ?? placeholder;
-
   return (
-    <>
-      <Trigger
-        label={label}
-        required={required}
-        icon="clock"
-        text={display}
-        filled={!!value}
-        onPress={() => setOpen(true)}
-      />
-      <Sheet open={open} onClose={() => setOpen(false)} title={label}>
-        <DateTimePicker
-          mode="time"
-          value={current}
-          accentColor={c.accent}
-          is24Hour
-          onValueChange={(_e, date) => {
-            onChange(toHHMM(date));
-            setOpen(false);
-          }}
-        />
-      </Sheet>
-    </>
+    <NativePickerField
+      label={label}
+      required={required}
+      icon="clock"
+      mode="time"
+      text={value ?? placeholder}
+      filled={!!value}
+      current={parseTime(value)}
+      onPick={(date) => onChange(toHHMM(date))}
+    />
   );
 }

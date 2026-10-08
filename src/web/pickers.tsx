@@ -126,6 +126,148 @@ function OptionRow({
   );
 }
 
+/**
+ * Un panneau déroulant ancré sous son déclencheur : son état ouvert, et sa
+ * fermeture au clic extérieur et à Escape. Commun aux quatre champs.
+ */
+function usePopover() {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
+  useDismiss(wrapRef, open, () => setOpen(false));
+  return { wrapRef, open, setOpen };
+}
+
+/** Le cadre d'un champ à panneau : libellé (et astérisque), puis l'ancre du panneau. */
+function PickerField({
+  id,
+  label,
+  required,
+  className,
+  wrapRef,
+  children,
+}: {
+  id: string;
+  label?: string;
+  required?: boolean;
+  className: string;
+  wrapRef: React.RefObject<HTMLDivElement | null>;
+  children: ReactNode;
+}) {
+  return (
+    <div className={`flex flex-col gap-1.5 ${className}`}>
+      {label ? (
+        <FieldLabel id={id} required={required}>
+          {label}
+        </FieldLabel>
+      ) : null}
+      <div ref={wrapRef} className="relative">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Le déclencheur d'un champ à panneau. Une liste (`listbox`) porte un chevron
+ * à droite ; un calendrier ou une horloge (`dialog`), son icône à gauche.
+ */
+function PickerTrigger({
+  id,
+  popup,
+  disabled,
+  required,
+  open,
+  onClick,
+  onKeyDown,
+  leading,
+  text,
+  empty,
+  textClassName = "",
+}: {
+  id: string;
+  popup: "listbox" | "dialog";
+  disabled?: boolean;
+  required?: boolean;
+  open: boolean;
+  onClick: () => void;
+  onKeyDown?: (e: React.KeyboardEvent) => void;
+  leading?: ReactNode;
+  text: ReactNode;
+  /** Rien de choisi : le texte est l'invite, en `text-muted`. */
+  empty: boolean;
+  textClassName?: string;
+}) {
+  const list = popup === "listbox";
+  return (
+    <button
+      type="button"
+      id={id}
+      disabled={disabled}
+      aria-haspopup={popup}
+      aria-required={required || undefined}
+      aria-expanded={open}
+      onClick={onClick}
+      onKeyDown={onKeyDown}
+      className={`ui-field flex h-11 w-full cursor-pointer items-center ${
+        list ? "justify-between gap-2" : "gap-2.5"
+      } px-3.5 text-left text-base`}
+    >
+      {leading}
+      <span className={`${textClassName ? `${textClassName} ` : ""}truncate ${empty ? "text-muted" : ""}`}>
+        {text}
+      </span>
+      {list ? (
+        <ChevronDown
+          className={`size-4 shrink-0 text-muted transition-transform ${
+            open ? "rotate-180" : ""
+          }`}
+        />
+      ) : null}
+    </button>
+  );
+}
+
+/** La liste d'options d'un panneau (Select, Combobox) : la ligne surlignée suit le clavier et la souris. */
+function OptionList({
+  options,
+  value,
+  highlighted,
+  onHighlight,
+  onSelect,
+  className,
+  emptyText,
+}: {
+  options: SelectOption[];
+  value: string;
+  highlighted: number;
+  onHighlight: (index: number) => void;
+  onSelect: (option: SelectOption) => void;
+  /** Hauteur maximale de la liste (`max-h-*`). */
+  className: string;
+  /** Liste vide (recherche sans résultat) : ce qui est dit à la place. */
+  emptyText?: string;
+}) {
+  return (
+    <div role="listbox" className={`${className} overflow-y-auto p-1`}>
+      {options.length === 0 && emptyText ? (
+        <p className="px-3 py-3 text-sm text-muted">{emptyText}</p>
+      ) : (
+        options.map((o, i) => (
+          <OptionRow
+            key={o.value}
+            active={o.value === value}
+            highlighted={i === highlighted}
+            onSelect={() => onSelect(o)}
+            onHover={() => onHighlight(i)}
+          >
+            {o.label}
+          </OptionRow>
+        ))
+      )}
+    </div>
+  );
+}
+
 /* ------------------------------------------------------------------ */
 /* Select maison — listbox custom, plus aucun <select> natif.          */
 /* ------------------------------------------------------------------ */
@@ -158,10 +300,8 @@ export function Select({
   const autoId = useId();
   const fieldId = id ?? autoId;
   const fieldPlaceholder = placeholder ?? t("form.select.placeholder");
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const [open, setOpen] = useState(false);
+  const { wrapRef, open, setOpen } = usePopover();
   const [hi, setHi] = useState(-1);
-  useDismiss(wrapRef, open, () => setOpen(false));
 
   const selected = options.find((o) => o.value === value) ?? null;
 
@@ -203,53 +343,32 @@ export function Select({
   };
 
   return (
-    <div className={`flex flex-col gap-1.5 ${className}`}>
-      {label ? (
-        <FieldLabel id={fieldId} required={required}>
-          {label}
-        </FieldLabel>
-      ) : null}
-      <div ref={wrapRef} className="relative">
-        <button
-          type="button"
-          id={fieldId}
-          disabled={disabled}
-          aria-haspopup="listbox"
-          aria-required={required || undefined}
-          aria-expanded={open}
-          onClick={() => (open ? setOpen(false) : openAt())}
-          onKeyDown={onKeyDown}
-          className="ui-field flex h-11 w-full cursor-pointer items-center justify-between gap-2 px-3.5 text-left text-base"
-        >
-          <span className={`truncate ${selected ? "" : "text-muted"}`}>
-            {selected?.label ?? fieldPlaceholder}
-          </span>
-          <ChevronDown
-            className={`size-4 shrink-0 text-muted transition-transform ${
-              open ? "rotate-180" : ""
-            }`}
-          />
-        </button>
+    <PickerField id={fieldId} label={label} required={required} className={className} wrapRef={wrapRef}>
+      <PickerTrigger
+        id={fieldId}
+        popup="listbox"
+        disabled={disabled}
+        required={required}
+        open={open}
+        onClick={() => (open ? setOpen(false) : openAt())}
+        onKeyDown={onKeyDown}
+        text={selected?.label ?? fieldPlaceholder}
+        empty={!selected}
+      />
 
-        {open ? (
-          <Panel>
-            <div role="listbox" className="max-h-64 overflow-y-auto p-1">
-              {options.map((o, i) => (
-                <OptionRow
-                  key={o.value}
-                  active={o.value === value}
-                  highlighted={i === hi}
-                  onSelect={() => commit(o)}
-                  onHover={() => setHi(i)}
-                >
-                  {o.label}
-                </OptionRow>
-              ))}
-            </div>
-          </Panel>
-        ) : null}
-      </div>
-    </div>
+      {open ? (
+        <Panel>
+          <OptionList
+            options={options}
+            value={value}
+            highlighted={hi}
+            onHighlight={setHi}
+            onSelect={commit}
+            className="max-h-64"
+          />
+        </Panel>
+      ) : null}
+    </PickerField>
   );
 }
 
@@ -283,12 +402,10 @@ export function Combobox({
   const fieldSearchPlaceholder =
     searchPlaceholder ?? t("form.field.search.placeholder");
   const fieldEmptyText = emptyText ?? t("form.noResults");
-  const wrapRef = useRef<HTMLDivElement>(null);
+  const { wrapRef, open, setOpen } = usePopover();
   const inputRef = useRef<HTMLInputElement>(null);
-  const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [hi, setHi] = useState(0);
-  useDismiss(wrapRef, open, () => setOpen(false));
 
   const selected = options.find((o) => o.value === value) ?? null;
 
@@ -327,74 +444,50 @@ export function Combobox({
   };
 
   return (
-    <div className={`flex flex-col gap-1.5 ${className}`}>
-      {label ? (
-        <FieldLabel id={fieldId} required={required}>
-          {label}
-        </FieldLabel>
-      ) : null}
-      <div ref={wrapRef} className="relative">
-        <button
-          type="button"
-          id={fieldId}
-          disabled={disabled}
-          aria-haspopup="listbox"
-          aria-required={required || undefined}
-          aria-expanded={open}
-          onClick={() => setOpen((o) => !o)}
-          className="ui-field flex h-11 w-full cursor-pointer items-center justify-between gap-2 px-3.5 text-left text-base"
-        >
-          <span className={`truncate ${selected ? "" : "text-muted"}`}>
-            {selected?.label ?? fieldPlaceholder}
-          </span>
-          <ChevronDown
-            className={`size-4 shrink-0 text-muted transition-transform ${
-              open ? "rotate-180" : ""
-            }`}
-          />
-        </button>
+    <PickerField id={fieldId} label={label} required={required} className={className} wrapRef={wrapRef}>
+      <PickerTrigger
+        id={fieldId}
+        popup="listbox"
+        disabled={disabled}
+        required={required}
+        open={open}
+        onClick={() => setOpen((o) => !o)}
+        text={selected?.label ?? fieldPlaceholder}
+        empty={!selected}
+      />
 
-        {open ? (
-          <Panel>
-            {/* Recherche en encart : le focus reste CONTENU dans le panneau
-                (fond teinté + bordure interne, aucun ring qui déborde). */}
-            <div className="border-b border-edge p-2">
-              <div className="flex items-center gap-2 rounded-lg border border-edge bg-raised px-2.5 transition-colors focus-within:border-accent">
-                <Search className="size-4 shrink-0 text-muted" />
-                <input
-                  ref={inputRef}
-                  value={query}
-                  onChange={(e) => {
-                    setQuery(e.target.value);
-                    setHi(0);
-                  }}
-                  onKeyDown={onKeyDown}
-                  placeholder={fieldSearchPlaceholder}
-                  className="h-9 w-full bg-transparent text-sm text-primary outline-none placeholder:text-muted"
-                />
-              </div>
+      {open ? (
+        <Panel>
+          {/* Recherche en encart : le focus reste CONTENU dans le panneau
+              (fond teinté + bordure interne, aucun ring qui déborde). */}
+          <div className="border-b border-edge p-2">
+            <div className="flex items-center gap-2 rounded-lg border border-edge bg-raised px-2.5 transition-colors focus-within:border-accent">
+              <Search className="size-4 shrink-0 text-muted" />
+              <input
+                ref={inputRef}
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setHi(0);
+                }}
+                onKeyDown={onKeyDown}
+                placeholder={fieldSearchPlaceholder}
+                className="h-9 w-full bg-transparent text-sm text-primary outline-none placeholder:text-muted"
+              />
             </div>
-            <div role="listbox" className="max-h-60 overflow-y-auto p-1">
-              {filtered.length === 0 ? (
-                <p className="px-3 py-3 text-sm text-muted">{fieldEmptyText}</p>
-              ) : (
-                filtered.map((o, i) => (
-                  <OptionRow
-                    key={o.value}
-                    active={o.value === value}
-                    highlighted={i === hi}
-                    onSelect={() => commit(o)}
-                    onHover={() => setHi(i)}
-                  >
-                    {o.label}
-                  </OptionRow>
-                ))
-              )}
-            </div>
-          </Panel>
-        ) : null}
-      </div>
-    </div>
+          </div>
+          <OptionList
+            options={filtered}
+            value={value}
+            highlighted={hi}
+            onHighlight={setHi}
+            onSelect={commit}
+            className="max-h-60"
+            emptyText={fieldEmptyText}
+          />
+        </Panel>
+      ) : null}
+    </PickerField>
   );
 }
 
@@ -464,9 +557,7 @@ export function DatePicker({
   const fieldPlaceholder = placeholder ?? t("form.date.placeholder");
   const autoId = useId();
   const fieldId = id ?? autoId;
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const [open, setOpen] = useState(false);
-  useDismiss(wrapRef, open, () => setOpen(false));
+  const { wrapRef, open, setOpen } = usePopover();
 
   const today = new Date();
   const todayISO = toISO(today.getFullYear(), today.getMonth(), today.getDate());
@@ -499,118 +590,107 @@ export function DatePicker({
     : null;
 
   return (
-    <div className={`flex flex-col gap-1.5 ${className}`}>
-      {label ? (
-        <FieldLabel id={fieldId} required={required}>
-          {label}
-        </FieldLabel>
-      ) : null}
-      <div ref={wrapRef} className="relative">
-        <button
-          type="button"
-          id={fieldId}
-          disabled={disabled}
-          aria-haspopup="dialog"
-          aria-required={required || undefined}
-          aria-expanded={open}
-          onClick={() => setOpen((o) => !o)}
-          className="ui-field flex h-11 w-full cursor-pointer items-center gap-2.5 px-3.5 text-left text-base"
-        >
-          <CalendarDays className="size-[18px] shrink-0 text-muted" />
-          <span className={`truncate ${display ? "" : "text-muted"}`}>
-            {display ?? fieldPlaceholder}
-          </span>
-        </button>
+    <PickerField id={fieldId} label={label} required={required} className={className} wrapRef={wrapRef}>
+      <PickerTrigger
+        id={fieldId}
+        popup="dialog"
+        disabled={disabled}
+        required={required}
+        open={open}
+        onClick={() => setOpen((o) => !o)}
+        leading={<CalendarDays className="size-[18px] shrink-0 text-muted" />}
+        text={display ?? fieldPlaceholder}
+        empty={!display}
+      />
 
-        {open ? (
-          <Panel className="w-72 p-3">
-            <div className="mb-2 flex items-center justify-between">
-              <button
-                type="button"
-                aria-label={t("form.date.prevMonth")}
-                onClick={() => shift(-1)}
-                className="grid size-8 place-items-center rounded-md text-secondary transition-colors hover:bg-raised hover:text-primary"
+      {open ? (
+        <Panel className="w-72 p-3">
+          <div className="mb-2 flex items-center justify-between">
+            <button
+              type="button"
+              aria-label={t("form.date.prevMonth")}
+              onClick={() => shift(-1)}
+              className="grid size-8 place-items-center rounded-md text-secondary transition-colors hover:bg-raised hover:text-primary"
+            >
+              <ChevronLeft className="size-4" />
+            </button>
+            <span className="text-sm font-semibold">
+              {MONTHS[view.m]} <span className="scoreboard">{view.y}</span>
+            </span>
+            <button
+              type="button"
+              aria-label={t("form.date.nextMonth")}
+              onClick={() => shift(1)}
+              className="grid size-8 place-items-center rounded-md text-secondary transition-colors hover:bg-raised hover:text-primary"
+            >
+              <ChevronRight className="size-4" />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-7 gap-0.5">
+            {WEEKDAYS.map((d, i) => (
+              <span
+                key={i}
+                className="grid h-8 place-items-center text-[11px] font-semibold text-muted"
               >
-                <ChevronLeft className="size-4" />
-              </button>
-              <span className="text-sm font-semibold">
-                {MONTHS[view.m]} <span className="scoreboard">{view.y}</span>
+                {d}
               </span>
-              <button
-                type="button"
-                aria-label={t("form.date.nextMonth")}
-                onClick={() => shift(1)}
-                className="grid size-8 place-items-center rounded-md text-secondary transition-colors hover:bg-raised hover:text-primary"
-              >
-                <ChevronRight className="size-4" />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-7 gap-0.5">
-              {WEEKDAYS.map((d, i) => (
-                <span
-                  key={i}
-                  className="grid h-8 place-items-center text-[11px] font-semibold text-muted"
+            ))}
+            {cells.map((day, i) => {
+              if (day === null) return <span key={`e${i}`} />;
+              const iso = toISO(view.y, view.m, day);
+              const isSelected = iso === value;
+              const isToday = iso === todayISO;
+              const isDisabled = min ? iso < min : false;
+              return (
+                <button
+                  key={iso}
+                  type="button"
+                  disabled={isDisabled}
+                  onClick={() => {
+                    onChange(iso);
+                    setOpen(false);
+                  }}
+                  className={`grid h-8 place-items-center rounded-md text-sm tabular-nums transition-colors disabled:opacity-30 ${
+                    isSelected
+                      ? "bg-accent font-bold text-on-accent"
+                      : isToday
+                        ? "border border-accent/50 text-accent hover:bg-raised"
+                        : "text-primary hover:bg-raised"
+                  }`}
                 >
-                  {d}
-                </span>
-              ))}
-              {cells.map((day, i) => {
-                if (day === null) return <span key={`e${i}`} />;
-                const iso = toISO(view.y, view.m, day);
-                const isSelected = iso === value;
-                const isToday = iso === todayISO;
-                const isDisabled = min ? iso < min : false;
-                return (
-                  <button
-                    key={iso}
-                    type="button"
-                    disabled={isDisabled}
-                    onClick={() => {
-                      onChange(iso);
-                      setOpen(false);
-                    }}
-                    className={`grid h-8 place-items-center rounded-md text-sm tabular-nums transition-colors disabled:opacity-30 ${
-                      isSelected
-                        ? "bg-accent font-bold text-on-accent"
-                        : isToday
-                          ? "border border-accent/50 text-accent hover:bg-raised"
-                          : "text-primary hover:bg-raised"
-                    }`}
-                  >
-                    {day}
-                  </button>
-                );
-              })}
-            </div>
+                  {day}
+                </button>
+              );
+            })}
+          </div>
 
-            <div className="mt-2 flex items-center justify-between border-t border-edge pt-2">
-              <button
-                type="button"
-                onClick={() => {
-                  onChange(todayISO);
-                  setView({ y: today.getFullYear(), m: today.getMonth() });
-                  setOpen(false);
-                }}
-                className="rounded-md px-2 py-1 text-xs font-medium text-accent transition-colors hover:bg-raised"
-              >
-                {t("form.date.today")}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  onChange(null);
-                  setOpen(false);
-                }}
-                className="rounded-md px-2 py-1 text-xs text-muted transition-colors hover:bg-raised hover:text-primary"
-              >
-                {t("form.action.clear")}
-              </button>
-            </div>
-          </Panel>
-        ) : null}
-      </div>
-    </div>
+          <div className="mt-2 flex items-center justify-between border-t border-edge pt-2">
+            <button
+              type="button"
+              onClick={() => {
+                onChange(todayISO);
+                setView({ y: today.getFullYear(), m: today.getMonth() });
+                setOpen(false);
+              }}
+              className="rounded-md px-2 py-1 text-xs font-medium text-accent transition-colors hover:bg-raised"
+            >
+              {t("form.date.today")}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                onChange(null);
+                setOpen(false);
+              }}
+              className="rounded-md px-2 py-1 text-xs text-muted transition-colors hover:bg-raised hover:text-primary"
+            >
+              {t("form.action.clear")}
+            </button>
+          </div>
+        </Panel>
+      ) : null}
+    </PickerField>
   );
 }
 
@@ -647,9 +727,7 @@ export function TimePicker({
   const t = useDsT();
   const autoId = useId();
   const fieldId = id ?? autoId;
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const [open, setOpen] = useState(false);
-  useDismiss(wrapRef, open, () => setOpen(false));
+  const { wrapRef, open, setOpen } = usePopover();
 
   const [h, m] = value ? value.split(":").map(Number) : [null, null];
   const hours = Array.from({ length: 24 }, (_, i) => i);
@@ -670,73 +748,63 @@ export function TimePicker({
     }`;
 
   return (
-    <div className={`flex flex-col gap-1.5 ${className}`}>
-      {label ? (
-        <FieldLabel id={fieldId} required={required}>
-          {label}
-        </FieldLabel>
-      ) : null}
-      <div ref={wrapRef} className="relative">
-        <button
-          type="button"
-          id={fieldId}
-          disabled={disabled}
-          aria-haspopup="dialog"
-          aria-required={required || undefined}
-          aria-expanded={open}
-          onClick={() => setOpen((o) => !o)}
-          className="ui-field flex h-11 w-full cursor-pointer items-center gap-2.5 px-3.5 text-left text-base"
-        >
-          <Clock className="size-[18px] shrink-0 text-muted" />
-          <span className={`scoreboard truncate ${value ? "" : "text-muted"}`}>
-            {value ?? placeholder}
-          </span>
-        </button>
+    <PickerField id={fieldId} label={label} required={required} className={className} wrapRef={wrapRef}>
+      <PickerTrigger
+        id={fieldId}
+        popup="dialog"
+        disabled={disabled}
+        required={required}
+        open={open}
+        onClick={() => setOpen((o) => !o)}
+        leading={<Clock className="size-[18px] shrink-0 text-muted" />}
+        text={value ?? placeholder}
+        empty={!value}
+        textClassName="scoreboard"
+      />
 
-        {open ? (
-          <Panel className="w-52">
-            <div className="grid grid-cols-2">
-              <div className="flex flex-col gap-0.5 border-r border-edge p-1">
-                <span className="px-1 py-1 text-center text-[11px] font-semibold uppercase text-muted">
-                  {t("form.date.hours")}
-                </span>
-                <div className="flex max-h-52 flex-col gap-0.5 overflow-y-auto">
-                  {hours.map((hh) => (
-                    <button
-                      key={hh}
-                      type="button"
-                      onClick={() => set(hh, null)}
-                      className={colBtn(hh === h)}
-                    >
-                      {String(hh).padStart(2, "0")}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="flex flex-col gap-0.5 p-1">
-                <span className="px-1 py-1 text-center text-[11px] font-semibold uppercase text-muted">
-                  {t("form.date.minutes")}
-                </span>
-                <div className="flex max-h-52 flex-col gap-0.5 overflow-y-auto">
-                  {minutes.map((mm) => (
-                    <button
-                      key={mm}
-                      type="button"
-                      onClick={() => {
-                        set(null, mm);
-                        if (h !== null) setOpen(false);
-                      }}
-                      className={colBtn(mm === m)}
-                    >
-                      {String(mm).padStart(2, "0")}
-                    </button>
-                  ))}
-                </div>
+      {open ? (
+        <Panel className="w-52">
+          <div className="grid grid-cols-2">
+            <div className="flex flex-col gap-0.5 border-r border-edge p-1">
+              <span className="px-1 py-1 text-center text-[11px] font-semibold uppercase text-muted">
+                {t("form.date.hours")}
+              </span>
+              <div className="flex max-h-52 flex-col gap-0.5 overflow-y-auto">
+                {hours.map((hh) => (
+                  <button
+                    key={hh}
+                    type="button"
+                    onClick={() => set(hh, null)}
+                    className={colBtn(hh === h)}
+                  >
+                    {String(hh).padStart(2, "0")}
+                  </button>
+                ))}
               </div>
             </div>
-          </Panel>
-        ) : null}
-      </div>
-    </div>
+            <div className="flex flex-col gap-0.5 p-1">
+              <span className="px-1 py-1 text-center text-[11px] font-semibold uppercase text-muted">
+                {t("form.date.minutes")}
+              </span>
+              <div className="flex max-h-52 flex-col gap-0.5 overflow-y-auto">
+                {minutes.map((mm) => (
+                  <button
+                    key={mm}
+                    type="button"
+                    onClick={() => {
+                      set(null, mm);
+                      if (h !== null) setOpen(false);
+                    }}
+                    className={colBtn(mm === m)}
+                  >
+                    {String(mm).padStart(2, "0")}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </Panel>
+      ) : null}
+    </PickerField>
   );
 }
