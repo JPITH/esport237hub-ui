@@ -9,13 +9,14 @@
  * Tailles pilotées par l'échelle de CardChrome (équivalent natif des `cqw`
  * du web) ; polices Space Grotesk / Chivo (comme le web).
  */
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 
 import { BRAND_NAME } from '../lib/brand-name';
 import { useDsT } from '../i18n';
+import { cardRecord } from '../lib/game-cards';
 import { cardStats, cityAbbr, type StatDef } from '../lib/player-stats';
-import { CARD_LAYOUT, FLAG_RADIUS, pct } from '../skins/geometry';
+import { CARD_BACK_LAYOUT, CARD_LAYOUT, FLAG_RADIUS, pct } from '../skins/geometry';
 import { stopColor, type SkinSpec } from '../skins/spec';
 import { useSkin } from '../skins/context';
 
@@ -25,8 +26,10 @@ import {
   useCardScale,
   type CardSkinInput,
 } from './card-skins';
+import { CardStage, RisingNumber } from './card-motion';
 import { DivisionBadge } from './division-badge';
 import { Flag } from './flag';
+import { Txt } from './text';
 
 /** Silhouette IA de repli (PNG léger bundlé — 28 Ko). */
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -183,13 +186,74 @@ export interface PlayerCardProps {
   country?: string;
   /** Force le foil même sur un skin non premium (aperçu de l'éditeur de skins). */
   animated?: boolean;
+  /** Défaites dans ce jeu — verso : duels joués et taux de réussite. */
+  losses?: number | null;
+  /** Points de carrière dans ce jeu — verso. */
+  points?: number | null;
+  /**
+   * Inclinaison 3D qui suit le doigt (la souris sur le web) et reflet
+   * holographique. Désactivé par défaut : une carte dans un paquet glissable
+   * ou une liste garde son comportement.
+   */
+  interactive?: boolean;
+  /** Retournement recto/verso au toucher. */
+  flippable?: boolean;
+  /** Verso personnalisé ; par défaut les stats détaillées du jeu. */
+  back?: ReactNode;
 }
 
-export function PlayerCard({ skin = 'signature', animated, ...props }: PlayerCardProps) {
-  return (
+/**
+ * Carte de jeu. Sans `interactive` ni `flippable`, c'est la carte statique
+ * d'avant — l'API reste rétrocompatible. Quand la note (`rating`) augmente
+ * d'un rendu à l'autre, elle monte en compteur avec un éclat du liseré.
+ */
+export function PlayerCard({
+  skin = 'signature',
+  animated,
+  interactive = false,
+  flippable = false,
+  back,
+  ...props
+}: PlayerCardProps) {
+  const t = useDsT();
+  const spec = useSkin(skin);
+
+  /* Progression de la note détectée au rendu (motif « ajuster l'état pendant
+     le rendu ») : un incrément par hausse, jamais par image. */
+  const [lastRating, setLastRating] = useState(props.rating);
+  const [riseKey, setRiseKey] = useState(0);
+  if (props.rating !== lastRating) {
+    setLastRating(props.rating);
+    if (props.rating > lastRating) setRiseKey((n) => n + 1);
+  }
+
+  const front = (
     <CardChrome skin={skin} animated={animated}>
       <PlayerCardBody skin={skin} {...props} />
     </CardChrome>
+  );
+  const verso = flippable
+    ? (back ?? (
+        <CardChrome skin={skin}>
+          <PlayerCardBackBody skin={skin} {...props} />
+        </CardChrome>
+      ))
+    : undefined;
+
+  return (
+    <CardStage
+      spec={spec}
+      interactive={interactive}
+      flippable={flippable}
+      front={front}
+      back={verso}
+      riseKey={riseKey}
+      flipLabel={t('ui.card.flip', {
+        game: props.gameName ?? '',
+        player: props.username,
+      })}
+      flipHint={t('ui.card.flipHint')}
+    />
   );
 }
 
@@ -209,7 +273,7 @@ function PlayerCardBody({
   imageUrl,
   skin = 'signature',
   country = 'CM',
-}: PlayerCardProps) {
+}: Omit<PlayerCardProps, 'animated' | 'interactive' | 'flippable' | 'back'>) {
   const t = useDsT();
   const spec = useSkin(skin);
   const s = useCardStyles();
@@ -220,13 +284,15 @@ function PlayerCardBody({
       {gameName ? <CardCrest spec={spec} label={gameName} /> : null}
 
       <View style={s.badge}>
-        <Text
-          numberOfLines={1}
-          adjustsFontSizeToFit
-          minimumFontScale={0.7}
-          style={[s.ovr, { color: spec.ink }]}>
-          {rating}
-        </Text>
+        {/* Hauteur de case = corps du chiffre ; le rattrapage négatif rend
+            l'interligne serré d'origine (37 pour 40) au bloc suivant. */}
+        <RisingNumber
+          value={rating}
+          textStyle={s.ovr}
+          lineHeight={s.ovrBox.height}
+          color={spec.ink}
+          style={s.ovrBox}
+        />
         <Text style={[s.pos, { color: spec.ink }]}>{cityAbbr(city)}</Text>
         <View style={s.flag}>
           <Flag country={country} />
@@ -323,9 +389,12 @@ function makeStyles(k: number) {
     ovr: {
       fontFamily: CARD_FONTS.black,
       fontSize: 40 * k,
-      lineHeight: 37 * k,
       letterSpacing: -2 * k,
+      textAlign: 'center',
+      fontVariant: ['tabular-nums'],
+      includeFontPadding: false,
     },
+    ovrBox: { height: 40 * k, marginBottom: -3 * k },
     pos: {
       marginTop: 3 * k,
       fontFamily: CARD_FONTS.extraBold,
@@ -439,6 +508,225 @@ function makeStyles(k: number) {
       backgroundColor: 'rgba(0,0,0,0.22)',
     },
     chipText: { fontFamily: CARD_FONTS.extraBold, fontSize: 8 * k, letterSpacing: 0.65 * k },
+  });
+}
+
+
+/* ========================================================================== */
+/* Verso — stats détaillées de la discipline                                  */
+/* ========================================================================== */
+
+/*
+ * Même bouclier, même skin que le recto (le joueur retourne SA carte, pas une
+ * fiche) : la plaque jeu reste en haut, la marque en pied. Entre les deux, les
+ * six axes de la discipline en toutes lettres avec leur jauge, puis le bilan
+ * (duels joués, victoires, défaites, réussite).
+ *
+ * Rien n'est chargé pour le verso : il ne lit que ce que l'écran a déjà —
+ * `cardStats` pour les axes (mêmes valeurs qu'au recto), `cardRecord` pour le
+ * bilan. Une donnée absente se tait (pas de défaites connues → pas de taux),
+ * elle ne s'invente pas. Ses textes passent par `Txt`.
+ */
+
+/** Plafond des jauges : une note de carte s'arrête à 99. */
+const STAT_MAX = 99;
+
+export interface PlayerCardBackProps {
+  username: string;
+  rating: number;
+  wins: number;
+  losses?: number | null;
+  points?: number | null;
+  gameSlug?: string;
+  gameName?: string;
+  stats?: Record<string, number> | null;
+  statDefs?: StatDef[];
+  skin?: CardSkinInput;
+}
+
+/** Corps du verso — rendu SOUS `CardChrome` pour recevoir l'échelle mesurée. */
+export function PlayerCardBackBody({
+  username,
+  rating,
+  wins,
+  losses,
+  points,
+  gameSlug,
+  gameName,
+  stats,
+  statDefs,
+  skin = 'signature',
+}: PlayerCardBackProps) {
+  const t = useDsT();
+  const spec = useSkin(skin);
+  const k = useCardScale();
+  const s = useMemo(() => makeBackStyles(k), [k]);
+  const rows = cardStats({ gameSlug, rating, stats, seed: username, statDefs });
+  const record = cardRecord(wins, losses);
+  const known = losses != null;
+
+  const cells: { value: string; label: string }[] = known
+    ? [
+        { value: String(record.played), label: t('ui.card.back.played') },
+        { value: String(record.wins), label: t('ui.card.back.won') },
+        { value: String(record.losses), label: t('ui.card.back.lost') },
+        {
+          value: record.winRate == null ? '—' : `${record.winRate} %`,
+          label: t('ui.card.back.winRate'),
+        },
+      ]
+    : [{ value: String(record.wins), label: t('ui.card.back.won') }];
+
+  return (
+    <>
+      {gameName ? <CardCrest spec={spec} label={gameName} /> : null}
+
+      <View style={[s.title, { borderBottomColor: spec.line }]}>
+        <Txt color={spec.ink} numberOfLines={1} style={s.titleText}>
+          {t('ui.card.back.title').toUpperCase()}
+        </Txt>
+        {points != null ? (
+          <Txt color={spec.ink} numberOfLines={1} style={s.titlePoints}>
+            {t('ui.card.back.points', { n: points })}
+          </Txt>
+        ) : null}
+      </View>
+
+      <View style={s.stats}>
+        {rows.map((row) => (
+          <View key={row.abbr} style={s.row} accessible accessibilityLabel={`${row.label} ${row.value}`}>
+            <View style={s.rowHead}>
+              <Txt color={spec.ink} numberOfLines={1} style={s.rowLabel}>
+                {row.label}
+              </Txt>
+              <Txt color={spec.ink} style={s.rowValue}>
+                {row.value}
+              </Txt>
+            </View>
+            <View style={[s.track, { backgroundColor: spec.line }]}>
+              <View
+                style={[
+                  s.fill,
+                  {
+                    width: pct(Math.min(1, Math.max(0, row.value / STAT_MAX))),
+                    backgroundColor: spec.accent,
+                  },
+                ]}
+              />
+            </View>
+          </View>
+        ))}
+      </View>
+
+      <View style={s.record}>
+        {cells.map((cell) => (
+          <View
+            key={cell.label}
+            style={[s.cell, { borderColor: spec.line }]}
+            accessible
+            accessibilityLabel={`${cell.label} ${cell.value}`}>
+            <Txt color={spec.ink} numberOfLines={1} style={s.cellValue}>
+              {cell.value}
+            </Txt>
+            <Txt color={spec.ink} numberOfLines={1} style={s.cellLabel}>
+              {cell.label.toUpperCase()}
+            </Txt>
+          </View>
+        ))}
+      </View>
+
+      <CardFooter spec={spec} />
+    </>
+  );
+}
+
+function makeBackStyles(k: number) {
+  const L = CARD_BACK_LAYOUT;
+  return StyleSheet.create({
+    title: {
+      position: 'absolute',
+      top: pct(L.title.top),
+      left: pct(L.title.left),
+      width: pct(L.title.width),
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      justifyContent: 'space-between',
+      paddingBottom: 4 * k,
+      borderBottomWidth: 1,
+    },
+    titleText: {
+      fontFamily: CARD_FONTS.extraBold,
+      fontSize: 10 * k,
+      lineHeight: 13 * k,
+      letterSpacing: 1.2 * k,
+    },
+    titlePoints: {
+      fontFamily: CARD_FONTS.black,
+      fontSize: 11 * k,
+      lineHeight: 13 * k,
+      fontVariant: ['tabular-nums'],
+      opacity: 0.85,
+    },
+    stats: {
+      position: 'absolute',
+      top: pct(L.stats.top),
+      left: pct(L.stats.left),
+      width: pct(L.stats.width),
+      height: pct(L.stats.height),
+      justifyContent: 'space-between',
+    },
+    row: { gap: 3 * k },
+    rowHead: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      justifyContent: 'space-between',
+      gap: 6 * k,
+    },
+    rowLabel: {
+      flexShrink: 1,
+      fontFamily: CARD_FONTS.bold,
+      fontSize: 10 * k,
+      lineHeight: 13 * k,
+      letterSpacing: 0.3 * k,
+      opacity: 0.85,
+    },
+    rowValue: {
+      fontFamily: CARD_FONTS.black,
+      fontSize: 12 * k,
+      lineHeight: 14 * k,
+      fontVariant: ['tabular-nums'],
+    },
+    track: { height: 4 * k, borderRadius: 2 * k, overflow: 'hidden' },
+    fill: { height: '100%', borderRadius: 2 * k },
+    record: {
+      position: 'absolute',
+      top: pct(L.record.top),
+      left: pct(L.record.left),
+      width: pct(L.record.width),
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      rowGap: 5 * k,
+    },
+    cell: {
+      width: '50%',
+      alignItems: 'center',
+      paddingVertical: 3 * k,
+      borderTopWidth: 1,
+    },
+    cellValue: {
+      fontFamily: CARD_FONTS.black,
+      fontSize: 15 * k,
+      lineHeight: 18 * k,
+      fontVariant: ['tabular-nums'],
+    },
+    cellLabel: {
+      fontFamily: CARD_FONTS.extraBold,
+      fontSize: 7 * k,
+      lineHeight: 9 * k,
+      letterSpacing: 0.6 * k,
+      opacity: 0.72,
+    },
   });
 }
 

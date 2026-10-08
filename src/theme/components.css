@@ -834,7 +834,7 @@
 }
 
 /* Plaque jeu — posée SUR le liseré (badge TOTY), jamais coupée par la forme.
-   Cartes de jeu : nom du jeu ; carte globale : « GLOBALE ». */
+   Elle porte le nom du jeu : une carte par discipline, plus de carte globale. */
 .pcard__crest {
   position: absolute;
   z-index: 10;
@@ -1092,37 +1092,221 @@
 }
 
 /* ---------------------------------------------------------------- */
-/* Carte globale (identité tous jeux)                                 */
+/* Scène de carte : inclinaison, reflet, retournement                */
 /* ---------------------------------------------------------------- */
-.gcard {
+/* `PlayerCard interactive | flippable`. Le pointeur écrit `--pcs-x` et
+   `--pcs-y` (de -1 à 1) en style inline, une fois par image au plus ; tout
+   le reste est ici. Deux éléments transformés : la scène suit la souris à
+   l'image près, le `flipper` tourne en 520 ms — une même propriété
+   `transform` ne peut pas faire les deux. Couleurs : celles du skin
+   (`--pc-*`, posées sur la scène par `CardStage`). */
+.pcard-stage {
+  --pcs-x: 0;
+  --pcs-y: 0;
+  --pcs-glare: 0;
+  --pcs-tilt: 11deg;
   position: relative;
-  overflow: hidden;
-  border-radius: 18px;
-  padding: 18px;
-  color: #eaf2ff;
-  background:
-    radial-gradient(90% 70% at 85% -10%, rgba(34, 211, 238, 0.25), transparent 55%),
-    linear-gradient(160deg, #16305a, #0b1a30 65%);
-  border: 1px solid rgba(250, 204, 21, 0.4);
-  box-shadow: 0 18px 40px -20px rgba(2, 6, 12, 0.75);
-  transition:
-    transform var(--e237-dur) var(--e237-ease-out),
-    box-shadow var(--e237-dur) var(--e237-ease-out);
+  width: 100%;
+  transform: perspective(900px) rotateX(calc(var(--pcs-y) * var(--pcs-tilt) * -1))
+    rotateY(calc(var(--pcs-x) * var(--pcs-tilt)));
+  transform-style: preserve-3d;
+  transition: transform 420ms var(--e237-ease-out);
+  -webkit-tap-highlight-color: transparent;
 }
-.gcard:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 22px 48px -18px rgba(2, 6, 12, 0.85);
+.pcard-stage[data-tracking="true"] {
+  transition: transform 80ms linear;
 }
-.gcard:active {
-  transform: translateY(0) scale(0.995);
+.pcard-stage[role="button"] {
+  cursor: pointer;
 }
-.gcard__ovr {
+.pcard-stage:focus-visible {
+  outline: 2px solid var(--e237-accent);
+  outline-offset: 4px;
+  border-radius: 14px;
+}
+.pcard-stage__flipper {
+  display: grid;
+  transform-style: preserve-3d;
+  transition: transform 520ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+.pcard-stage[data-flipped="true"] .pcard-stage__flipper {
+  transform: rotateY(180deg);
+}
+.pcard-stage__face {
+  grid-area: 1 / 1;
+  min-width: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.pcard-stage__face--back {
+  transform: rotateY(180deg);
+}
+/* Survol de la scène : la carte suit déjà la souris, le soulèvement de
+   `.pcard:hover` ferait double emploi. */
+.pcard-stage--interactive .pcard:hover {
+  transform: none;
+}
+/* Reflet holographique : une bande diagonale aux couleurs du skin, découpée
+   au bouclier (`clip-path` inline), qui glisse avec l'inclinaison. */
+.pcard-stage__holo {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: var(--pcs-glare);
+  transform: translateZ(1px);
+  background: linear-gradient(
+    115deg,
+    transparent 0 34%,
+    color-mix(in srgb, var(--pc-accent) 20%, transparent) 43%,
+    color-mix(in srgb, var(--pc-ink) 34%, transparent) 50%,
+    color-mix(in srgb, var(--pc-glowc, var(--pc-frame-hi)) 20%, transparent) 57%,
+    transparent 66% 100%
+  );
+  background-size: 300% 300%;
+  background-position:
+    calc(50% + (var(--pcs-x) + var(--pcs-y)) * 25%)
+    calc(50% + (var(--pcs-x) + var(--pcs-y)) * 25%);
+  transition: opacity 420ms var(--e237-ease-out);
+}
+.pcard-stage[data-tracking="true"] .pcard-stage__holo {
+  transition: opacity 160ms linear;
+}
+
+/* Verso : stats détaillées du jeu. Positions inline depuis
+   `CARD_BACK_LAYOUT` (partagé avec le natif) ; tailles en `cqw`, comme le
+   recto. */
+.pcard__back-title {
+  position: absolute;
+  z-index: 7;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4%;
+  padding-bottom: 1.4cqw;
+  border-bottom: 1px solid color-mix(in srgb, var(--pc-frame1) 45%, transparent);
   font-family: var(--e237-font-display);
+  font-size: clamp(7px, 3.4cqw, 12px);
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.pcard__back-title b {
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  opacity: 0.85;
+}
+.pcard__back-stats {
+  position: absolute;
+  z-index: 7;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pcard__back-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  row-gap: 0.9cqw;
+  column-gap: 2cqw;
+}
+.pcard__back-label {
+  overflow: hidden;
+  font-size: clamp(7px, 3.3cqw, 12px);
   font-weight: 700;
-  font-size: 46px;
-  line-height: 0.9;
-  letter-spacing: -0.03em;
-  color: #fde68a;
+  letter-spacing: 0.02em;
+  opacity: 0.85;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pcard__back-value {
+  font-family: var(--e237-font-display);
+  font-size: clamp(8px, 4cqw, 14px);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+.pcard__back-bar {
+  grid-column: 1 / -1;
+  height: max(2px, 1.3cqw);
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--pc-line);
+}
+.pcard__back-bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--pc-accent);
+}
+.pcard__back-record {
+  position: absolute;
+  z-index: 7;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  row-gap: 1.6cqw;
+  margin: 0;
+}
+.pcard__back-cell {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  width: 50%;
+  padding-top: 1cqw;
+  border-top: 1px solid color-mix(in srgb, var(--pc-frame1) 45%, transparent);
+}
+.pcard__back-cell dd {
+  margin: 0;
+  font-family: var(--e237-font-display);
+  font-size: clamp(9px, 5cqw, 17px);
+  font-weight: 900;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+.pcard__back-cell dt {
+  font-size: clamp(6px, 2.4cqw, 9px);
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  opacity: 0.72;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Mouvement réduit : ni inclinaison ni reflet, le retournement devient un
+   fondu. Les faces restent superposées et échangent leur opacité. */
+@media (prefers-reduced-motion: reduce) {
+  .pcard-stage,
+  .pcard-stage[data-tracking="true"] {
+    transform: none;
+    transition: none;
+  }
+  .pcard-stage__holo {
+    display: none;
+  }
+  .pcard-stage__flipper,
+  .pcard-stage[data-flipped="true"] .pcard-stage__flipper {
+    transform: none;
+    transition: none;
+  }
+  .pcard-stage__face {
+    backface-visibility: visible;
+    -webkit-backface-visibility: visible;
+    transition: opacity 220ms ease;
+  }
+  .pcard-stage__face--back {
+    transform: none;
+    opacity: 0;
+  }
+  .pcard-stage[data-flipped="true"] .pcard-stage__face {
+    opacity: 0;
+  }
+  .pcard-stage[data-flipped="true"] .pcard-stage__face--back {
+    opacity: 1;
+  }
 }
 
 /* ---------------------------------------------------------------- */
@@ -4352,7 +4536,6 @@ a.mkt-social:focus-visible {
   .chip,
   .seg__item,
   .pcard,
-  .gcard,
   .e237-game-rail__btn,
   .e237-game-rail__more,
   .e237-game-picker__close,

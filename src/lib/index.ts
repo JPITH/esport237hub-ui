@@ -1,6 +1,6 @@
 export * from './player-stats';
 export * from './duel-status';
-export * from './global-card';
+export * from './game-cards';
 export * from './tone';
 export * from './money';
 export * from './media-policy';

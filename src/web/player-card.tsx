@@ -5,10 +5,11 @@
  */
 "use client";
 
-import { useState, type CSSProperties } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
 import { UserRound } from "lucide-react";
 
 import { useDsT } from "../i18n";
+import { cardRecord } from "../lib/game-cards";
 import { cardStats, cityAbbr, type StatDef } from "../lib/player-stats";
 import { DivisionBadge } from "./division-badge";
 import {
@@ -16,7 +17,10 @@ import {
   BUILTIN_SKIN_KEYS,
   type BuiltinSkinKey,
 } from "../skins/spec";
+import { CARD_BACK_LAYOUT, pct } from "../skins/geometry";
+import { useSkin } from "../skins/context";
 import { CardChrome, type CardSkinInput } from "./card-chrome";
+import { CardStage, RisingNumber } from "./card-stage";
 import { Flag } from "./flag";
 import { Picture } from './picture';
 
@@ -102,7 +106,6 @@ function CardImage({
  */
 function CardBadge({
   ovr,
-  tag,
   cityText,
   country,
   division,
@@ -110,7 +113,6 @@ function CardBadge({
   divisionColor,
 }: {
   ovr: number;
-  tag?: string;
   cityText: string;
   country: string;
   division?: string | null;
@@ -119,8 +121,8 @@ function CardBadge({
 }) {
   return (
     <div className="pcard__badge">
-      <span className="pcard__ovr">{ovr}</span>
-      {tag ? <span className="pcard__ovrlabel">{tag}</span> : null}
+      {/* La note monte en compteur quand elle augmente (duel validé). */}
+      <RisingNumber value={ovr} className="pcard__ovr" />
       <span className="pcard__pos">{cityText}</span>
       <span className="pcard__flag">
         <Flag country={country} />
@@ -166,6 +168,20 @@ export interface PlayerCardProps {
   style?: CSSProperties;
   /** Force les effets premium (halo + foil) — utile pour l'éditeur de skins. */
   animated?: boolean;
+  /** Défaites dans ce jeu — verso : duels joués et taux de réussite. */
+  losses?: number | null;
+  /** Points de carrière dans ce jeu — verso. */
+  points?: number | null;
+  /**
+   * Inclinaison 3D qui suit la souris (ou le doigt) et reflet holographique.
+   * Désactivé par défaut : une carte dans une grille ou un carrousel garde
+   * son comportement.
+   */
+  interactive?: boolean;
+  /** Retournement recto/verso au clic (Entrée / Espace au clavier). */
+  flippable?: boolean;
+  /** Verso personnalisé ; par défaut les stats détaillées du jeu. */
+  back?: ReactNode;
 }
 
 /**
@@ -173,8 +189,47 @@ export interface PlayerCardProps {
  * pour tous les jeux) : plaque jeu sur le liseré, OVR + ville + drapeau +
  * division en colonne, portrait (ou fallback IA), nom + victoires, stats de
  * la catégorie du jeu (séparateur porté par les cellules), marque en pied.
+ *
+ * Sans `interactive` ni `flippable`, le DOM est exactement celui d'avant (un
+ * seul `.pcard`) : l'API reste rétrocompatible. Avec l'un des deux, la carte
+ * est posée dans une scène (`CardStage`) — `className` va alors à la scène.
  */
 export function PlayerCard({
+  interactive = false,
+  flippable = false,
+  back,
+  className = "",
+  ...props
+}: PlayerCardProps) {
+  const t = useDsT();
+  const spec = useSkin(props.skin ?? "signature");
+
+  if (!interactive && !flippable) {
+    return <PlayerCardFront {...props} className={className} />;
+  }
+
+  const verso = flippable
+    ? (back ?? <PlayerCardBack {...props} />)
+    : undefined;
+
+  return (
+    <CardStage
+      spec={spec}
+      interactive={interactive}
+      flippable={flippable}
+      className={className}
+      front={<PlayerCardFront {...props} />}
+      back={verso}
+      flipLabel={`${t("ui.card.flip", {
+        game: props.gameName ?? "",
+        player: props.username,
+      })}. ${t("ui.card.flipHint")}`}
+    />
+  );
+}
+
+/** Recto — la carte telle qu'elle a toujours été rendue. */
+function PlayerCardFront({
   username,
   rating,
   wins,
@@ -193,7 +248,7 @@ export function PlayerCard({
   className = "",
   style,
   animated = false,
-}: PlayerCardProps) {
+}: Omit<PlayerCardProps, "interactive" | "flippable" | "back">) {
   const t = useDsT();
   const rows = cardStats({ gameSlug, rating, stats, seed: username, statDefs });
 
@@ -239,117 +294,88 @@ export function PlayerCard({
   );
 }
 
-const GAME_CODE: Record<string, string> = {
-  fc27: "FC",
-  "clash-royale": "CR",
-  "call-of-duty": "COD",
-  "pubg-mobile": "PUB",
-  valorant: "VAL",
-};
+/** Plafond des jauges du verso : une note de carte s'arrête à 99. */
+const STAT_MAX = 99;
 
-function gameCode(slug: string | undefined, name: string): string {
-  if (slug && GAME_CODE[slug]) return GAME_CODE[slug];
-  return name.replace(/[^A-Za-z]/g, "").slice(0, 3).toUpperCase();
-}
-
-export interface GlobalCardCard {
-  gameSlug?: string;
-  gameName: string;
-  rating: number;
-}
-
-export interface GlobalCardProps {
-  username: string;
-  cards: GlobalCardCard[];
-  points: number;
-  wins: number;
-  losses: number;
-  platform?: string | null;
-  city?: string | null;
-  /** Nom de la division globale — sert d'`aria-label` et de repli. */
-  division?: string | null;
-  /** Rang de la division globale : affiche « DIV 3 » sous le drapeau. */
-  divisionRank?: number | null;
-  /** Couleur de la division fournie par le back-office (hex). */
-  divisionColor?: string | null;
-  imageUrl?: string | null;
-  fallbackImageUrl?: string | null;
-  country?: string;
-  /** Défaut = global ; "champion" pour le n°1 du classement global. */
-  skin?: CardSkinInput;
-  className?: string;
+/** Position d'un bloc du verso, depuis le gabarit partagé avec le natif. */
+function backBox(box: {
+  top: number;
+  left: number;
+  width: number;
+  height?: number;
+}): CSSProperties {
+  return {
+    top: pct(box.top),
+    left: pct(box.left),
+    width: pct(box.width),
+    ...(box.height != null ? { height: pct(box.height) } : null),
+  };
 }
 
 /**
- * Carte globale (identité tous jeux) — même template/forme que la carte de
- * jeu, plaque « GLOBALE » (pas de badge jeu). OVR = MEILLEURE note ; les
- * stats du bas listent les jeux joués et leur note.
+ * Verso — les stats détaillées du jeu, sur le même bouclier et le même skin
+ * que le recto. Ne lit que les données déjà chargées : les six axes
+ * (`cardStats`, mêmes valeurs qu'au recto) et le bilan (`cardRecord`). Sans
+ * défaites connues, pas de taux de réussite inventé.
  */
-export function GlobalCard({
+function PlayerCardBack({
   username,
-  cards,
-  points,
+  rating,
   wins,
   losses,
-  platform,
-  city,
-  division,
-  divisionRank,
-  divisionColor,
-  imageUrl,
-  fallbackImageUrl = "/cards/player-fallback.png",
-  country = "CM",
-  skin = "global",
-  className = "",
-}: GlobalCardProps) {
-  // OVERALL = MEILLEURE note (décision du porteur — pas la moyenne).
-  // `cards` vient de l'API et n'est vérifié par personne à l'exécution : une
-  // vue qui n'agrège aucune discipline renvoie le champ absent, et la carte
-  // faisait alors tomber toute la page de classement en écran blanc.
-  const list = cards ?? [];
-  const overall = list.length ? Math.max(...list.map((c) => c.rating)) : 0;
-  const cells = list.slice(0, 6);
+  points,
+  gameSlug,
+  gameName,
+  stats,
+  statDefs,
+  skin = "signature",
+}: Omit<PlayerCardProps, "interactive" | "flippable" | "back">) {
+  const t = useDsT();
+  const rows = cardStats({ gameSlug, rating, stats, seed: username, statDefs });
+  const record = cardRecord(wins, losses);
+  const cells =
+    losses != null
+      ? [
+          { value: String(record.played), label: t("ui.card.back.played") },
+          { value: String(record.wins), label: t("ui.card.back.won") },
+          { value: String(record.losses), label: t("ui.card.back.lost") },
+          {
+            value: record.winRate == null ? "—" : `${record.winRate} %`,
+            label: t("ui.card.back.winRate"),
+          },
+        ]
+      : [{ value: String(record.wins), label: t("ui.card.back.won") }];
 
   return (
-    <CardChrome skin={skin} className={className}>
-      <span className="pcard__crest">Globale</span>
-      <CardBadge
-        ovr={overall}
-        tag="GLB"
-        cityText={cityAbbr(city)}
-        country={country}
-        division={division}
-        divisionRank={divisionRank}
-        divisionColor={divisionColor}
-      />
-      <div className="pcard__img">
-        <CardImage
-          imageUrl={imageUrl}
-          fallbackImageUrl={fallbackImageUrl}
-          alt={username}
-        />
+    <CardChrome skin={skin} className="pcard--back">
+      {gameName ? <span className="pcard__crest">{gameName}</span> : null}
+
+      <div className="pcard__back-title" style={backBox(CARD_BACK_LAYOUT.title)}>
+        <span>{t("ui.card.back.title")}</span>
+        {points != null ? <b>{t("ui.card.back.points", { n: points })}</b> : null}
       </div>
 
-      <div className="pcard__identity">
-        <div className="pcard__name">{username}</div>
-        <div className="pcard__meta">
-          {points} pts
-          {platform ? ` · ${platform.toUpperCase()}` : ""} · {wins}V/{losses}D
-        </div>
-      </div>
+      <ul className="pcard__back-stats" style={backBox(CARD_BACK_LAYOUT.stats)}>
+        {rows.map((row) => (
+          <li key={row.abbr} className="pcard__back-row">
+            <span className="pcard__back-label">{row.label}</span>
+            <b className="pcard__back-value">{row.value}</b>
+            <span className="pcard__back-bar" aria-hidden>
+              <i style={{ width: pct(Math.min(1, Math.max(0, row.value / STAT_MAX))) }} />
+            </span>
+          </li>
+        ))}
+      </ul>
 
-      <div className="pcard__stats">
-        {cells.length ? (
-          cells.map((c) => (
-            <div key={c.gameName} className="pcard__stat" title={c.gameName}>
-              <b>{c.rating}</b>
-              <span>{gameCode(c.gameSlug, c.gameName)}</span>
-            </div>
-          ))
-        ) : (
-          <span className="text-xs opacity-70">Aucune discipline active.</span>
-        )}
-      </div>
+      <dl className="pcard__back-record" style={backBox(CARD_BACK_LAYOUT.record)}>
+        {cells.map((cell) => (
+          /* `dt` d'abord (ordre sémantique), la valeur passe au-dessus en CSS. */
+          <div key={cell.label} className="pcard__back-cell">
+            <dt>{cell.label}</dt>
+            <dd>{cell.value}</dd>
+          </div>
+        ))}
+      </dl>
 
       <div className="pcard__footer">
         <span className="pcard__chip">{BRAND_NAME}</span>

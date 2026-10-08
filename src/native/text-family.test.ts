@@ -40,8 +40,7 @@ const NATIF = join(import.meta.dir);
  * `fontFamily` dans chacun de ses styles de texte, ils étaient donc corrects
  * avant cette garde et les réécrire en `Txt` aurait été un risque sans gain.
  * `player-card` porte en plus sa propre typographie mise à l'échelle
- * (`CARD_FONTS`, facteur `k`) que les variantes ne savent pas reproduire, et
- * `global-card` emprunte ses styles via `useCardStyles()`.
+ * (`CARD_FONTS`, facteur `k`) que les variantes ne savent pas reproduire.
  *
  * CETTE LISTE NE DOIT QUE RÉTRÉCIR. On n'y ajoute pas un fichier pour faire
  * passer la garde : on écrit `<Txt>`.
@@ -51,7 +50,6 @@ const TOLÉRÉS = new Set([
   'core.tsx',
   'dashboard.tsx',
   'fields.tsx',
-  'global-card.tsx',
   'player-card.tsx',
   'stepper-form.tsx',
   // Définit `Txt` : c'est le seul `Text` qui a le droit d'exister.

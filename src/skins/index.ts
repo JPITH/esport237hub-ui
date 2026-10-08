@@ -56,6 +56,7 @@ export {
   CARD_INSET,
   CARD_SHAPE,
   CARD_LAYOUT,
+  CARD_BACK_LAYOUT,
   FLAG_RADIUS,
   cardLayoutCssVars,
   pct,

@@ -90,6 +90,21 @@ export const CARD_LAYOUT = {
 } as const;
 
 /**
+ * Gabarit du VERSO (stats détaillées), même convention que `CARD_LAYOUT` :
+ * des fractions de la carte, lues par le natif (`player-card-back`) et le web
+ * (`PlayerCardBack`). Les blocs restent dans la partie large du bouclier — la
+ * pointe basse commence à 73 % de la hauteur, le bilan s'arrête avant.
+ */
+export const CARD_BACK_LAYOUT = {
+  /** « STATISTIQUES » + points de carrière. */
+  title: { top: 0.088, left: 0.16, width: 0.68 },
+  /** Six axes de stats, libellé complet + jauge. */
+  stats: { top: 0.15, left: 0.15, width: 0.7, height: 0.42 },
+  /** Bilan en deux lignes de deux cases. */
+  record: { top: 0.595, left: 0.17, width: 0.66 },
+} as const;
+
+/**
  * `0.125` → `'12.5%'`. Le type littéral est indispensable côté React Native :
  * `DimensionValue` n'accepte pas un `string` quelconque.
  */
