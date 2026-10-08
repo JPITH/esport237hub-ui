@@ -2,6 +2,15 @@ import type { frUi } from './fr.ui';
 
 export const enUi: Record<keyof typeof frUi, string> = {
   'ui.card.wins': 'WINS',
+  'ui.card.back.title': 'Statistics',
+  'ui.card.back.points': '{n} pts',
+  'ui.card.back.played': 'Duels played',
+  'ui.card.back.won': 'Wins',
+  'ui.card.back.lost': 'Losses',
+  'ui.card.back.winRate': 'Win rate',
+  'ui.card.back.hint': 'Tap to flip',
+  'ui.card.flip': '{player}’s {game} card',
+  'ui.card.flipHint': 'Flips the card to show its detailed statistics',
   'ui.player.verified': 'Verified player',
 
   'ui.tab.accueil': 'Home',

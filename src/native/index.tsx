@@ -173,8 +173,6 @@ export type {
 
 export { PlayerCard, DivisionChip } from './player-card';
 export type { PlayerCardProps } from './player-card';
-export { GlobalCard } from './global-card';
-export type { GlobalCardProps } from './global-card';
 export { DuelStatusBadge } from './duel-status-badge';
 export { ScoreInput } from './score-board';
 export { E237TabBar, TAB_BAR_SPACE } from './tab-bar';
@@ -315,8 +313,9 @@ export {
   DISPUTE_STATUSES,
   DISPUTE_STATUS_META,
   disputeStatusMeta,
-  buildGlobalCard,
-  GLOBAL_CARD_MAX_GAMES,
+  mainGameCard,
+  orderedGameCards,
+  cardRecord,
   formatXaf,
   formatFcfa,
   priceOrFreeLabel,
@@ -359,9 +358,8 @@ export type {
   GameCategory,
   StatDef,
   DisputeStatus,
-  GameCardLike,
-  GlobalCardData,
-  GlobalCardGame,
+  MainCardLike,
+  CardRecord,
   Tone,
   AllowedImageMimeType,
   ImageFileLike,

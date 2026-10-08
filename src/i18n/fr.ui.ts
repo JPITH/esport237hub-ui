@@ -2,6 +2,16 @@
 export const frUi = {
   // Carte joueur
   'ui.card.wins': 'VICT.',
+  // Verso de la carte (stats détaillées) et retournement
+  'ui.card.back.title': 'Statistiques',
+  'ui.card.back.points': '{n} pts',
+  'ui.card.back.played': 'Duels joués',
+  'ui.card.back.won': 'Victoires',
+  'ui.card.back.lost': 'Défaites',
+  'ui.card.back.winRate': 'Réussite',
+  'ui.card.back.hint': 'Touchez pour retourner',
+  'ui.card.flip': 'Carte {game} de {player}',
+  'ui.card.flipHint': 'Retourne la carte pour voir ses statistiques détaillées',
   'ui.player.verified': 'Joueur vérifié',
 
   // Barre d'onglets native

@@ -254,7 +254,7 @@ export function PlayerCell({ username, city, verified }: PlayerCellProps) {
 export interface ChampionSpotlightProps {
   /** Précision après « Champion » (nom du jeu, saison…). */
   subtitle?: string;
-  /** La carte du champion (`PlayerCard` / `GlobalCard`). */
+  /** La carte du champion (`PlayerCard` de son jeu principal). */
   children: ReactNode;
   style?: StyleProp<ViewStyle>;
 }

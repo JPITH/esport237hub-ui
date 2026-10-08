@@ -129,15 +129,12 @@ export type { MediaImageProps, MediaRounded } from './media-image';
 
 export {
   PlayerCard,
-  GlobalCard,
   PREMIUM_SKINS,
   SKIN_LABELS,
 } from './player-card';
 export type {
   CardSkin,
   PlayerCardProps,
-  GlobalCardProps,
-  GlobalCardCard,
 } from './player-card';
 
 export { CardChrome } from './card-chrome';
@@ -383,8 +380,9 @@ export {
   DISPUTE_STATUSES,
   DISPUTE_STATUS_META,
   disputeStatusMeta,
-  buildGlobalCard,
-  GLOBAL_CARD_MAX_GAMES,
+  mainGameCard,
+  orderedGameCards,
+  cardRecord,
   formatXaf,
   formatFcfa,
   priceOrFreeLabel,
@@ -443,9 +441,8 @@ export type {
   GameCategory,
   StatDef,
   DisputeStatus,
-  GameCardLike,
-  GlobalCardData,
-  GlobalCardGame,
+  MainCardLike,
+  CardRecord,
   Tone,
   AllowedImageMimeType,
   ImageFileLike,
