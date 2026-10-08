@@ -44,7 +44,13 @@ function toISO(y: number, m: number, d: number): string {
   return `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 }
 
-function Trigger({
+/**
+ * Le déclencheur d'un champ date ou heure : libellé (et astérisque), puis une
+ * rangée de 44 px avec son icône et la valeur — ou l'invite, en `muted`.
+ * Partagé avec la version `@expo/ui` (`./expo/date-time.tsx`) : seule la
+ * feuille qui s'ouvre change d'une version à l'autre.
+ */
+export function FieldTrigger({
   label,
   required,
   icon,
@@ -136,7 +142,7 @@ export function DateField({
 
   return (
     <>
-      <Trigger
+      <FieldTrigger
         label={label}
         required={required}
         icon="calendar"
@@ -267,7 +273,7 @@ export function TimeField({
 
   return (
     <>
-      <Trigger
+      <FieldTrigger
         label={label}
         required={required}
         icon="clock"

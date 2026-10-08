@@ -129,13 +129,20 @@ export function ErrorNote({ message }: { message: string }) {
 }
 
 /** Marque « joueur vérifié » (icône G-HUB `badge-check`). */
+/**
+ * Badge « joueur vérifié » (identité confirmée en salle partenaire) — LE seul
+ * du produit (08/10/2026) : le web et le mobile avaient chacun leur copie, en
+ * `success`, pendant que celui-ci était en `cyan` — la même marque, deux
+ * couleurs. Vérifié est un ÉTAT acquis : émeraude `success`, jamais l'accent
+ * ni le cyan (« en direct ») — DESIGN.md, couches 2 et 3.
+ */
 export function VerifiedMark({ className = "" }: { className?: string }) {
   const t = useDsT();
   return (
     <Icon
       name="badge-check"
       accessibilityLabel={t("ui.player.verified")}
-      className={`inline-block size-4 shrink-0 text-cyan ${className}`}
+      className={`inline-block size-4 shrink-0 text-success ${className}`.trim()}
     />
   );
 }
