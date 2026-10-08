@@ -386,6 +386,13 @@
   color: var(--e237-text-secondary);
 }
 
+/* Pastille compacte (`<Badge size="sm">`) : légende d'une case d'arbre,
+   ligne de tableau. Remplace les `!px-1.5 !py-0 text-[11px]` recopiés. */
+.e237-badge--sm {
+  padding: 0 6px;
+  font-size: 11px;
+}
+
 /* Pilule de division — affiche « DIV 1 » ; le nom reste dans aria-label.
    La teinte vient de --e237-div-tone (posée en inline par le composant quand
    le back-office fournit une couleur), sinon du cyan des tokens. */
@@ -484,6 +491,29 @@
   color: var(--e237-text-secondary);
 }
 
+/* `Stat` avec `aside` : la valeur et son compagnon (mini-courbe) sur une
+   ligne, la statistique prend la largeur de sa carte. */
+.e237-stat--wide {
+  align-self: stretch;
+  align-items: stretch;
+}
+.e237-stat__row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+/* `Stat` avec enfants : variation, précision — sous le libellé. */
+.e237-stat__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--e237-text-muted);
+}
+
 .e237-section-label {
   display: inline-flex;
   align-items: center;
@@ -493,6 +523,12 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--e237-cyan);
+}
+.e237-section-label--muted {
+  color: var(--e237-text-muted);
+}
+.e237-section-label--gold {
+  color: var(--e237-gold);
 }
 
 .e237-player-card {

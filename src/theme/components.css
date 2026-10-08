@@ -570,6 +570,8 @@
   white-space: nowrap;
   border: none;
   background: transparent;
+  /* Onglet de route (`Tabs` avec `href`) : rendu en lien, jamais souligné. */
+  text-decoration: none;
   transition:
     color var(--e237-dur) var(--e237-ease-out),
     transform var(--e237-dur-fast) var(--e237-ease-out);
@@ -4968,6 +4970,10 @@ a.mkt-social:focus-visible {
 @media (pointer: coarse) {
   .e237-post__action,
   .e237-icon-btn,
+  /* `IconButton` porte `.icon-btn` (36 px) : sans lui, la règle ne touchait
+     aucun bouton d'icône réel. Fond et liseré transparents au repos — la
+     zone grandit, le dessin ne bouge pas. */
+  .icon-btn,
   .e237-post__more,
   .e237-search-clear,
   .e237-field-toggle,
