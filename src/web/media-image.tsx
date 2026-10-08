@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
-import { ImageOff } from "lucide-react";
+import { Icon } from "../icons/generated/web";
 
 import { Picture } from "./picture";
 
@@ -27,7 +27,7 @@ export interface MediaImageProps {
   rounded?: MediaRounded;
   /** `cover` (défaut) remplit le cadre, `contain` montre le média entier. */
   fit?: "cover" | "contain";
-  /** Icône Lucide de repli (défaut `ImageOff`). */
+  /** Icône de repli (défaut : `image-off` du jeu G-HUB). */
   fallbackIcon?: ReactNode;
   /** Courte légende sous l'icône de repli (ex. « Photo à venir »). */
   fallbackLabel?: string;
@@ -86,7 +86,7 @@ export function MediaImage({
 
       {failed ? (
         <span className="e237-media__ph" role="img" aria-label={alt}>
-          {fallbackIcon ?? <ImageOff strokeWidth={1.25} aria-hidden />}
+          {fallbackIcon ?? <Icon name="image-off" strokeWidth={1.25} />}
           {fallbackLabel ? (
             <span className="e237-media__phlabel">{fallbackLabel}</span>
           ) : null}

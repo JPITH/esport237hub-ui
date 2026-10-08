@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Minus } from "lucide-react";
+import { Icon } from "../icons/generated/web";
 
 export interface PerkListProps {
   /** Lignes à afficher ; une liste vide ne rend rien. */
@@ -19,7 +19,7 @@ export interface PerkListProps {
  * Le même `<ul>` avec `Check`/`Minus` et les classes
  * « mt-0.5 size-3.5 shrink-0 text-success » existait en CINQ exemplaires
  * (tier-picker, tier-manager ×2, subscription-plans, abonnements-tab). Les
- * icônes restent des icônes Lucide, jamais de puce typographique.
+ * icônes restent des icônes du jeu G-HUB, jamais de puce typographique.
  */
 export function PerkList({
   items,
@@ -28,7 +28,6 @@ export function PerkList({
 }: PerkListProps) {
   if (!items || items.length === 0) return null;
   const perk = variant === "perk";
-  const Icon = perk ? Check : Minus;
 
   return (
     <ul className={`flex flex-col gap-1 ${className}`.trim()}>
@@ -40,8 +39,9 @@ export function PerkList({
           }`}
         >
           <Icon
-            aria-hidden
-            className={`mt-0.5 size-3.5 shrink-0 ${
+            name={perk ? "check" : "minus"}
+            size={14}
+            className={`mt-0.5 shrink-0 ${
               perk ? "text-success" : "text-warning"
             }`}
           />

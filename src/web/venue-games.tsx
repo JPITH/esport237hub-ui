@@ -1,6 +1,6 @@
 "use client";
 
-import { Gamepad2 } from "lucide-react";
+import { Icon } from "../icons/generated/web";
 
 /** Un jeu de l'inventaire d'une salle — forme rendue par `GET /venues/:id`. */
 export interface VenueGameItem {
@@ -47,9 +47,10 @@ export function VenueGameList({
           className="flex items-center justify-between gap-3 py-2.5 first:pt-0 last:pb-0"
         >
           <span className="flex min-w-0 items-center gap-2">
-            <Gamepad2
-              aria-hidden
-              className="size-4 shrink-0 text-muted"
+            <Icon
+              name="gamepad"
+              size={16}
+              className="shrink-0 text-muted"
               strokeWidth={1.75}
             />
             <span className="truncate text-sm">{game.name}</span>

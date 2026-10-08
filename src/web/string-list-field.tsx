@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, Trash2 } from "lucide-react";
+import { Icon } from "../icons/generated/web";
 
 import { Button, IconButton } from "./button";
 import { Input } from "./fields";
@@ -57,7 +57,7 @@ export function StringListField({
             label="Retirer cette ligne"
             onClick={() => onChange(values.filter((_, i) => i !== index))}
           >
-            <Trash2 />
+            <Icon name="trash" />
           </IconButton>
         </div>
       ))}
@@ -65,7 +65,7 @@ export function StringListField({
         <Button
           variant="ghost"
           size="sm"
-          icon={<Plus />}
+          icon={<Icon name="plus" />}
           className="w-fit"
           onClick={() => onChange([...values, ""])}
         >

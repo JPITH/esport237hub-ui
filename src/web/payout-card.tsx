@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Banknote } from "lucide-react";
+import { Icon } from "../icons/generated/web";
 
 import { useDsT } from "../i18n";
 import { formatXaf } from "../lib/money";
@@ -103,7 +103,7 @@ export function PayoutCard({
           {error ? <Notice tone="danger">{error}</Notice> : null}
           <Button
             loading={busy}
-            icon={<Banknote />}
+            icon={<Icon name="banknote" />}
             className="w-fit"
             onClick={onPayout}
           >

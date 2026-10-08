@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { AlertTriangle, ArrowLeft, BadgeCheck } from "lucide-react";
+import { Icon } from "../icons/generated/web";
 import type { DuelStatus } from "@esport237hub/types";
 
 import { DUEL_STATUS_META } from "../lib/duel-status";
@@ -21,7 +21,7 @@ export function BackLink({
       href={href}
       className="inline-flex w-fit items-center gap-1.5 rounded-md py-1 text-sm text-secondary transition-colors hover:text-accent"
     >
-      <ArrowLeft className="size-4" />
+      <Icon name="arrow-left" size={16} />
       {children}
     </a>
   );
@@ -122,18 +122,19 @@ export function EmptyState({ children }: { children: ReactNode }) {
 export function ErrorNote({ message }: { message: string }) {
   return (
     <div className="flex items-center gap-2 rounded-md border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger">
-      <AlertTriangle className="size-4 shrink-0" />
+      <Icon name="alert-triangle" size={16} className="shrink-0" />
       {message}
     </div>
   );
 }
 
-/** Marque « joueur vérifié » (icône Lucide BadgeCheck). */
+/** Marque « joueur vérifié » (icône G-HUB `badge-check`). */
 export function VerifiedMark({ className = "" }: { className?: string }) {
   const t = useDsT();
   return (
-    <BadgeCheck
-      aria-label={t("ui.player.verified")}
+    <Icon
+      name="badge-check"
+      accessibilityLabel={t("ui.player.verified")}
       className={`inline-block size-4 shrink-0 text-cyan ${className}`}
     />
   );

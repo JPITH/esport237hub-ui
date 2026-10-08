@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { ArrowDownLeft, ArrowUpRight, Wallet as WalletIcon } from "lucide-react";
+import { Icon } from "../icons/generated/web";
 
 /*
  * `formatXaf` — la forme EXACTE — et jamais `formatXafCompact` ici.
@@ -48,7 +48,7 @@ export function BalanceCard({
   return (
     <Card className={`flex flex-col gap-3 ${className}`.trim()}>
       <span className="flex items-center gap-2 text-sm font-medium text-secondary">
-        <WalletIcon className="size-[18px]" aria-hidden /> {label}
+        <Icon name="wallet" size={18} /> {label}
       </span>
       {balanceXaf === null ? (
         <Skeleton className="h-9 w-40 rounded-md" />
@@ -100,9 +100,9 @@ export function TransactionRow({
         }`}
       >
         {credit ? (
-          <ArrowDownLeft className="size-[18px]" />
+          <Icon name="arrow-down-left" size={18} />
         ) : (
-          <ArrowUpRight className="size-[18px]" />
+          <Icon name="arrow-up-right" size={18} />
         )}
       </span>
       <div className="flex min-w-0 flex-col">

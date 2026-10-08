@@ -8,15 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import {
-  CalendarDays,
-  Check,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  Clock,
-  Search,
-} from "lucide-react";
+import { Icon } from "../icons/generated/web";
 
 import { useDsT, type DsKey } from "../i18n";
 
@@ -121,7 +113,7 @@ function OptionRow({
       } ${active ? "font-semibold text-accent" : "text-primary"}`}
     >
       <span className="truncate">{children}</span>
-      {active ? <Check className="size-4 shrink-0" /> : null}
+      {active ? <Icon name="check" size={16} className="shrink-0" /> : null}
     </button>
   );
 }
@@ -224,7 +216,8 @@ export function Select({
           <span className={`truncate ${selected ? "" : "text-muted"}`}>
             {selected?.label ?? fieldPlaceholder}
           </span>
-          <ChevronDown
+          <Icon
+            name="chevron-down"
             className={`size-4 shrink-0 text-muted transition-transform ${
               open ? "rotate-180" : ""
             }`}
@@ -347,7 +340,8 @@ export function Combobox({
           <span className={`truncate ${selected ? "" : "text-muted"}`}>
             {selected?.label ?? fieldPlaceholder}
           </span>
-          <ChevronDown
+          <Icon
+            name="chevron-down"
             className={`size-4 shrink-0 text-muted transition-transform ${
               open ? "rotate-180" : ""
             }`}
@@ -360,7 +354,7 @@ export function Combobox({
                 (fond teinté + bordure interne, aucun ring qui déborde). */}
             <div className="border-b border-edge p-2">
               <div className="flex items-center gap-2 rounded-lg border border-edge bg-raised px-2.5 transition-colors focus-within:border-accent">
-                <Search className="size-4 shrink-0 text-muted" />
+                <Icon name="search" size={16} className="shrink-0 text-muted" />
                 <input
                   ref={inputRef}
                   value={query}
@@ -516,7 +510,7 @@ export function DatePicker({
           onClick={() => setOpen((o) => !o)}
           className="ui-field flex h-11 w-full cursor-pointer items-center gap-2.5 px-3.5 text-left text-base"
         >
-          <CalendarDays className="size-[18px] shrink-0 text-muted" />
+          <Icon name="calendar" size={18} className="shrink-0 text-muted" />
           <span className={`truncate ${display ? "" : "text-muted"}`}>
             {display ?? fieldPlaceholder}
           </span>
@@ -531,7 +525,7 @@ export function DatePicker({
                 onClick={() => shift(-1)}
                 className="grid size-8 place-items-center rounded-md text-secondary transition-colors hover:bg-raised hover:text-primary"
               >
-                <ChevronLeft className="size-4" />
+                <Icon name="chevron-left" size={16} />
               </button>
               <span className="text-sm font-semibold">
                 {MONTHS[view.m]} <span className="scoreboard">{view.y}</span>
@@ -542,7 +536,7 @@ export function DatePicker({
                 onClick={() => shift(1)}
                 className="grid size-8 place-items-center rounded-md text-secondary transition-colors hover:bg-raised hover:text-primary"
               >
-                <ChevronRight className="size-4" />
+                <Icon name="chevron-right" size={16} />
               </button>
             </div>
 
@@ -687,7 +681,7 @@ export function TimePicker({
           onClick={() => setOpen((o) => !o)}
           className="ui-field flex h-11 w-full cursor-pointer items-center gap-2.5 px-3.5 text-left text-base"
         >
-          <Clock className="size-[18px] shrink-0 text-muted" />
+          <Icon name="clock" size={18} className="shrink-0 text-muted" />
           <span className={`scoreboard truncate ${value ? "" : "text-muted"}`}>
             {value ?? placeholder}
           </span>

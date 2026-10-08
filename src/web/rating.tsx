@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties, ReactNode } from "react";
-import { Lock, Star } from "lucide-react";
+import { Icon } from "../icons/generated/web";
 
 import { useDsT } from "../i18n";
 import {
@@ -70,7 +70,8 @@ export function StarRating({
             className="relative inline-block"
             style={{ width: size, height: size }}
           >
-            <Star
+            <Icon
+              name="star"
               className="absolute inset-0 text-muted"
               style={{ width: size, height: size }}
               strokeWidth={1.5}
@@ -80,10 +81,11 @@ export function StarRating({
                 className="absolute inset-y-0 left-0 overflow-hidden"
                 style={{ width: `${fill * 100}%` }}
               >
-                <Star
+                <Icon
+                  name="star"
                   className="text-gold"
                   style={{ width: size, height: size }}
-                  fill="currentColor"
+                  filled
                   strokeWidth={1.5}
                 />
               </span>
@@ -161,11 +163,11 @@ export function StarRatingInput({
                 onChange={() => onChange(score)}
                 className="sr-only peer"
               />
-              <Star
-                aria-hidden
+              <Icon
+                name="star"
                 style={{ width: size, height: size }}
                 strokeWidth={1.5}
-                fill={active ? "currentColor" : "none"}
+                filled={active}
                 className={`${active ? "text-gold" : "text-muted"} peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent`}
               />
               <span className="sr-only">
@@ -338,7 +340,7 @@ export function RatingGateNotice({ gate, className = "" }: RatingGateNoticeProps
     <p
       className={`flex items-start gap-2 rounded-md border border-edge bg-raised p-3 text-sm text-secondary ${className}`.trim()}
     >
-      <Lock aria-hidden className="mt-0.5 size-4 shrink-0 text-muted" />
+      <Icon name="lock" size={16} className="mt-0.5 shrink-0 text-muted" />
       {RATING_GATE_MESSAGE[gate]}
     </p>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Icon } from "../icons/generated/web";
 
 export interface Slide {
   label: string;
@@ -81,7 +81,7 @@ export function CardSlider({
             aria-label="Carte précédente"
             className="grid size-8 shrink-0 place-items-center rounded-md border border-edge text-secondary transition-colors hover:border-accent hover:text-accent disabled:opacity-40 disabled:pointer-events-none"
           >
-            <ChevronLeft className="size-4" />
+            <Icon name="chevron-left" size={16} />
           </button>
 
           <div className="flex flex-1 items-center justify-center">
@@ -113,7 +113,7 @@ export function CardSlider({
             aria-label="Carte suivante"
             className="grid size-8 shrink-0 place-items-center rounded-md border border-edge text-secondary transition-colors hover:border-accent hover:text-accent disabled:opacity-40 disabled:pointer-events-none"
           >
-            <ChevronRight className="size-4" />
+            <Icon name="chevron-right" size={16} />
           </button>
         </div>
       ) : null}
