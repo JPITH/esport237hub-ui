@@ -1,14 +1,20 @@
 "use client";
 
+import type { ReactNode } from "react";
 import type { OrderStatus } from "@esport237hub/types";
 
-import { ORDER_STATUS_TONE, orderStatusLabel } from "../lib/order-status";
+import { orderStatusLabel, orderStatusTone } from "../lib/order-status";
 import { Badge } from "./foundation";
 
 export interface OrderStatusBadgeProps {
   status: OrderStatus;
   /** Type de produit — change la lecture de `collected` (livrée / retirée). */
   kind?: string;
+  /**
+   * Libellé propre à un écran (la console du gérant dit « Réservée » d'une
+   * commande à payer au comptoir). Le TON, lui, reste celui de la table.
+   */
+  label?: ReactNode;
   className?: string;
 }
 
@@ -16,11 +22,12 @@ export interface OrderStatusBadgeProps {
 export function OrderStatusBadge({
   status,
   kind,
+  label,
   className,
 }: OrderStatusBadgeProps) {
   return (
-    <Badge tone={ORDER_STATUS_TONE[status] ?? "neutral"} className={className}>
-      {orderStatusLabel(status, kind)}
+    <Badge tone={orderStatusTone(status)} className={className}>
+      {label ?? orderStatusLabel(status, kind)}
     </Badge>
   );
 }

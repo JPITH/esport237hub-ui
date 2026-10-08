@@ -177,8 +177,46 @@ export { PlayerCard, DivisionChip } from './player-card';
 export type { PlayerCardProps } from './player-card';
 export { DuelStatusBadge } from './duel-status-badge';
 export { ScoreInput } from './score-board';
-export { E237TabBar, TAB_BAR_SPACE } from './tab-bar';
-export type { E237TabBarProps } from './tab-bar';
+/*
+ * Pilule d'onglets flottante (07/10/2026) — remplace `E237TabBar`, retirée le
+ * 08/10/2026. Le verre natif (`expo-glass-effect`) reste dans l'app, injecté
+ * par `renderGlass` : le barrel ne prend aucune dépendance de plus.
+ */
+export { FloatingTabBar } from './floating-tab-bar';
+export type {
+  FloatingTab,
+  FloatingTabBarGlassProps,
+  FloatingTabBarProps,
+} from './floating-tab-bar';
+export {
+  ACTIVE_GROW,
+  CONTENT_BREATHING,
+  PILL_HEIGHT,
+  PILL_ITEM_HEIGHT,
+  PILL_MIN_BOTTOM_GAP,
+  PILL_PADDING,
+  PILL_SIDE_MARGIN,
+  TAB_TRANSITION_MS,
+  tabBarBottomOffset,
+  tabBarReserve,
+} from './floating-tab-bar-layout';
+export {
+  Carousel,
+  PROMO_SLIDE_HEIGHT,
+  PromoSlideCard,
+  PromoSlideTile,
+} from './carousel';
+export type {
+  CarouselProps,
+  PromoSlideCardProps,
+  PromoSlideSize,
+  PromoSlideTone,
+} from './carousel';
+export { carouselIndexAt, nextCarouselIndex } from './carousel-model';
+export { ConfettiBurst } from './confetti';
+export type { ConfettiBurstProps } from './confetti';
+export { confettiAt, confettiPieces, shouldBurst, CONFETTI_GRAVITY } from './confetti-model';
+export type { ConfettiPiece } from './confetti-model';
 export { StepperForm } from './stepper-form';
 export type { StepperFormProps } from './stepper-form';
 export { haptic, setNativeHaptics } from './haptics';
@@ -330,6 +368,7 @@ export {
   validateImageFile,
   ORDER_STATUS_TONE,
   orderStatusLabel,
+  orderStatusTone,
   EVENT_TYPE_LABEL,
   EVENT_TYPE_TONE,
   EVENT_STATUS_LABEL,

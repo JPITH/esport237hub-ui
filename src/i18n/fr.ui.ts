@@ -14,12 +14,8 @@ export const frUi = {
   'ui.card.flipHint': 'Retourne la carte pour voir ses statistiques détaillées',
   'ui.player.verified': 'Joueur vérifié',
 
-  // Barre d'onglets native
-  'ui.tab.accueil': 'Accueil',
-  'ui.tab.salles': 'Salles',
-  'ui.tab.duels': 'Duels',
-  'ui.tab.evenements': 'Évènements',
-  'ui.tab.boutique': 'Boutique',
+  // Carrousel natif : la seule phrase, lue par le lecteur d'écran.
+  'ui.carousel.position': '{label} : élément {index} sur {total}.',
 
   // États transverses
   'ui.loading': 'Chargement…',
