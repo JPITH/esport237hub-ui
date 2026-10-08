@@ -213,7 +213,7 @@ export function Icon({
 }
 `;
 
-const GEN_NATIVE = `${HEADER('Le gabarit vit dans scripts/icons.ts.')}import type { StyleProp, ViewStyle } from 'react-native';
+const GEN_NATIVE = `${HEADER('Le gabarit vit dans scripts/icons.ts.')}import { Platform, type StyleProp, type ViewStyle } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { useE237Colors } from '../../native/core';
@@ -266,9 +266,10 @@ export function Icon({
       testID={testID}
       accessibilityRole={accessibilityLabel ? 'image' : undefined}
       accessibilityLabel={accessibilityLabel}
-      // \`accessible={false}\` descendrait jusqu'au DOM sous react-native-web
-      // (« Received \`false\` for a non-boolean attribute ») — voir mark.tsx.
-      accessible={accessibilityLabel ? true : undefined}
+      // \`accessible\` (vrai ou faux) descendrait jusqu'au DOM sous
+      // react-native-web (« Received \`true\` for a non-boolean attribute ») :
+      // natif seulement ; sur le web, rôle + libellé suffisent — voir mark.tsx.
+      accessible={accessibilityLabel && Platform.OS !== 'web' ? true : undefined}
     >
       {(active || filled) &&
         g.a?.map((d, i) => (
