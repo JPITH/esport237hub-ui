@@ -16,7 +16,7 @@ import { BRAND_NAME } from '../lib/brand-name';
 import { useDsT } from '../i18n';
 import { cardRecord } from '../lib/game-cards';
 import { cardStats, cityAbbr, type StatDef } from '../lib/player-stats';
-import { CARD_BACK_LAYOUT, CARD_LAYOUT, FLAG_RADIUS, pct } from '../skins/geometry';
+import { FLAG_RADIUS, pct, type CardBackLayout, type CardLayout } from '../skins/geometry';
 import { stopColor, type SkinSpec } from '../skins/spec';
 import { useSkin } from '../skins/context';
 
@@ -24,6 +24,7 @@ import {
   CARD_FONTS,
   CardChrome,
   useCardScale,
+  useCardShape,
   type CardSkinInput,
 } from './card-skins';
 import { CardStage, RisingNumber } from './card-motion';
@@ -38,7 +39,8 @@ const FALLBACK_AVATAR = require('./assets/player-fallback.png');
 /** Styles de carte proportionnels à la largeur mesurée (k = largeur/300). */
 export function useCardStyles() {
   const k = useCardScale();
-  return useMemo(() => makeStyles(k), [k]);
+  const layout = useCardShape().layout;
+  return useMemo(() => makeStyles(k, layout), [k, layout]);
 }
 
 type CardStyles = ReturnType<typeof makeStyles>;
@@ -347,7 +349,8 @@ function PlayerCardBody({
 /**
  * Fabrique des styles à l'échelle k (1 = carte de 300 px de large).
  *
- * Les POSITIONS viennent de `CARD_LAYOUT` (socle partagé) et sont exprimées en
+ * Les POSITIONS viennent du gabarit de la forme (`CARD_LAYOUT` replacé dans
+ * la zone sûre de la silhouette — identique pour le bouclier) et sont exprimées en
  * pourcentages, exactement comme les règles `.pcard__*` du web : c'est ce qui
  * garantit que l'OVR tombe au même endroit sur les trois plateformes. Seules
  * les TAILLES de texte restent propres au mobile (retour porteur du 24/07 :
@@ -356,8 +359,7 @@ function PlayerCardBody({
  * Chivo/Space Grotesk encodent la graisse dans le nom de famille — ne jamais
  * cumuler avec `fontWeight` (conflit Android).
  */
-function makeStyles(k: number) {
-  const L = CARD_LAYOUT;
+function makeStyles(k: number, L: CardLayout) {
   return StyleSheet.create({
     crestWrap: {
       position: 'absolute',
@@ -560,7 +562,8 @@ export function PlayerCardBackBody({
   const t = useDsT();
   const spec = useSkin(skin);
   const k = useCardScale();
-  const s = useMemo(() => makeBackStyles(k), [k]);
+  const backLayout = useCardShape().backLayout;
+  const s = useMemo(() => makeBackStyles(k, backLayout), [k, backLayout]);
   const rows = cardStats({ gameSlug, rating, stats, seed: username, statDefs });
   const record = cardRecord(wins, losses);
   const known = losses != null;
@@ -640,8 +643,7 @@ export function PlayerCardBackBody({
   );
 }
 
-function makeBackStyles(k: number) {
-  const L = CARD_BACK_LAYOUT;
+function makeBackStyles(k: number, L: CardBackLayout) {
   return StyleSheet.create({
     title: {
       position: 'absolute',

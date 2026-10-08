@@ -36,7 +36,18 @@ describe('skins intégrés', () => {
 
   test('les skins vendables ont foil et halo', () => {
     const premium = BUILTIN_SKIN_KEYS.filter((k) => BUILTIN_SKINS[k].premium);
-    expect(premium).toEqual(['indomptable', 'heritage237', 'nuit-douala']);
+    expect(premium).toEqual([
+      'indomptable',
+      'heritage237',
+      'nuit-douala',
+      /* Skins de forme (v2) : tous vendables. */
+      'hexa-neon',
+      'wouri',
+      'braise',
+      'galons',
+      'blason',
+      'finale',
+    ]);
     for (const k of premium) {
       expect(BUILTIN_SKINS[k].sheen).toBeDefined();
       expect(BUILTIN_SKINS[k].glow).toBeDefined();

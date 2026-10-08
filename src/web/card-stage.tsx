@@ -17,6 +17,7 @@
 
 import {
   useEffect,
+  useId,
   useRef,
   useState,
   type CSSProperties,
@@ -25,7 +26,7 @@ import {
   type ReactNode,
 } from "react";
 
-import { shapeClipPath } from "../skins/geometry";
+import { cardShape, shapeClipPath } from "../skins/geometry";
 import { skinCssVars } from "../skins/css";
 import type { SkinSpec } from "../skins/spec";
 
@@ -144,6 +145,12 @@ export function CardStage({
 }: CardStageProps) {
   const ref = useRef<HTMLDivElement>(null);
   const frame = useRef(0);
+  /* Découpe du reflet : le bouclier garde son `polygon()` CSS ; une autre
+     forme passe par un clipPath en unités de boîte (un `path()` CSS est en
+     pixels et ne suivrait pas la taille de la carte). */
+  const shape = cardShape(spec.shape);
+  const clipId = `pcs${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
+  const holoClip = shape.clipUnit ? `url(#${clipId})` : SHIELD;
   const [flipped, setFlipped] = useState(false);
   const [backMounted, setBackMounted] = useState(false);
   const canFlip = flippable && back != null;
@@ -220,8 +227,15 @@ export function CardStage({
           </div>
         ) : null}
       </div>
+      {interactive && shape.clipUnit ? (
+        <svg className="pcard-stage__clip" width="0" height="0" aria-hidden focusable="false">
+          <clipPath id={clipId} clipPathUnits="objectBoundingBox">
+            <path d={shape.clipUnit} />
+          </clipPath>
+        </svg>
+      ) : null}
       {interactive ? (
-        <span className="pcard-stage__holo" style={{ clipPath: SHIELD }} aria-hidden />
+        <span className="pcard-stage__holo" style={{ clipPath: holoClip }} aria-hidden />
       ) : null}
     </div>
   );

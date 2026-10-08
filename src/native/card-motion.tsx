@@ -38,10 +38,10 @@ import Animated, {
   withTiming,
   type SharedValue,
 } from 'react-native-reanimated';
-import Svg, { ClipPath, Defs, LinearGradient, Polygon, Rect, Stop } from 'react-native-svg';
+import Svg, { ClipPath, Defs, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 
 import { odometerDigits, odometerOffset } from '../lib/game-cards';
-import { CARD_BASE_WIDTH, CARD_REF_HEIGHT, shapePoints } from '../skins/geometry';
+import { CARD_BASE_WIDTH, CARD_REF_HEIGHT, cardShape } from '../skins/geometry';
 import { stopColor, type SkinSpec } from '../skins/spec';
 
 import { haptic } from './haptics';
@@ -55,8 +55,11 @@ const REST_SPRING = { damping: 16, stiffness: 170, mass: 0.6 };
 const FLIP_MS = 520;
 const FADE_MS = 220;
 
-/** Le bouclier entier (liseré compris), au repère du tracé de référence. */
-const SHIELD = shapePoints(CARD_BASE_WIDTH, CARD_REF_HEIGHT);
+/**
+ * La silhouette entière (liseré compris) vient de la FORME du skin
+ * (`cardShape(spec.shape).framePath`), au repère du tracé de référence : le
+ * reflet et l'éclat épousent un hexagone ou un ticket comme le bouclier.
+ */
 const VIEWBOX = `0 0 ${CARD_BASE_WIDTH} ${CARD_REF_HEIGHT.toFixed(2)}`;
 
 /**
@@ -91,6 +94,7 @@ function HoloBand({
   intensity: SharedValue<number>;
 }) {
   const glow = spec.glow?.color ?? stopColor(spec.frame, 0);
+  const silhouette = cardShape(spec.shape).framePath;
   const style = useAnimatedStyle(() => {
     /* Position du reflet le long de la diagonale haut-gauche → bas-droite. */
     const sweep = 0.5 + 0.25 * (tiltX.value + tiltY.value);
@@ -111,7 +115,7 @@ function HoloBand({
             <Stop offset={at(0.22)} stopColor={glow} stopOpacity={0} />
           </LinearGradient>
           <ClipPath id={`${id}c`}>
-            <Polygon points={SHIELD} />
+            <Path d={silhouette} />
           </ClipPath>
         </Defs>
         <Rect
@@ -135,8 +139,8 @@ function RiseHalo({ spec, burst }: { spec: SkinSpec; burst: SharedValue<number> 
   return (
     <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, style]}>
       <Svg viewBox={VIEWBOX} width="100%" height="100%">
-        <Polygon
-          points={SHIELD}
+        <Path
+          d={cardShape(spec.shape).framePath}
           fill={color}
           fillOpacity={0.12}
           stroke={color}

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Forme de carte G-HUB « Biseau asymétrique » — source éditable.
+  Repère de la carte : 300 × 419,05 (ratio 63 × 88 mm), le même que geometry.ts.
+  Optimisée par `bun scripts/card-shapes.ts` (SVGO) vers generated.ts :
+  ne jamais éditer generated.ts à la main.
+
+  Éléments lus par le script (par id) :
+    #frame   silhouette complète = liseré ; sert aussi de découpe (reflet, verso)
+    #surface surface intérieure, retrait de 9 du liseré
+    #safe    zone sûre : le gabarit du contenu y est replacé
+    #sheen   boîte où le balayage « foil » peut courir sans sortir de la forme
+    #crest   point d'attache HAUT de la plaque jeu (milieu de son bord supérieur)
+    #footer  point d'attache BAS du pied de carte (milieu de son bord inférieur)
+  Les couleurs ci-dessous ne servent qu'à l'aperçu de ce fichier (rampes du
+  design system) : en production, le skin fournit les siennes.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 419.05" width="300" height="419.05">
+  <title>Biseau asymétrique</title>
+  <desc>Grands pans coupés en haut à droite et en bas à gauche : la carte « file » en diagonale.</desc>
+  <path id="frame" fill="#5fb21f" d="M14 0 L236 0 L300 64 L300 405.05 L286 419.05 L64 419.05 L0 355.05 L0 14 Z"/>
+  <path id="surface" fill="#123100" d="M17.73 9 L232.27 9 L291 67.73 L291 401.32 L282.27 410.05 L67.73 410.05 L9 351.32 L9 17.73 Z"/>
+  <rect id="safe" x="36" y="44" width="228" height="316.38" fill="none" stroke="#15c3dd" stroke-dasharray="4 3"/>
+  <rect id="sheen" x="0" y="64" width="300" height="291.05" fill="none" stroke="#caad34" stroke-dasharray="2 4"/>
+  <circle id="crest" cx="150" cy="5.03" r="3" fill="#e79d38"/>
+  <circle id="footer" cx="150" cy="390.55" r="3" fill="#e79d38"/>
+</svg>

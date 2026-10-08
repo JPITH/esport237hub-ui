@@ -12,6 +12,15 @@
  * dégradé, mêmes rayures, aux mêmes coordonnées.
  */
 import type { SkinSpec, SkinStripes } from './spec';
+import { mapPath, parsePath, serializePath } from './shapes/path';
+import {
+  CARD_SHAPE_NAMES,
+  CARD_SHAPE_SOURCES,
+  CARD_SHAPE_VIEW,
+  type CardShapeName,
+} from './shapes/generated';
+
+export { CARD_SHAPE_NAMES, type CardShapeName };
 
 /** Largeur de référence : toutes les tailles fixes sont dessinées pour 300 px. */
 export const CARD_BASE_WIDTH = 300;
@@ -120,9 +129,9 @@ export function pct(fraction: number): `${number}%` {
 export const FLAG_RADIUS = 3;
 
 /** Gabarit en variables CSS, pour les règles `.pcard__*` de components.css. */
-export function cardLayoutCssVars(): Record<string, string> {
+export function cardLayoutCssVars(shape?: string | null): Record<string, string> {
   const vars: Record<string, string> = {};
-  for (const [block, box] of Object.entries(CARD_LAYOUT)) {
+  for (const [block, box] of Object.entries(cardShape(shape).layout)) {
     for (const [side, value] of Object.entries(box)) {
       vars[`--pc-l-${block}-${side.toLowerCase()}`] = pct(value as number);
     }
@@ -153,6 +162,190 @@ export function shapeClipPath(inset = 0): string {
   const k = 1 - inset;
   const pct = (v: number) => `${((0.5 + (v - 0.5) * k) * 100).toFixed(2)}%`;
   return `polygon(${CARD_SHAPE.map(([x, y]) => `${pct(x)} ${pct(y)}`).join(', ')})`;
+}
+
+/* ========================================================================== */
+/* Formes de carte                                                            */
+/* ========================================================================== */
+
+/**
+ * Forme par défaut : le bouclier crénelé. Un skin sans `shape` (tous ceux
+ * écrits avant l'arrivée des formes) la garde, au pixel près.
+ */
+export const DEFAULT_CARD_SHAPE: CardShapeName = 'bouclier';
+
+/** Vrai si la valeur nomme une forme connue. */
+export function isCardShapeName(value: unknown): value is CardShapeName {
+  return typeof value === 'string' && (CARD_SHAPE_NAMES as readonly string[]).includes(value);
+}
+
+/** Gabarit du recto, valeurs élargies en `number` (une forme les déplace). */
+export type CardLayout = {
+  readonly [K in keyof typeof CARD_LAYOUT]: {
+    readonly [P in keyof (typeof CARD_LAYOUT)[K]]: number;
+  };
+};
+/** Gabarit du verso, même convention. */
+export type CardBackLayout = {
+  readonly [K in keyof typeof CARD_BACK_LAYOUT]: {
+    readonly [P in keyof (typeof CARD_BACK_LAYOUT)[K]]: number;
+  };
+};
+
+/** Rectangle en FRACTION de la carte. */
+export interface ShapeBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+/**
+ * Tout ce que le rendu doit savoir d'une forme. Les chemins sont dans le
+ * repère du tracé (`0 0 300 CARD_REF_HEIGHT`) ; les boîtes et le gabarit en
+ * fractions de la carte, comme `CARD_LAYOUT`.
+ */
+export interface CardShapeGeometry {
+  name: CardShapeName;
+  /** Nom affiché (éditeur de skins, planche). */
+  label: string;
+  description: string;
+  /** Silhouette complète = liseré. Sert aussi de découpe (reflet, éclat). */
+  framePath: string;
+  /** Surface intérieure : fond, halos et rayures y sont découpés. */
+  surfacePath: string;
+  /**
+   * Silhouette en unités de boîte (0 → 1), pour un `<clipPath
+   * clipPathUnits="objectBoundingBox">` — `null` pour le bouclier, que le web
+   * découpe en `polygon()` CSS comme avant.
+   */
+  clipUnit: string | null;
+  /** Zone sûre : le contenu (recto et verso) y est replacé. */
+  safe: ShapeBox;
+  /** Boîte où le balayage « foil » court sans jamais sortir de la forme. */
+  sheen: ShapeBox;
+  /** Gabarit du recto, replacé dans la zone sûre. */
+  layout: CardLayout;
+  /** Gabarit du verso, replacé dans la zone sûre. */
+  backLayout: CardBackLayout;
+}
+
+function polygonPath(points: string): string {
+  return `M${points.split(' ').join('L')}Z`;
+}
+
+/** Chemin du repère de référence porté à une autre taille de tracé. */
+function scalePath(d: string, width: number, height: number): string {
+  const sx = width / CARD_BASE_WIDTH;
+  const sy = height / CARD_REF_HEIGHT;
+  return serializePath(mapPath(parsePath(d), (x, y) => [x * sx, y * sy]));
+}
+
+function boxFromSource(r: readonly [number, number, number, number]): ShapeBox {
+  return {
+    x: r[0] / CARD_SHAPE_VIEW.width,
+    y: r[1] / CARD_SHAPE_VIEW.height,
+    width: r[2] / CARD_SHAPE_VIEW.width,
+    height: r[3] / CARD_SHAPE_VIEW.height,
+  };
+}
+
+/**
+ * Zone sûre de référence = celle du bouclier, pour laquelle `CARD_LAYOUT` et
+ * `CARD_BACK_LAYOUT` ont été dessinés. Une autre forme déclare la sienne ; le
+ * gabarit y est transposé par une simple homothétie par axe.
+ */
+const REFERENCE_SAFE = boxFromSource(CARD_SHAPE_SOURCES[DEFAULT_CARD_SHAPE].safe);
+
+function remap<T extends Record<string, number>>(
+  box: T,
+  safe: ShapeBox,
+  extra: Partial<Record<keyof T, number>> = {},
+): { [K in keyof T]: number } {
+  const sx = safe.width / REFERENCE_SAFE.width;
+  const sy = safe.height / REFERENCE_SAFE.height;
+  const out: Record<string, number> = {};
+  for (const [k, v] of Object.entries(box)) {
+    const forced = extra[k as keyof T];
+    if (forced != null) out[k] = forced;
+    else if (k === 'top') out[k] = safe.y + (v - REFERENCE_SAFE.y) * sy;
+    else if (k === 'left') out[k] = safe.x + (v - REFERENCE_SAFE.x) * sx;
+    else if (k === 'width') out[k] = v * sx;
+    else if (k === 'height') out[k] = v * sy;
+    else out[k] = v;
+  }
+  return out as { [K in keyof T]: number };
+}
+
+function geometryOf(name: CardShapeName): CardShapeGeometry {
+  const src = CARD_SHAPE_SOURCES[name];
+  if (name === DEFAULT_CARD_SHAPE) {
+    /* Le bouclier reste calculé comme il l'a toujours été (CARD_SHAPE,
+       retrait par homothétie) et garde ses gabarits d'origine : c'est la
+       garantie qu'un skin existant ne bouge pas d'un pixel. `bouclier.svg`
+       n'en est que la transcription, vérifiée par les tests. */
+    return {
+      name,
+      label: src.label,
+      description: src.description,
+      framePath: polygonPath(shapePoints(CARD_BASE_WIDTH, CARD_REF_HEIGHT)),
+      surfacePath: polygonPath(shapePoints(CARD_BASE_WIDTH, CARD_REF_HEIGHT, CARD_INSET)),
+      clipUnit: null,
+      safe: REFERENCE_SAFE,
+      sheen: { x: 0, y: 0.08, width: 1, height: 0.8 },
+      layout: CARD_LAYOUT,
+      backLayout: CARD_BACK_LAYOUT,
+    };
+  }
+  const safe = boxFromSource(src.safe);
+  const L = CARD_LAYOUT;
+  const B = CARD_BACK_LAYOUT;
+  return {
+    name,
+    label: src.label,
+    description: src.description,
+    framePath: src.frame,
+    surfacePath: src.surface,
+    clipUnit: src.unit,
+    safe,
+    sheen: boxFromSource(src.sheen),
+    layout: {
+      crest: remap(L.crest, safe, { top: src.anchors.crest / CARD_SHAPE_VIEW.height }),
+      badge: remap(L.badge, safe),
+      portrait: remap(L.portrait, safe),
+      identity: remap(L.identity, safe),
+      stats: remap(L.stats, safe),
+      footer: remap(L.footer, safe, { bottom: 1 - src.anchors.footer / CARD_SHAPE_VIEW.height }),
+      flag: { ...L.flag },
+    },
+    backLayout: {
+      title: remap(B.title, safe),
+      stats: remap(B.stats, safe),
+      record: remap(B.record, safe),
+    },
+  };
+}
+
+const SHAPE_CACHE = new Map<CardShapeName, CardShapeGeometry>();
+
+/**
+ * Géométrie d'une forme. Un nom inconnu, absent ou corrompu rend le
+ * bouclier : comme pour les skins, une donnée douteuse ne casse jamais une
+ * carte. Calculée une fois par forme.
+ */
+export function cardShape(name?: string | null): CardShapeGeometry {
+  const key = isCardShapeName(name) ? name : DEFAULT_CARD_SHAPE;
+  let g = SHAPE_CACHE.get(key);
+  if (!g) {
+    g = geometryOf(key);
+    SHAPE_CACHE.set(key, g);
+  }
+  return g;
+}
+
+/** Toutes les formes, forme par défaut en tête (éditeur, planche, tests). */
+export function cardShapes(): CardShapeGeometry[] {
+  return CARD_SHAPE_NAMES.map((n) => cardShape(n));
 }
 
 /* ========================================================================== */
@@ -205,7 +398,14 @@ export interface DrawSheen {
   height: number;
   width: number;
   skewDeg: number;
-  /** Translation X de départ et d'arrivée. */
+  /**
+   * Bornes horizontales de la boîte où court la bande (la forme la déclare :
+   * pleine largeur pour le bouclier, en retrait pour un ticket). Le natif y
+   * confine sa vue animée ; le web aussi, hors bouclier, qu'il découpe.
+   */
+  left: number;
+  boxWidth: number;
+  /** Translation X de départ et d'arrivée, relative à `left`. */
   from: number;
   to: number;
   travelMs: number;
@@ -217,10 +417,15 @@ export interface DrawSheen {
 export interface SkinDraw {
   width: number;
   height: number;
-  /** Polygone du liseré extérieur. */
-  framePoints: string;
-  /** Polygone de la surface intérieure. */
-  surfacePoints: string;
+  /** Forme de la carte (`SkinSpec.shape` résolu). */
+  shape: CardShapeName;
+  /**
+   * Chemin du liseré extérieur = silhouette complète, à la taille du tracé.
+   * Pour le bouclier : le polygone historique, `M x,y L x,y … Z`.
+   */
+  framePath: string;
+  /** Chemin de la surface intérieure (fond, halos, rayures y sont découpés). */
+  surfacePath: string;
   frame: DrawLinear;
   surface: DrawLinear;
   radials: DrawRadial[];
@@ -278,12 +483,21 @@ export function buildSkinDraw(
 ): SkinDraw {
   const sheenSpec = skin.sheen;
   const bandWidth = sheenSpec ? sheenSpec.width * width : 0;
+  const shape = cardShape(skin.shape);
+  const atRef = width === CARD_BASE_WIDTH && height === CARD_REF_HEIGHT;
+  const sized = (d: string) => (atRef ? d : scalePath(d, width, height));
+  const isDefault = shape.name === DEFAULT_CARD_SHAPE;
+  const box = shape.sheen;
+  const boxWidth = box.width * width;
 
   return {
     width,
     height,
-    framePoints: shapePoints(width, height),
-    surfacePoints: shapePoints(width, height, CARD_INSET),
+    shape: shape.name,
+    framePath: isDefault ? polygonPath(shapePoints(width, height)) : sized(shape.framePath),
+    surfacePath: isDefault
+      ? polygonPath(shapePoints(width, height, CARD_INSET))
+      : sized(shape.surfacePath),
     frame: { id: `${uid}-frame`, ...skin.frame },
     surface: { id: `${uid}-surface`, ...skin.surface },
     radials: skin.radials.map((r, i) => ({ id: `${uid}-radial-${i}`, ...r })),
@@ -294,12 +508,14 @@ export function buildSkinDraw(
       ? {
           color: sheenSpec.color,
           opacity: sheenSpec.opacity,
-          top: height * 0.08,
-          height: height * 0.8,
+          top: height * box.y,
+          height: height * box.height,
+          left: width * box.x,
+          boxWidth,
           width: bandWidth,
           skewDeg: sheenSpec.skewDeg,
           from: -bandWidth * 1.6,
-          to: width + bandWidth,
+          to: boxWidth + bandWidth,
           travelMs: sheenSpec.travelMs,
           holdMs: sheenSpec.holdMs,
           periodMs: sheenSpec.travelMs + sheenSpec.holdMs,
