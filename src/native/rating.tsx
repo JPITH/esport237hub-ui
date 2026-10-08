@@ -5,7 +5,6 @@
  * accent : DESIGN.md interdit à l'accent de dire un état, et une note EST un
  * état ; l'or est le jeton « podium, décoratif » prévu pour ça.
  */
-import { Lock, Star } from 'lucide-react-native';
 import {
   Pressable,
   StyleSheet,
@@ -30,6 +29,7 @@ import {
 } from '../lib/rating';
 import { font, radius, spacing, useE237Colors } from './core';
 import { Txt } from './text';
+import { Icon } from '../icons/generated/native';
 
 /* ------------------------------------------------------------------ */
 /* StarRating — lecture                                                */
@@ -68,10 +68,10 @@ export function StarRating({ value, size = 16, showValue = false, style }: StarR
       <View style={styles.stars}>
         {fills.map((fill, i) => (
           <View key={i} style={{ width: size, height: size }}>
-            <Star size={size} color={c.textMuted} strokeWidth={1.5} />
+            <Icon name="star" size={size} color={c.textMuted} strokeWidth={1.5} />
             {fill > 0 ? (
               <View style={[styles.overlay, { width: size * fill, height: size }]}>
-                <Star size={size} color={c.gold} fill={c.gold} strokeWidth={1.5} />
+                <Icon name="star" size={size} color={c.gold} filled strokeWidth={1.5} />
               </View>
             ) : null}
           </View>
@@ -133,10 +133,10 @@ export function StarRatingInput({
               accessibilityState={{ selected: value === score, disabled }}
               accessibilityLabel={`${score} — ${RATING_LABELS[score]}`}
               style={({ pressed }) => [styles.starButton, pressed ? styles.pressed : null]}>
-              <Star
+              <Icon name="star"
                 size={size}
                 color={active ? c.gold : c.textMuted}
-                fill={active ? c.gold : 'transparent'}
+                filled={active}
                 strokeWidth={1.5}
               />
             </Pressable>
@@ -300,7 +300,7 @@ export function RatingGateNotice({ gate, style }: RatingGateNoticeProps) {
         { backgroundColor: c.surfaceRaised, borderColor: c.border },
         style,
       ]}>
-      <Lock size={16} color={c.textMuted} />
+      <Icon name="lock" size={16} color={c.textMuted} />
       <Txt variant="body" tone="secondary" style={styles.gateText}>
         {RATING_GATE_MESSAGE[gate]}
       </Txt>

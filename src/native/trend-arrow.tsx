@@ -1,13 +1,14 @@
 /**
  * Flèche de mouvement au classement (natif) — jumelle de `./web/trend-arrow`.
  * Haute VERTE (accent) si le joueur monte, basse ROUGE (danger) s'il descend,
- * tiret discret (textMuted) s'il ne bouge pas. Icônes Lucide, jamais d'emoji.
+ * tiret discret (textMuted) s'il ne bouge pas. Icônes du jeu G-HUB, jamais d’emoji.
  */
-import { ArrowDown, ArrowUp, Minus } from 'lucide-react-native';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { font, useE237Colors } from './core';
 import { Txt } from './text';
+import { Icon } from '../icons/generated/native';
+import type { IconName } from '../icons/names';
 
 /** Sens du mouvement au classement. */
 export type TrendMovement = 'up' | 'down' | 'same';
@@ -47,8 +48,8 @@ export function TrendArrow({
   const c = useE237Colors();
   const tone =
     movement === 'up' ? c.accent : movement === 'down' ? c.danger : c.textMuted;
-  const Icon =
-    movement === 'up' ? ArrowUp : movement === 'down' ? ArrowDown : Minus;
+  const name: IconName =
+    movement === 'up' ? 'arrow-up' : movement === 'down' ? 'arrow-down' : 'minus';
   const text = MOVEMENT_LABEL[movement];
   const full = label ?? (delta != null ? `${text} de ${Math.abs(delta)}` : text);
 
@@ -59,7 +60,7 @@ export function TrendArrow({
       accessibilityLabel={full}
       style={[styles.row, style]}
     >
-      <Icon color={tone} size={size} strokeWidth={2.5} />
+      <Icon name={name} color={tone} size={size} strokeWidth={2.5} />
       {delta != null ? (
         <Txt variant="bodyBold" size={font.size.xs} color={tone} style={styles.delta}>
           {formatDelta(movement, delta)}

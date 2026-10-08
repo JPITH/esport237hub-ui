@@ -6,7 +6,6 @@
  * manquaient au natif). Les libellés de mouvement viennent désormais tous de
  * `lib/ranking`.
  */
-import { Crown, Radio, RefreshCw, WifiOff } from 'lucide-react-native';
 import type { ReactNode } from 'react';
 import {
   ActivityIndicator,
@@ -33,6 +32,7 @@ import { DivisionBadge } from './division-badge';
 import { Skeleton, VerifiedMark } from './primitives';
 import { Txt } from './text';
 import { TrendArrow } from './trend-arrow';
+import { Icon } from '../icons/generated/native';
 
 /* ------------------------------------------------------------------ */
 /* LiveBar                                                             */
@@ -62,7 +62,6 @@ export function LiveBar({
   const c = useE237Colors();
   const live = status === 'live';
   const connecting = status === 'connecting';
-  const Icon = live ? Radio : WifiOff;
 
   return (
     <View style={[styles.liveBar, style]}>
@@ -81,7 +80,7 @@ export function LiveBar({
           {connecting ? (
             <ActivityIndicator size="small" color={c.textMuted} />
           ) : (
-            <Icon color={live ? c.accent : c.textMuted} size={14} />
+            <Icon name={live ? 'radio' : 'wifi-off'} color={live ? c.accent : c.textMuted} size={14} />
           )}
           <Txt
             variant="bodyMedium"
@@ -114,7 +113,7 @@ export function LiveBar({
         {refreshing ? (
           <ActivityIndicator size="small" color={c.textMuted} />
         ) : (
-          <RefreshCw color={c.textSecondary} size={16} />
+          <Icon name="refresh" color={c.textSecondary} size={16} />
         )}
       </Pressable>
     </View>
@@ -277,7 +276,7 @@ export function ChampionSpotlight({
       ]}
     >
       <View style={styles.spotlightHead}>
-        <Crown color={c.gold} size={18} />
+        <Icon name="crown" color={c.gold} size={18} />
         <Txt variant="overline" size={font.size.sm} tone="gold" style={styles.spotlightTitle}>
           {`Champion${subtitle ? ` · ${subtitle}` : ''}`}
         </Txt>

@@ -1,12 +1,12 @@
 /**
  * Liste d'avantages ou de restrictions (natif) — jumelle de `./web/perk-list`.
- * Icônes Lucide, jamais de puce typographique.
+ * Icônes du jeu G-HUB (`Icon`), jamais de puce typographique.
  */
-import { Check, Minus } from 'lucide-react-native';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { spacing, useE237Colors } from './core';
 import { Txt } from './text';
+import { Icon } from '../icons/generated/native';
 
 export interface PerkListProps {
   /** Lignes à afficher ; une liste vide ne rend rien. */
@@ -23,7 +23,6 @@ export function PerkList({ items, variant = 'perk', style }: PerkListProps) {
   const c = useE237Colors();
   if (!items || items.length === 0) return null;
   const perk = variant === 'perk';
-  const Icon = perk ? Check : Minus;
   const iconColor = perk ? c.success : c.warning;
   const textColor = perk ? c.textSecondary : c.textMuted;
 
@@ -31,7 +30,7 @@ export function PerkList({ items, variant = 'perk', style }: PerkListProps) {
     <View style={[styles.list, style]}>
       {items.map((item, i) => (
         <View key={`${i}-${item}`} style={styles.row}>
-          <Icon color={iconColor} size={14} style={styles.icon} />
+          <Icon name={perk ? 'check' : 'minus'} color={iconColor} size={14} style={styles.icon} />
           <Txt variant="caption" color={textColor} style={styles.text}>
             {item}
           </Txt>

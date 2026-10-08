@@ -4,7 +4,6 @@
  * Ils comblaient un vrai manque du design system : les écrans posaient des
  * pastilles à la main, avec des dosages de teinte tous différents.
  */
-import { Check } from 'lucide-react-native';
 import type { ReactNode } from 'react';
 import {
   Pressable,
@@ -16,6 +15,7 @@ import {
 
 import { radius, spacing, useE237Colors } from './core';
 import { Txt } from './text';
+import { Icon } from '../icons/generated/native';
 
 /* ------------------------------------------------------------------ */
 /* Checkbox                                                            */
@@ -65,7 +65,7 @@ export function Checkbox({
           },
         ]}
       >
-        {checked ? <Check color={c.onAccent} size={13} strokeWidth={3} /> : null}
+        {checked ? <Icon name="check" color={c.onAccent} size={13} strokeWidth={3} /> : null}
       </View>
       <View style={styles.labelBox}>
         <Txt variant="body">{label}</Txt>

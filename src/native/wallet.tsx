@@ -2,7 +2,6 @@
  * Portefeuille (natif) — jumeaux de `./web/wallet`, mêmes noms, mêmes props.
  * La ligne de transaction était écrite à l'identique des deux côtés.
  */
-import { ArrowDownLeft, ArrowUpRight, Wallet as WalletIcon } from 'lucide-react-native';
 import type { ReactNode } from 'react';
 import {
   Pressable,
@@ -25,6 +24,7 @@ import {
 } from './core';
 import { Skeleton } from './primitives';
 import { Txt } from './text';
+import { Icon } from '../icons/generated/native';
 
 /* ------------------------------------------------------------------ */
 /* BalanceCard                                                         */
@@ -50,7 +50,7 @@ export function BalanceCard({
   return (
     <Card style={[styles.balance, style]}>
       <View style={styles.balanceHead}>
-        <WalletIcon color={c.textSecondary} size={18} />
+        <Icon name="wallet" color={c.textSecondary} size={18} />
         <Txt variant="bodyMedium" tone="secondary">
           {label}
         </Txt>
@@ -103,9 +103,9 @@ export function TransactionRow({
         ]}
       >
         {credit ? (
-          <ArrowDownLeft color={tone} size={18} />
+          <Icon name="arrow-down-left" color={tone} size={18} />
         ) : (
-          <ArrowUpRight color={tone} size={18} />
+          <Icon name="arrow-up-right" color={tone} size={18} />
         )}
       </View>
       <View style={styles.txBody}>

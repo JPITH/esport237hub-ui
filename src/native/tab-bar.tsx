@@ -16,8 +16,6 @@
  * écrans qu'on consulte, pas des lieux où l'on travaille, et l'appbar commune
  * les tient déjà à un appui (avatar à droite, lien depuis le profil).
  */
-import type { LucideIcon } from 'lucide-react-native';
-import { CalendarDays, House, ShoppingBag, Store, Swords } from 'lucide-react-native';
 import { useEffect } from 'react';
 import {
   Pressable,
@@ -42,6 +40,8 @@ import { useDsT, type DsKey } from '../i18n';
 import { font, radius, spacing, useE237Colors } from './core';
 import { haptic } from './haptics';
 import { Txt } from './text';
+import { Icon } from '../icons/generated/native';
+import type { IconName } from '../icons/names';
 
 // 88 et non 64 depuis que chaque onglet porte son libellé ET son point d'état
 // sous le pictogramme : la rangée est alignée en bas (`flex-end`) et le fond
@@ -71,13 +71,13 @@ export const TAB_BAR_SPACE = BAR_HEIGHT + FAB_OVERHANG + 16;
  */
 const TAB_META: Record<
   string,
-  { labelKey: DsKey; Icon: LucideIcon; fab?: boolean }
+  { labelKey: DsKey; icon: IconName; fab?: boolean }
 > = {
-  index: { labelKey: 'ui.tab.accueil', Icon: House },
-  salles: { labelKey: 'ui.tab.salles', Icon: Store },
-  duels: { labelKey: 'ui.tab.duels', Icon: Swords, fab: true },
-  evenements: { labelKey: 'ui.tab.evenements', Icon: CalendarDays },
-  boutique: { labelKey: 'ui.tab.boutique', Icon: ShoppingBag },
+  index: { labelKey: 'ui.tab.accueil', icon: 'home' },
+  salles: { labelKey: 'ui.tab.salles', icon: 'store' },
+  duels: { labelKey: 'ui.tab.duels', icon: 'swords', fab: true },
+  evenements: { labelKey: 'ui.tab.evenements', icon: 'calendar' },
+  boutique: { labelKey: 'ui.tab.boutique', icon: 'shopping-bag' },
 };
 
 export interface E237TabBarProps {
@@ -135,14 +135,14 @@ function barPath(width: number, height: number): string {
 
 function TabItem({
   label,
-  Icon,
+  icon,
   focused,
   onPress,
   onLongPress,
   accessibilityLabel,
 }: {
   label: string;
-  Icon: LucideIcon;
+  icon: IconName;
   focused: boolean;
   onPress: () => void;
   onLongPress?: () => void;
@@ -174,7 +174,7 @@ function TabItem({
       style={styles.tabItem}
     >
       <Animated.View style={[styles.tabInner, animatedStyle]}>
-        <Icon color={tint} size={22} strokeWidth={focused ? 2.4 : 2} />
+        <Icon name={icon} color={tint} size={22} active={focused} />
         {/* Le titre de l'écran, sous son pictogramme : une icône seule se
             devine, elle ne se lit pas — et la barre est le seul endroit où
             l'on nomme les cinq destinations du produit. */}
@@ -279,7 +279,7 @@ function DuelsFab({
             web) le remet au premier plan ; en natif, l'ordre suffisait déjà.
           */}
           <View style={styles.fabIcon}>
-            <Swords color={c.onAccent} size={28} strokeWidth={2.4} />
+            <Icon name="swords" color={c.onAccent} size={28} strokeWidth={2.25} />
           </View>
         </Animated.View>
       </Pressable>
@@ -423,7 +423,7 @@ export function E237TabBar({
             <TabItem
               key={route.key}
               label={options.title ?? t(meta.labelKey)}
-              Icon={meta.Icon}
+              icon={meta.icon}
               focused={focused}
               onPress={onPress}
               onLongPress={onLongPress}

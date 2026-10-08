@@ -6,7 +6,6 @@
  * tuiles, lignes avec vignette + action, en-têtes avec « Voir tout ».
  * Aucune couleur en dur : tokens + `useE237Colors()` (DESIGN.md).
  */
-import { ChevronLeft, ChevronRight, Plus } from 'lucide-react-native';
 import type { ReactNode } from 'react';
 import {
   Image,
@@ -29,6 +28,7 @@ import { font, radius, spacing, useE237Colors } from './core';
 import { haptic } from './haptics';
 import { useNeu } from './neu';
 import { Txt } from './text';
+import { Icon } from '../icons/generated/native';
 
 /* ------------------------------------------------------------------ */
 /* Pressable animé (socle commun)                                      */
@@ -216,7 +216,7 @@ export function PillTag({ label, tone = 'surface', icon, style }: PillTagProps) 
 /* ------------------------------------------------------------------ */
 
 export interface BalancePillProps {
-  /** Pastille de gauche (icône Lucide 14 px ou point coloré). */
+  /** Pastille de gauche (`<Icon>` 14 px ou point coloré). */
   icon: ReactNode;
   value: string | number;
   tone?: 'accent' | 'cyan' | 'gold';
@@ -291,7 +291,7 @@ export function BalancePill({
             pressed && styles.pressed,
           ]}
         >
-          <Plus color={c.onAccent} size={12} strokeWidth={3} />
+          <Icon name="plus" color={c.onAccent} size={12} strokeWidth={3} />
         </Pressable>
       ) : null}
     </View>
@@ -329,7 +329,7 @@ export function TopBar({
     <View style={[styles.topBar, style]}>
       {onBack ? (
         <IconButton
-          icon={<ChevronLeft color={c.textPrimary} size={20} />}
+          icon={<Icon name="chevron-left" color={c.textPrimary} size={20} />}
           onPress={onBack}
           accessibilityLabel="Retour"
         />
@@ -363,7 +363,7 @@ export function TopBar({
 
 export interface SectionHeaderProps {
   title: string;
-  /** Icône Lucide 16 px, teintée par l'appelant. */
+  /** `<Icon>` 16 px, teintée par l'appelant. */
   icon?: ReactNode;
   /** Affiche la pilule « Voir tout ». */
   onSeeAll?: () => void;
@@ -401,7 +401,7 @@ export function SectionHeader({
         ) : null}
         {onPrev ? (
           <IconButton
-            icon={<ChevronLeft color={c.textSecondary} size={16} />}
+            icon={<Icon name="chevron-left" color={c.textSecondary} size={16} />}
             onPress={onPrev}
             accessibilityLabel="Précédent"
             size={30}
@@ -409,7 +409,7 @@ export function SectionHeader({
         ) : null}
         {onNext ? (
           <IconButton
-            icon={<ChevronRight color={c.textSecondary} size={16} />}
+            icon={<Icon name="chevron-right" color={c.textSecondary} size={16} />}
             onPress={onNext}
             accessibilityLabel="Suivant"
             size={30}

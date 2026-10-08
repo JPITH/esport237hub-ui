@@ -18,11 +18,11 @@ import type { ReactNode } from 'react';
 import { Children, isValidElement, cloneElement } from 'react';
 import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
-import { ChevronRight } from 'lucide-react-native';
 
 import { radius, spacing, useE237Colors, useNeu } from './core';
 import { haptic } from './haptics';
 import { Txt } from './text';
+import { Icon } from '../icons/generated/native';
 
 export interface NavItemProps {
   /** Pictogramme, posé dans une pastille teintée de 36 px. */
@@ -80,7 +80,7 @@ export function NavItem({
         ) : null}
       </View>
 
-      {trailing ?? <ChevronRight color={c.textMuted} size={18} />}
+      {trailing ?? <Icon name="chevron-right" color={c.textMuted} size={18} />}
     </Pressable>
   );
 }

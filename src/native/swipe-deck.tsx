@@ -2,7 +2,6 @@
  * Recherche d'adversaire « à la Tinder » : carte joueur + swipe L/R (suivant)
  * et vers le haut (feuille d'infos). Reanimated + gesture-handler.
  */
-import { ChevronsLeftRight, ChevronsUp, MapPin, Swords } from 'lucide-react-native';
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
@@ -21,6 +20,7 @@ import { PlayerCard } from './player-card';
 import { EmptyState } from './primitives';
 import { Sheet } from './sheet';
 import { Txt } from './text';
+import { Icon } from '../icons/generated/native';
 
 export interface SwipePlayer {
   id: string;
@@ -161,13 +161,13 @@ export function SwipeDeck({
 
       <View style={styles.hints}>
         <View style={styles.hint}>
-          <ChevronsLeftRight color={c.textMuted} size={14} />
+          <Icon name="chevrons-left-right" color={c.textMuted} size={14} />
           <Txt variant="caption" size={11} tone="muted">
             joueur suivant
           </Txt>
         </View>
         <View style={styles.hint}>
-          <ChevronsUp color={c.textMuted} size={14} />
+          <Icon name="chevrons-up" color={c.textMuted} size={14} />
           <Txt variant="caption" size={11} tone="muted">
             plus d&rsquo;infos
           </Txt>
@@ -218,7 +218,7 @@ export function SwipeDeck({
       >
         <View style={styles.infoBlock}>
           <View style={[styles.heroChip, { backgroundColor: `${c.accent}22` }]}>
-            <Swords color={c.accent} size={18} />
+            <Icon name="swords" color={c.accent} size={18} />
             <Txt variant="label" tone="accent">
               Note {current.rating}
             </Txt>
@@ -235,7 +235,7 @@ export function SwipeDeck({
           <InfoRow
             label="Ville"
             value={current.city ?? '—'}
-            icon={<MapPin color={c.textSecondary} size={14} />}
+            icon={<Icon name="map-pin" color={c.textSecondary} size={14} />}
           />
           <InfoRow label="Plateforme" value={current.platform?.toUpperCase() ?? '—'} />
         </View>

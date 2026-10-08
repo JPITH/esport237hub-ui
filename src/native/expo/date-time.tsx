@@ -3,7 +3,6 @@
  * Même API que `../date-time` (valeur ISO date / HH:mm).
  */
 import { DateTimePicker } from '@expo/ui/community/datetime-picker';
-import { CalendarDays, Clock } from 'lucide-react-native';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 
@@ -12,6 +11,8 @@ import { FieldLabel, requiredFieldLabel } from '../fields';
 import { Txt } from '../text';
 import { useDsT } from '../../i18n';
 import { Sheet } from './sheet';
+import { Icon } from '../../icons/generated/native';
+import type { IconName } from '../../icons/names';
 
 function toISODate(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -39,14 +40,14 @@ function parseTime(hhmm: string | null): Date {
 function Trigger({
   label,
   required,
-  icon: Icon,
+  icon,
   text,
   filled,
   onPress,
 }: {
   label?: string;
   required?: boolean;
-  icon: typeof CalendarDays;
+  icon: IconName;
   text: string;
   filled: boolean;
   onPress: () => void;
@@ -72,7 +73,7 @@ function Trigger({
           borderColor: c.border,
         }}
       >
-        <Icon color={c.textSecondary} size={18} />
+        <Icon name={icon} color={c.textSecondary} size={18} />
         <Txt
           numberOfLines={1}
           variant="body"
@@ -118,7 +119,7 @@ export function DateField({
       <Trigger
         label={label}
         required={required}
-        icon={CalendarDays}
+        icon="calendar"
         text={display}
         filled={!!value}
         onPress={() => setOpen(true)}
@@ -163,7 +164,7 @@ export function TimeField({
       <Trigger
         label={label}
         required={required}
-        icon={Clock}
+        icon="clock"
         text={display}
         filled={!!value}
         onPress={() => setOpen(true)}

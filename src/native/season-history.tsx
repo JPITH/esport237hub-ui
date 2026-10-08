@@ -9,7 +9,6 @@
  * Rien n'est recalculé : `finalPosition` et `finalOutcome` sont figés en base
  * à la clôture.
  */
-import { Trophy } from 'lucide-react-native';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import {
@@ -23,6 +22,7 @@ import {
 import { radius, spacing, useE237Colors } from './core';
 import { DivisionBadge } from './division-badge';
 import { Txt } from './text';
+import { Icon } from '../icons/generated/native';
 
 /** Une saison du palmarès — `GET /rankings/history/:username`. */
 export interface SeasonHistoryEntry {
@@ -104,7 +104,7 @@ export function SeasonHistory({ entries, gameSlug, style }: SeasonHistoryProps) 
                 />
               ) : null}
               <View style={styles.result}>
-                <Trophy color={c.gold} size={13} />
+                <Icon name="trophy" color={c.gold} size={13} />
                 <Txt variant="bodyBold">
                   {seasonResultLabel(entry.state, entry.finalPosition)}
                 </Txt>

@@ -4,7 +4,6 @@
  * zones tactiles ≥ 44 px, thèmes clair/sombre via useE237Colors().
  */
 import { radius, spacing, useE237Colors } from './core';
-import { CalendarDays, ChevronLeft, ChevronRight, Clock } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
@@ -12,6 +11,8 @@ import { useDsT, type DsKey } from '../i18n';
 import { FieldLabel, requiredFieldLabel } from './fields';
 import { Sheet } from './sheet';
 import { Txt } from './text';
+import { Icon } from '../icons/generated/native';
+import type { IconName } from '../icons/names';
 
 // Clés de traduction, pas des libellés rendus : ce composant s'affiche sur
 // des apps bilingues (cf. DUEL_STATUS_META dans src/lib/duel-status.ts).
@@ -53,14 +54,13 @@ function Trigger({
 }: {
   label?: string;
   required?: boolean;
-  icon: ReactNodeIcon;
+  icon: IconName;
   text: string;
   filled: boolean;
   onPress: () => void;
 }) {
   const c = useE237Colors();
   const t = useDsT();
-  const Icon = icon;
   return (
     <View style={{ gap: spacing['1'] }}>
       {label ? <FieldLabel label={label} required={required} /> : null}
@@ -69,7 +69,7 @@ function Trigger({
         accessibilityLabel={requiredFieldLabel(t, label, required)}
         onPress={onPress}
         style={[styles.trigger, { backgroundColor: c.surface, borderColor: c.border }]}>
-        <Icon color={c.textSecondary} size={18} />
+        <Icon name={icon} color={c.textSecondary} size={18} />
         <Txt
           numberOfLines={1}
           variant="body"
@@ -82,7 +82,6 @@ function Trigger({
     </View>
   );
 }
-type ReactNodeIcon = typeof CalendarDays;
 
 /** Champ date : calendrier mensuel en feuille. Valeur ISO `YYYY-MM-DD` ou null. */
 export function DateField({
@@ -140,7 +139,7 @@ export function DateField({
       <Trigger
         label={label}
         required={required}
-        icon={CalendarDays}
+        icon="calendar"
         text={display}
         filled={!!value}
         onPress={() => setOpen(true)}
@@ -153,7 +152,7 @@ export function DateField({
             accessibilityLabel={t('form.date.prevMonth')}
             onPress={() => shift(-1)}
             style={styles.monthBtn}>
-            <ChevronLeft color={c.textSecondary} size={20} />
+            <Icon name="chevron-left" color={c.textSecondary} size={20} />
           </Pressable>
           <Txt variant="label" size={15}>
             {MONTHS[view.m]} {view.y}
@@ -163,7 +162,7 @@ export function DateField({
             accessibilityLabel={t('form.date.nextMonth')}
             onPress={() => shift(1)}
             style={styles.monthBtn}>
-            <ChevronRight color={c.textSecondary} size={20} />
+            <Icon name="chevron-right" color={c.textSecondary} size={20} />
           </Pressable>
         </View>
 
@@ -271,7 +270,7 @@ export function TimeField({
       <Trigger
         label={label}
         required={required}
-        icon={Clock}
+        icon="clock"
         text={value ?? placeholder}
         filled={!!value}
         onPress={() => setOpen(true)}

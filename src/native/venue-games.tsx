@@ -7,11 +7,11 @@
  * classement s'applique. Un lieu peut proposer Tekken 8 sans qu'aucun duel n'y
  * soit possible — le dire franchement vaut mieux que de masquer la ligne.
  */
-import { Gamepad2 } from 'lucide-react-native';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { font, pill, radius, spacing, useE237Colors, withAlpha } from './core';
 import { Txt } from './text';
+import { Icon } from '../icons/generated/native';
 
 /** Un jeu de l'inventaire d'une salle — forme rendue par `GET /venues/:id`. */
 export interface VenueGameItem {
@@ -51,7 +51,7 @@ export function VenueGameList({ items, emptyLabel, style }: VenueGameListProps) 
           ]}
         >
           <View style={styles.name}>
-            <Gamepad2 color={c.textMuted} size={16} strokeWidth={1.75} />
+            <Icon name="gamepad" color={c.textMuted} size={16} strokeWidth={1.75} />
             <Txt variant="body" style={styles.label} numberOfLines={1}>
               {game.name}
             </Txt>

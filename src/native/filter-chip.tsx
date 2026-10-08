@@ -34,7 +34,7 @@ export interface FilterChipProps {
   onPress: () => void;
   /** Compteur/statistique affiché dans une sous-pilule (ex. « Douala 12 »). */
   count?: number | null;
-  /** Icône Lucide (taille conseillée : 14). */
+  /** Icône `<Icon>` (taille conseillée : 14). */
   icon?: ReactNode;
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;

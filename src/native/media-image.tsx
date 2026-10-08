@@ -6,7 +6,6 @@
  * - cadre à ratio fixe : la liste ne saute pas pendant le chargement ;
  * - état de chargement discret (ActivityIndicator, aucune dépendance ajoutée).
  */
-import { ImageOff } from 'lucide-react-native';
 import { useEffect, useState, type ReactNode } from 'react';
 import {
   ActivityIndicator,
@@ -20,6 +19,7 @@ import {
 
 import { radius, spacing, useE237Colors } from './core';
 import { Txt } from './text';
+import { Icon } from '../icons/generated/native';
 
 /** Rayon d'arrondi, pris dans les tokens. */
 export type MediaRounded = 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
@@ -49,7 +49,7 @@ export interface MediaImageProps {
   rounded?: MediaRounded;
   /** `cover` (défaut) remplit le cadre, `contain` montre le média entier. */
   fit?: 'cover' | 'contain';
-  /** Icône Lucide de repli (défaut `ImageOff`). */
+  /** Icône de repli (défaut l'icône G-HUB `image-off`). */
   fallbackIcon?: ReactNode;
   /** Courte légende sous l'icône de repli (ex. « Photo à venir »). */
   fallbackLabel?: string;
@@ -114,7 +114,7 @@ export function MediaImage({
 
       {failed ? (
         <View style={styles.overlay} pointerEvents="none">
-          {fallbackIcon ?? <ImageOff color={c.textMuted} size={26} strokeWidth={1.25} />}
+          {fallbackIcon ?? <Icon name="image-off" color={c.textMuted} size={26} strokeWidth={1.25} />}
           {fallbackLabel ? (
             <Txt variant="caption" tone="muted" align="center" numberOfLines={2}>
               {fallbackLabel}
