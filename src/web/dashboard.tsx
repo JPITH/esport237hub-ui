@@ -12,7 +12,7 @@ import {
   type ReactNode,
 } from 'react';
 import { flushSync } from 'react-dom';
-import { ChevronRight, X } from 'lucide-react';
+import { Icon } from '../icons/generated/web';
 
 import { Avatar } from './avatar';
 import { SearchField } from './fields';
@@ -198,7 +198,7 @@ export function GameRail({
                 aria-expanded={false}
                 onClick={() => setExpanded(true)}
               >
-                <ChevronRight className="size-6" strokeWidth={2.75} />
+                <Icon name='chevron-right' size={24} strokeWidth={2.75} />
               </button>
             ) : null}
           </nav>
@@ -254,7 +254,7 @@ export function GamePicker({
           aria-label="Fermer"
           onClick={onClose}
         >
-          <X className="size-4" />
+          <Icon name='x' size={16} />
         </button>
       </div>
       <SearchField

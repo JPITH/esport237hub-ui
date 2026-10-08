@@ -10,7 +10,7 @@
  *    en HTML natif (`<details>` pour l'accordéon FAQ).
  * 2. **Icônes par nom.** Astro ne peut pas passer un élément React en prop
  *    depuis un `.astro` : les composants reçoivent un nom d'icône (`string`) et
- *    résolvent eux-mêmes le glyphe Lucide. Cela permet aussi de décrire les
+ *    résolvent eux-mêmes le glyphe du jeu G-HUB. Cela permet aussi de décrire les
  *    sections dans de simples fichiers de données.
  * 3. **Relief neumorphique** composé uniquement des tokens `--e237-neu-*` —
  *    jamais de `box-shadow` littérale (cf. DESIGN.md).
@@ -22,130 +22,79 @@ import type { HTMLAttributes, ReactNode } from 'react';
 import { BrandIcon, type BrandIconName } from './brand-icons';
 import { AppMark } from './mark';
 import { Picture } from './picture';
-import {
-  ArrowRight,
-  ArrowUp,
-  BadgeCheck,
-  BarChart3,
-  Building2,
-  CalendarCheck,
-  CalendarDays,
-  Camera,
-  Check,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  Clock,
-  Coins,
-  Crown,
-  EyeOff,
-  Gamepad2,
-  Gauge,
-  Handshake,
-  Info,
-  Landmark,
-  ListChecks,
-  Lock,
-  Mail,
-  MapPin,
-  Medal,
-  Menu,
-  MonitorPlay,
-  Newspaper,
-  Pause,
-  Percent,
-  Phone,
-  Play,
-  Plus,
-  Puzzle,
-  QrCode,
-  Radar,
-  ScrollText,
-  Send,
-  ShieldCheck,
-  Smartphone,
-  Sparkles,
-  Store,
-  Swords,
-  Ticket,
-  Timer,
-  TrendingUp,
-  Trophy,
-  UserRound,
-  Users,
-  Video,
-  Wallet,
-  X,
-  Zap,
-  type LucideIcon,
-} from 'lucide-react';
+import { Icon } from '../icons/generated/web';
+import { ICON_NAMES, type IconName as GhubIconName } from '../icons/names';
 
 function cx(...parts: Array<string | false | null | undefined>): string {
   return parts.filter(Boolean).join(' ');
 }
 
 /* ------------------------------------------------------------------ */
-/* Registre d'icônes — Lucide uniquement, jamais d'emoji (cf. DESIGN.md) */
+/* Registre d'icônes — jeu G-HUB, jamais d'emoji (cf. DESIGN.md)      */
 /* ------------------------------------------------------------------ */
 
-const ICONS = {
-  ArrowRight,
-  BadgeCheck,
-  BarChart3,
-  Building2,
-  CalendarCheck,
-  CalendarDays,
-  Camera,
-  Check,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  Clock,
-  Coins,
-  Crown,
-  EyeOff,
-  Gamepad2,
-  Gauge,
-  Handshake,
-  Info,
-  Landmark,
-  ListChecks,
-  Lock,
-  Mail,
-  MapPin,
-  Medal,
-  MonitorPlay,
-  Newspaper,
-  Pause,
-  Percent,
-  Phone,
-  Play,
-  Plus,
-  Puzzle,
-  QrCode,
-  Radar,
-  ScrollText,
-  Send,
-  ShieldCheck,
-  Smartphone,
-  Sparkles,
-  Store,
-  Swords,
-  Ticket,
-  Timer,
-  TrendingUp,
-  Trophy,
-  UserRound,
-  Users,
-  Video,
-  Wallet,
-  X,
-  Zap,
-} satisfies Record<string, LucideIcon>;
+/**
+ * Noms historiques (ceux de Lucide, que les données de la vitrine
+ * emploient) → icône du jeu G-HUB. La table de correspondance complète vit
+ * dans `src/icons/README.md`.
+ */
+const GLYPHS = {
+  ArrowRight: 'arrow-right',
+  BadgeCheck: 'badge-check',
+  BarChart3: 'bar-chart',
+  Building2: 'building',
+  CalendarCheck: 'calendar-check',
+  CalendarDays: 'calendar',
+  Camera: 'camera',
+  Check: 'check',
+  ChevronDown: 'chevron-down',
+  ChevronLeft: 'chevron-left',
+  ChevronRight: 'chevron-right',
+  Clock: 'clock',
+  Coins: 'coins',
+  Crown: 'crown',
+  EyeOff: 'eye-off',
+  Gamepad2: 'gamepad',
+  Gauge: 'gauge',
+  Handshake: 'handshake',
+  Info: 'info',
+  Landmark: 'landmark',
+  ListChecks: 'list-checks',
+  Lock: 'lock',
+  Mail: 'mail',
+  MapPin: 'map-pin',
+  Medal: 'medal',
+  MonitorPlay: 'monitor-play',
+  Newspaper: 'newspaper',
+  Pause: 'pause',
+  Percent: 'percent',
+  Phone: 'phone',
+  Play: 'play',
+  Plus: 'plus',
+  QrCode: 'qr-code',
+  Radar: 'radar',
+  ScrollText: 'scroll',
+  Send: 'send',
+  ShieldCheck: 'shield-check',
+  Smartphone: 'smartphone',
+  Sparkles: 'sparkles',
+  Store: 'store',
+  Swords: 'swords',
+  Ticket: 'ticket',
+  Timer: 'timer',
+  TrendingUp: 'trending-up',
+  Trophy: 'trophy',
+  UserRound: 'user',
+  Users: 'users',
+  Video: 'video',
+  Wallet: 'wallet',
+  X: 'x',
+  Zap: 'zap',
+} as const satisfies Record<string, GhubIconName>;
 
 import { BRAND_HOME_LABEL, BRAND_NAME_ACCENT, BRAND_NAME_REST } from '../lib/brand-name';
 
-export type IconName = keyof typeof ICONS;
+export type IconName = keyof typeof GLYPHS;
 
 export interface GlyphProps {
   name?: string;
@@ -153,15 +102,19 @@ export interface GlyphProps {
   className?: string;
 }
 
+const GHUB_NAMES: ReadonlySet<string> = new Set(ICON_NAMES);
+
 /**
- * Rend une icône Lucide à partir de son nom.
+ * Rend une icône du jeu G-HUB à partir de son nom : un nom historique du
+ * registre (`Trophy`) ou directement un nom du jeu (`trophy`).
  * Nom inconnu ou absent → rien (pas de glyphe de repli hasardeux).
  */
 export function Glyph({ name, size = 20, className }: GlyphProps) {
   if (!name) return null;
-  const Icon = ICONS[name as IconName];
-  if (!Icon) return null;
-  return <Icon size={size} className={className} aria-hidden strokeWidth={1.75} />;
+  const glyph: GhubIconName | undefined =
+    GLYPHS[name as IconName] ?? (GHUB_NAMES.has(name) ? (name as GhubIconName) : undefined);
+  if (!glyph) return null;
+  return <Icon name={glyph} size={size} className={className} />;
 }
 
 /* ------------------------------------------------------------------ */
@@ -311,7 +264,7 @@ export function FeatureCard({
       <a href={href} className={cx('e237-card mkt-card mkt-card--link', className)}>
         {body}
         <span className="mkt-card__arrow" aria-hidden>
-          <ArrowRight size={16} />
+          <Icon name='arrow-right' size={16} />
         </span>
       </a>
     );
@@ -427,7 +380,7 @@ export function AudienceCard({
         <ul className="mkt-audience__list">
           {bullets.map((b) => (
             <li key={b}>
-              <BadgeCheck size={15} aria-hidden strokeWidth={2} />
+              <Icon name='badge-check' size={15} strokeWidth={2} />
               <span>{b}</span>
             </li>
           ))}
@@ -436,7 +389,7 @@ export function AudienceCard({
       {ctaLabel && ctaHref ? (
         <a className="mkt-audience__cta" href={ctaHref}>
           {ctaLabel}
-          <ArrowRight size={15} aria-hidden />
+          <Icon name='arrow-right' size={15} />
         </a>
       ) : null}
     </article>
@@ -629,7 +582,7 @@ export function FaqAccordion({
         >
           <summary className="mkt-faq__q">
             <span>{item.question}</span>
-            <ChevronDown size={18} className="mkt-faq__chevron" aria-hidden />
+            <Icon name='chevron-down' size={18} className="mkt-faq__chevron" />
           </summary>
           <div className="mkt-faq__a">
             <p>{item.answer}</p>
@@ -677,7 +630,7 @@ export function CtaBand({
         <div className="mkt-cta__actions">
           <a className="btn btn--primary btn--lg" href={primaryHref}>
             {primaryLabel}
-            <ArrowRight size={18} aria-hidden />
+            <Icon name='arrow-right' size={18} />
           </a>
           {secondaryLabel && secondaryHref ? (
             <a className="btn btn--secondary btn--lg" href={secondaryHref}>
@@ -814,7 +767,7 @@ export function MarketingHeader({
             popoverTarget="mkt-menu"
             aria-label="Ouvrir le menu"
           >
-            <Menu size={22} aria-hidden />
+            <Icon name='menu' size={22} />
           </button>
         </div>
       </div>
@@ -829,7 +782,7 @@ export function MarketingHeader({
             popoverTargetAction="hide"
             aria-label="Fermer le menu"
           >
-            <X size={22} aria-hidden />
+            <Icon name='x' size={22} />
           </button>
         </div>
         <nav className="mkt-menu__nav" aria-label="Menu">
@@ -1005,7 +958,7 @@ export function MarketingFooter({
           <div className="mkt-footer__app" data-reveal>
             <div className="mkt-footer__app-copy">
               <span className="mkt-footer__app-icon">
-                <Smartphone size={20} aria-hidden strokeWidth={1.75} />
+                <Icon name='smartphone' size={20} strokeWidth={1.75} />
               </span>
               <div>
                 <p className="mkt-footer__app-title">{appTitle ?? "L'app G-HUB, dans ta poche."}</p>
@@ -1025,7 +978,7 @@ export function MarketingFooter({
             <BrandLogo src={logoSrc} />
             <p className="mkt-footer__slogan">{tagline}</p>
             <p className="mkt-footer__place">
-              <MapPin size={14} aria-hidden strokeWidth={2} />
+              <Icon name='map-pin' size={14} strokeWidth={2} />
               <span>Yaoundé · Douala · Cameroun</span>
             </p>
             {socials.length ? (
@@ -1085,7 +1038,7 @@ export function MarketingFooter({
                       {...(link.external ? { target: '_blank', rel: 'noopener' } : {})}
                     >
                       <span>{link.label}</span>
-                      <ArrowRight size={13} aria-hidden className="mkt-footer__link-arrow" />
+                      <Icon name='arrow-right' size={13} className="mkt-footer__link-arrow" />
                     </a>
                   ) : (
                     <span key={link.label} className="mkt-footer__link mkt-footer__link--soon">
@@ -1115,7 +1068,7 @@ export function MarketingFooter({
                 <circle cx="22" cy="22" r="20" pathLength={1} className="mkt-footer__top-track" />
                 <circle cx="22" cy="22" r="20" pathLength={1} className="mkt-footer__top-progress" data-footer-progress />
               </svg>
-              <ArrowUp size={16} aria-hidden strokeWidth={2.25} />
+              <Icon name='arrow-up' size={16} strokeWidth={2.25} />
             </a>
           </span>
         </div>

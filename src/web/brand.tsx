@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Moon, Sun } from "lucide-react";
+import { Icon } from "../icons/generated/web";
 
 import { BRAND_HOME_LABEL, BRAND_NAME, BRAND_NAME_ACCENT, BRAND_NAME_REST } from "../lib/brand-name";
 import { AppMark } from "./mark";
@@ -110,7 +110,7 @@ export function sidebarLinkClass({
 
 export interface SidebarNavLinkProps extends SidebarNavLinkOptions {
   href: string;
-  /** Icône Lucide. */
+  /** Icône (`<Icon>` du jeu G-HUB). */
   icon?: ReactNode;
   label: string;
   onClick?: () => void;
@@ -184,7 +184,7 @@ export function ThemeToggleButton({
   className = "",
 }: ThemeToggleButtonProps) {
   const next = mode === "light" ? "dark" : "light";
-  const Icon = mode === "light" ? Sun : Moon;
+  const icon = mode === "light" ? "sun" : "moon";
   const aria = `Thème : ${THEME_LABEL[mode]} — cliquer pour ${THEME_LABEL[next]}`;
 
   if (compact) {
@@ -196,7 +196,7 @@ export function ThemeToggleButton({
         title={`Thème : ${THEME_LABEL[mode]}`}
         className={`grid size-9 place-items-center rounded-md border border-edge text-secondary transition-colors hover:border-accent hover:text-accent ${className}`.trim()}
       >
-        <Icon className="size-[18px]" />
+        <Icon name={icon} size={18} />
       </button>
     );
   }
@@ -209,7 +209,7 @@ export function ThemeToggleButton({
       className={`flex h-9 w-full items-center justify-between gap-2 rounded-md border border-edge px-3 text-sm text-secondary transition-colors hover:border-accent hover:text-accent ${className}`.trim()}
     >
       <span className="flex items-center gap-2">
-        <Icon className="size-4" />
+        <Icon name={icon} size={16} />
         {THEME_LABEL[mode]}
       </span>
       <span className="text-[11px] text-muted">changer</span>

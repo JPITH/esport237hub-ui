@@ -6,7 +6,7 @@
 "use client";
 
 import { useState, type CSSProperties, type ReactNode } from "react";
-import { UserRound } from "lucide-react";
+import { Icon } from "../icons/generated/web";
 
 import { useDsT } from "../i18n";
 import { cardRecord } from "../lib/game-cards";
@@ -93,7 +93,7 @@ function CardImage({
   }
   return (
     <span className="pcard__imgph" aria-hidden>
-      <UserRound strokeWidth={1.25} />
+      <Icon name="user" strokeWidth={1.25} />
     </span>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, CalendarDays } from "lucide-react";
+import { Icon } from "../icons/generated/web";
 
 import { useDsT } from "../i18n";
 import { MediaImage } from "./media-image";
@@ -42,7 +42,7 @@ export function EventCover({
       alt={t("form.cover.eventAlt", { title })}
       ratio={ratio}
       rounded={rounded}
-      fallbackIcon={<CalendarDays strokeWidth={1.25} aria-hidden />}
+      fallbackIcon={<Icon name="calendar" strokeWidth={1.25} />}
       fallbackLabel={t("form.cover.eventFallback")}
       className={className}
     />
@@ -74,7 +74,7 @@ export function VenuePhoto({
       alt={t("form.cover.venueAlt", { name })}
       ratio={ratio}
       rounded={rounded}
-      fallbackIcon={<Building2 strokeWidth={1.25} aria-hidden />}
+      fallbackIcon={<Icon name="building" strokeWidth={1.25} />}
       fallbackLabel={t("form.cover.venueFallback")}
       className={className}
     />

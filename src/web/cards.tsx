@@ -1,16 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import {
-  CalendarDays,
-  CheckCircle2,
-  Clock,
-  Gift,
-  MapPin,
-  Package,
-  Shirt,
-  Store,
-} from "lucide-react";
+import { Icon } from "../icons/generated/web";
 
 import {
   competitionStatusLabel,
@@ -127,12 +118,12 @@ export function EventCard({
         </div>
         <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted">
           <span className="inline-flex items-center gap-1">
-            <CalendarDays className="size-3.5" aria-hidden />
+            <Icon name="calendar" size={14} />
             {dateLabel}
           </span>
           {placeLabel ? (
             <span className="inline-flex items-center gap-1">
-              <MapPin className="size-3.5" aria-hidden />
+              <Icon name="map-pin" size={14} />
               {placeLabel}
             </span>
           ) : null}
@@ -257,9 +248,9 @@ export function ProductCard({
             rounded="lg"
             fallbackIcon={
               digital ? (
-                <Gift strokeWidth={1.25} aria-hidden />
+                <Icon name="gift" strokeWidth={1.25} />
               ) : (
-                <Shirt strokeWidth={1.25} aria-hidden />
+                <Icon name="shirt" strokeWidth={1.25} />
               )
             }
             fallbackLabel="Visuel à venir"
@@ -282,7 +273,7 @@ export function ProductCard({
             {formatXaf(priceXaf)}
           </span>
           <span className="flex items-center gap-1 text-xs text-muted">
-            <Package className="size-3.5" aria-hidden />
+            <Icon name="package" size={14} />
             {soldOut ? "Épuisé" : "Voir"}
           </span>
         </div>
@@ -361,12 +352,12 @@ export function TicketCard({
 
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
         <span className="inline-flex items-center gap-1">
-          <CalendarDays className="size-3.5" aria-hidden />
+          <Icon name="calendar" size={14} />
           {dateLabel}
         </span>
         {city ? (
           <span className="inline-flex items-center gap-1">
-            <MapPin className="size-3.5" aria-hidden />
+            <Icon name="map-pin" size={14} />
             {city}
           </span>
         ) : null}
@@ -385,7 +376,7 @@ export function TicketCard({
             {admitted ? (
               <>
                 <span className="inline-flex items-center gap-1.5 font-semibold text-accent">
-                  <CheckCircle2 className="size-4" aria-hidden />
+                  <Icon name="check-circle" size={16} />
                   Déjà admis à l’entrée
                 </span>
                 {checkedInAtLabel ? (
@@ -450,7 +441,7 @@ export function SubscriptionCard({
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="flex min-w-0 flex-col">
           <span className="flex items-center gap-1.5 text-sm font-semibold">
-            <Store className="size-4 text-accent" aria-hidden />
+            <Icon name="store" size={16} className="text-accent" />
             {venueName}
           </span>
           <span className="text-xs text-muted">{planName}</span>
@@ -462,13 +453,13 @@ export function SubscriptionCard({
 
       <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-secondary">
         <span className="inline-flex items-center gap-1.5">
-          <Clock className="size-3.5 text-muted" aria-hidden />
+          <Icon name="clock" size={14} className="text-muted" />
           {remainingLabel}
         </span>
         <span>{expiresLabel ?? "Sans péremption"}</span>
         {city ? (
           <span className="inline-flex items-center gap-1.5">
-            <MapPin className="size-3.5 text-muted" aria-hidden />
+            <Icon name="map-pin" size={14} className="text-muted" />
             {city}
           </span>
         ) : null}

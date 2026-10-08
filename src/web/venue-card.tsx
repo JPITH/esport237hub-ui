@@ -1,4 +1,4 @@
-import { Building2, Clock, MapPin, Star } from "lucide-react";
+import { Icon } from "../icons/generated/web";
 
 import { Picture } from "./picture";
 import { formatRatingAverage, ratingCountLabel } from "../lib/rating";
@@ -66,7 +66,7 @@ export function VenueCard({
           />
         ) : (
           <div className="grid size-full place-items-center text-muted">
-            <Building2 className="size-12 opacity-30" strokeWidth={1.25} />
+            <Icon name="building" size={48} className="opacity-30" strokeWidth={1.25} />
           </div>
         )}
 
@@ -84,7 +84,7 @@ export function VenueCard({
                 : "bg-black/55 text-white/80"
             }`}
           >
-            <Clock className="size-3" />
+            <Icon name="clock" size={12} />
             {isOpen ? "Ouvert" : "Fermé"}
           </span>
         ) : null}
@@ -104,14 +104,14 @@ export function VenueCard({
               className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-gold"
               title={`${formatRatingAverage(ratingAvg)} sur 5 — ${ratingCountLabel(ratingCount)}`}
             >
-              <Star className="size-3.5" fill="currentColor" strokeWidth={1.5} />
+              <Icon name="star" size={14} filled strokeWidth={1.5} />
               {formatRatingAverage(ratingAvg)}
               <span className="font-normal text-muted">({ratingCount})</span>
             </span>
           ) : null}
         </div>
         <span className="inline-flex items-center gap-1 text-xs text-muted">
-          <MapPin className="size-3.5" />
+          <Icon name="map-pin" size={14} />
           {city}
           {district ? ` · ${district}` : ""}
         </span>
