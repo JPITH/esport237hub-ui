@@ -405,6 +405,7 @@ export {
   validateImageFile,
   ORDER_STATUS_TONE,
   orderStatusLabel,
+  orderStatusTone,
   EVENT_TYPE_LABEL,
   EVENT_TYPE_TONE,
   EVENT_STATUS_LABEL,

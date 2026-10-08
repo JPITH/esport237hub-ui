@@ -308,12 +308,17 @@ export function Avatar({
  * Marque « joueur vérifié » (icône G-HUB `badge-check`) — jumelle du web.
  * Elle manquait au natif : les écrans posaient l'icône à la main.
  */
+/**
+ * Badge « joueur vérifié » (identité confirmée en salle partenaire) — jumeau
+ * du web, et le seul du produit : vérifié est un ÉTAT acquis, donc `success`
+ * (émeraude), jamais l'accent ni le cyan (« en direct »).
+ */
 export function VerifiedMark({ size = 14 }: { size?: number }) {
   const c = useE237Colors();
   const t = useDsT();
   return (
     <Icon name="badge-check"
-      color={c.cyan}
+      color={c.success}
       size={size}
       accessibilityLabel={t('ui.player.verified')}
     />

@@ -5,20 +5,22 @@
 import type { OrderStatus } from '@esport237hub/types';
 import type { StyleProp, ViewStyle } from 'react-native';
 
-import { ORDER_STATUS_TONE, orderStatusLabel } from '../lib/order-status';
+import { orderStatusLabel, orderStatusTone } from '../lib/order-status';
 import { Badge } from './core';
 
 export interface OrderStatusBadgeProps {
   status: OrderStatus;
   /** Type de produit — change la lecture de `collected` (livrée / retirée). */
   kind?: string;
+  /** Libellé propre à un écran ; le TON reste celui de la table. */
+  label?: string;
   style?: StyleProp<ViewStyle>;
 }
 
-export function OrderStatusBadge({ status, kind, style }: OrderStatusBadgeProps) {
+export function OrderStatusBadge({ status, kind, label, style }: OrderStatusBadgeProps) {
   return (
-    <Badge tone={ORDER_STATUS_TONE[status] ?? 'neutral'} style={style}>
-      {orderStatusLabel(status, kind)}
+    <Badge tone={orderStatusTone(status)} style={style}>
+      {label ?? orderStatusLabel(status, kind)}
     </Badge>
   );
 }
