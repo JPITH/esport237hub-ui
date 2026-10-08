@@ -1,4 +1,12 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["src/tokens", "src/lib", "src/skins", "src/native"]
+  "include": [
+    "src/tokens",
+    "src/lib",
+    "src/skins",
+    "src/native",
+    "src/icons/names.ts",
+    "src/icons/generated/data.ts",
+    "src/icons/generated/native.tsx"
+  ]
 }

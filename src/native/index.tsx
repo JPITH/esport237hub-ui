@@ -367,3 +367,9 @@ export type {
   LiveStatus,
   RankMovement,
 } from '../lib';
+
+// Jeu d'icônes G-HUB — SVG maison, encre du thème (src/icons/README.md).
+export { Icon } from '../icons/generated/native';
+export type { IconProps } from '../icons/generated/native';
+export { ICON_NAMES } from '../icons/names';
+export type { IconName } from '../icons/names';

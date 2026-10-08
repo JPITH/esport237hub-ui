@@ -55,7 +55,9 @@ export type {
   FaqEntry,
   FeatureCardProps,
   GlyphProps,
-  IconName,
+  // `IconName` des glyphes marketing (Lucide) — renommé : `IconName` désigne
+  // désormais le jeu d'icônes G-HUB (`../icons`).
+  IconName as GlyphName,
   MarketingFooterColumn,
   MarketingFooterLink,
   MarketingFooterProps,
@@ -450,3 +452,9 @@ export type {
   LiveStatus,
   RankMovement,
 } from '../lib';
+
+// Jeu d'icônes G-HUB — SVG maison, encre `currentColor` (src/icons/README.md).
+export { Icon } from '../icons/generated/web';
+export type { IconProps } from '../icons/generated/web';
+export { ICON_NAMES } from '../icons/names';
+export type { IconName } from '../icons/names';
