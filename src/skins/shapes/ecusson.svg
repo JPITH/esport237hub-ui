@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Forme de carte G-HUB « Écusson » — source éditable.
+  Repère de la carte : 300 × 419,05 (ratio 63 × 88 mm), le même que geometry.ts.
+  Optimisée par `bun scripts/card-shapes.ts` (SVGO) vers generated.ts :
+  ne jamais éditer generated.ts à la main.
+
+  Éléments lus par le script (par id) :
+    #frame   silhouette complète = liseré ; sert aussi de découpe (reflet, verso)
+    #surface surface intérieure, retrait de 9 du liseré
+    #safe    zone sûre : le gabarit du contenu y est replacé
+    #sheen   boîte où le balayage « foil » peut courir sans sortir de la forme
+    #crest   point d'attache HAUT de la plaque jeu (milieu de son bord supérieur)
+    #footer  point d'attache BAS du pied de carte (milieu de son bord inférieur)
+  Les couleurs ci-dessous ne servent qu'à l'aperçu de ce fichier (rampes du
+  design system) : en production, le skin fournit les siennes.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 419.05" width="300" height="419.05">
+  <title>Écusson</title>
+  <desc>Écu héraldique : haut droit aux coins cassés, flancs droits, pointe arrondie.</desc>
+  <path id="frame" fill="#5fb21f" d="M10 0 L290 0 L300 10 L300 292 C300 374 238 403 150 419.05 C62 403 0 374 0 292 L0 10 Z"/>
+  <path id="surface" fill="#123100" d="M13.73 9 L286.27 9 L291 13.73 L291 292 C291 368.27 235.24 394.35 150 409.9 C64.76 394.35 9 368.27 9 292 L9 13.73 Z"/>
+  <rect id="safe" x="36" y="36.88" width="228" height="323.51" fill="none" stroke="#15c3dd" stroke-dasharray="4 3"/>
+  <rect id="sheen" x="0" y="10" width="300" height="282" fill="none" stroke="#caad34" stroke-dasharray="2 4"/>
+  <circle id="crest" cx="150" cy="5.03" r="3" fill="#e79d38"/>
+  <circle id="footer" cx="150" cy="390.55" r="3" fill="#e79d38"/>
+</svg>

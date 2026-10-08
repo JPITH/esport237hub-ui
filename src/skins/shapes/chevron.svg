@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Forme de carte G-HUB « Chevrons » — source éditable.
+  Repère de la carte : 300 × 419,05 (ratio 63 × 88 mm), le même que geometry.ts.
+  Optimisée par `bun scripts/card-shapes.ts` (SVGO) vers generated.ts :
+  ne jamais éditer generated.ts à la main.
+
+  Éléments lus par le script (par id) :
+    #frame   silhouette complète = liseré ; sert aussi de découpe (reflet, verso)
+    #surface surface intérieure, retrait de 9 du liseré
+    #safe    zone sûre : le gabarit du contenu y est replacé
+    #sheen   boîte où le balayage « foil » peut courir sans sortir de la forme
+    #crest   point d'attache HAUT de la plaque jeu (milieu de son bord supérieur)
+    #footer  point d'attache BAS du pied de carte (milieu de son bord inférieur)
+  Les couleurs ci-dessous ne servent qu'à l'aperçu de ce fichier (rampes du
+  design system) : en production, le skin fournit les siennes.
+
+  La plaque jeu descend dans le V (attache à 21) pour rester posée sur le liseré.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 419.05" width="300" height="419.05">
+  <title>Chevrons</title>
+  <desc>Haut en V rentrant, bas en pointe : la silhouette d’un galon de grade.</desc>
+  <path id="frame" fill="#5fb21f" d="M0 0 L150 30 L300 0 L300 389.05 L150 419.05 L0 389.05 Z"/>
+  <path id="surface" fill="#123100" d="M9 10.98 L150 39.18 L291 10.98 L291 381.67 L150 409.87 L9 381.67 Z"/>
+  <rect id="safe" x="36" y="46" width="228" height="316" fill="none" stroke="#15c3dd" stroke-dasharray="4 3"/>
+  <rect id="sheen" x="0" y="30" width="300" height="359.05" fill="none" stroke="#caad34" stroke-dasharray="2 4"/>
+  <circle id="crest" cx="150" cy="21" r="3" fill="#e79d38"/>
+  <circle id="footer" cx="150" cy="396" r="3" fill="#e79d38"/>
+</svg>

@@ -8,9 +8,10 @@
  */
 import { useId } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import Svg, { Defs, LinearGradient, Polygon, Stop } from 'react-native-svg';
+import Svg, { Defs, LinearGradient, Path, Polygon, Stop } from 'react-native-svg';
 
 import { useDsT } from '../i18n';
+import { CARD_BASE_WIDTH, CARD_REF_HEIGHT, cardShape } from '../skins/geometry';
 import { stopColor } from '../skins/spec';
 import { useSkin } from '../skins/context';
 
@@ -59,6 +60,9 @@ export function SkinSwatch({
   /* Ids uniques par vignette : deux rails de skins sur un même écran
      partageraient sinon leurs dégradés. */
   const uid = `sw${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
+  /* Un skin de FORME montre sa vraie silhouette (c'est ce qu'on achète) ; le
+     bouclier garde la vignette simplifiée, lisible à 34 px. */
+  const shape = cardShape(spec.shape);
 
   return (
     <Pressable
@@ -104,8 +108,22 @@ export function SkinSwatch({
               ))}
             </LinearGradient>
           </Defs>
-          <Polygon points={swatchPoints(width, height)} fill={`url(#${uid}-frame)`} />
-          <Polygon points={swatchPoints(width, height, 0.12)} fill={`url(#${uid}-bg)`} />
+          {shape.clipUnit ? (
+            <Svg
+              width={width}
+              height={height}
+              viewBox={`0 0 ${CARD_BASE_WIDTH} ${CARD_REF_HEIGHT}`}
+              preserveAspectRatio="none"
+            >
+              <Path d={shape.framePath} fill={`url(#${uid}-frame)`} />
+              <Path d={shape.surfacePath} fill={`url(#${uid}-bg)`} />
+            </Svg>
+          ) : (
+            <>
+              <Polygon points={swatchPoints(width, height)} fill={`url(#${uid}-frame)`} />
+              <Polygon points={swatchPoints(width, height, 0.12)} fill={`url(#${uid}-bg)`} />
+            </>
+          )}
         </Svg>
 
         {locked ? (

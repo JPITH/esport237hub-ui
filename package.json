@@ -31,7 +31,9 @@
     "lint": "bun scripts/tsc7.ts -p tsconfig.web.json --noEmit",
     "test": "bun test src",
     "icons": "bun scripts/icons.ts",
-    "icons:check": "bun scripts/icons.ts --check"
+    "icons:check": "bun scripts/icons.ts --check",
+    "shapes": "bun scripts/card-shapes.ts",
+    "shapes:check": "bun scripts/card-shapes.ts --check"
   },
   "dependencies": {
     "@astryxdesign/core": "0.1.8",

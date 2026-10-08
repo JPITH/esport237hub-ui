@@ -131,6 +131,7 @@ export type { MediaImageProps, MediaRounded } from './media-image';
 
 export {
   PlayerCard,
+  PlayerCardBack,
   PREMIUM_SKINS,
   SKIN_LABELS,
 } from './player-card';
@@ -164,6 +165,11 @@ export {
   stopColor,
   skinAnimated,
   buildSkinDraw,
+  CARD_SHAPE_NAMES,
+  DEFAULT_CARD_SHAPE,
+  isCardShapeName,
+  cardShape,
+  cardShapes,
 } from '../skins';
 export type {
   SkinSpec,
@@ -171,6 +177,8 @@ export type {
   SkinStripePattern,
   BuiltinSkinKey,
   SkinDraw,
+  CardShapeName,
+  CardShapeGeometry,
 } from '../skins';
 export { SkinCatalogProvider, useSkin, useSkinCatalog, useSkins } from '../skins/context';
 export type { SkinCatalog, SkinCatalogProviderProps } from '../skins/context';

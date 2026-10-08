@@ -36,7 +36,7 @@ import Svg, {
   G,
   Line,
   LinearGradient,
-  Polygon,
+  Path,
   RadialGradient,
   Rect,
   Stop,
@@ -47,7 +47,9 @@ import {
   CARD_BASE_WIDTH,
   buildSkinDraw,
   cardScale,
+  cardShape,
   skinAnimated,
+  type CardShapeGeometry,
   type DrawSheen,
   type SkinDraw,
 } from '../skins/geometry';
@@ -101,6 +103,16 @@ export function useCardScale(): number {
 }
 
 /**
+ * Forme de la carte en cours de rendu — fournie par CardChrome, lue par les
+ * gabarits du recto et du verso (zone sûre, ancrages de la plaque et du pied).
+ * Hors carte : le bouclier, donc le gabarit historique.
+ */
+const CardShapeContext = createContext<CardShapeGeometry>(cardShape());
+export function useCardShape(): CardShapeGeometry {
+  return useContext(CardShapeContext);
+}
+
+/**
  * Balayage « foil » périodique (premium) — transform only, donc quasi gratuit
  * même sur un Android d'entrée de gamme.
  *
@@ -111,9 +123,16 @@ export function useCardScale(): number {
  */
 function Sheen({ sheen, width }: { sheen: DrawSheen; width: number }) {
   const scale = width > 0 ? width / CARD_BASE_WIDTH : 0;
+  /* Hors bouclier, la forme déclare une boîte inscrite dans sa silhouette :
+     la bande y court, découpée par un `overflow: hidden` rectangulaire — le
+     seul découpage qu'une vue animée sache faire sans MaskedView. */
+  const boxed = sheen.left > 0 || sheen.boxWidth < CARD_BASE_WIDTH;
   const from = sheen.from * scale;
   const to = sheen.to * scale;
   const x = useSharedValue(from);
+  /* Un id par instance : sur le web, les ids SVG sont globaux au document et
+     deux cartes premium de skins différents prendraient le même dégradé. */
+  const gradientId = `pcs${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
 
   useEffect(() => {
     if (scale === 0) return;
@@ -138,7 +157,7 @@ function Sheen({ sheen, width }: { sheen: DrawSheen; width: number }) {
 
   if (scale === 0) return null;
 
-  return (
+  const band = (
     <Animated.View
       pointerEvents="none"
       style={[
@@ -154,15 +173,30 @@ function Sheen({ sheen, width }: { sheen: DrawSheen; width: number }) {
       ]}>
       <Svg width="100%" height="100%" style={{ transform: [{ skewX: `${sheen.skewDeg}deg` }] }}>
         <Defs>
-          <LinearGradient id="pc-sheen" x1="0" y1="0" x2="1" y2="0">
+          <LinearGradient id={gradientId} x1="0" y1="0" x2="1" y2="0">
             <Stop offset="0" stopColor={sheen.color} stopOpacity={0} />
             <Stop offset="0.5" stopColor={sheen.color} stopOpacity={sheen.opacity} />
             <Stop offset="1" stopColor={sheen.color} stopOpacity={0} />
           </LinearGradient>
         </Defs>
-        <Rect width="100%" height="100%" fill="url(#pc-sheen)" />
+        <Rect width="100%" height="100%" fill={`url(#${gradientId})`} />
       </Svg>
     </Animated.View>
+  );
+  if (!boxed) return band;
+  return (
+    <View
+      pointerEvents="none"
+      style={{
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        left: sheen.left * scale,
+        width: sheen.boxWidth * scale,
+        overflow: 'hidden',
+      }}>
+      {band}
+    </View>
   );
 }
 
@@ -207,13 +241,13 @@ function CardArtwork({ draw }: { draw: SkinDraw }) {
           </RadialGradient>
         ))}
         <ClipPath id={draw.clipId}>
-          <Polygon points={draw.surfacePoints} />
+          <Path d={draw.surfacePath} />
         </ClipPath>
       </Defs>
 
-      {/* Liseré extérieur puis surface intérieure. */}
-      <Polygon points={draw.framePoints} fill={`url(#${draw.frame.id})`} />
-      <Polygon points={draw.surfacePoints} fill={`url(#${draw.surface.id})`} />
+      {/* Liseré extérieur puis surface intérieure — la forme du skin. */}
+      <Path d={draw.framePath} fill={`url(#${draw.frame.id})`} />
+      <Path d={draw.surfacePath} fill={`url(#${draw.surface.id})`} />
 
       {/* Halos et rayures, bornés à la surface. */}
       <G clipPath={`url(#${draw.clipId})`}>
@@ -235,7 +269,7 @@ function CardArtwork({ draw }: { draw: SkinDraw }) {
       </G>
 
       {/* Anneau intérieur brillant. */}
-      <Polygon points={draw.surfacePoints} fill="none" stroke={draw.inner} />
+      <Path d={draw.surfacePath} fill="none" stroke={draw.inner} />
     </Svg>
   );
 }
@@ -276,6 +310,7 @@ export function CardChrome({
   const uid = `pc${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
 
   const draw = useMemo(() => buildSkinDraw(spec, uid), [spec, uid]);
+  const shape = cardShape(spec.shape);
   const showSheen = skinAnimated(spec, animated);
   const k = width > 0 ? cardScale(width) : 1;
 
@@ -286,11 +321,14 @@ export function CardChrome({
       <CardArtwork draw={draw} />
       {draw.sheen && showSheen ? <Sheen sheen={draw.sheen} width={width} /> : null}
 
-      <CardScaleContext.Provider value={k}>
-        {/* Aucun padding : les blocs se positionnent en pourcentages depuis
-            CARD_LAYOUT, exactement comme les règles `.pcard__*` du web. */}
-        <View style={styles.content}>{children}</View>
-      </CardScaleContext.Provider>
+      <CardShapeContext.Provider value={shape}>
+        <CardScaleContext.Provider value={k}>
+          {/* Aucun padding : les blocs se positionnent en pourcentages depuis
+              le gabarit de la forme, exactement comme les règles `.pcard__*`
+              du web. */}
+          <View style={styles.content}>{children}</View>
+        </CardScaleContext.Provider>
+      </CardShapeContext.Provider>
     </View>
   );
 }

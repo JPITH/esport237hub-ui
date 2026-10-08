@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Forme de carte G-HUB « Bouclier » — source éditable.
+  Repère de la carte : 300 × 419,05 (ratio 63 × 88 mm), le même que geometry.ts.
+  Optimisée par `bun scripts/card-shapes.ts` (SVGO) vers generated.ts :
+  ne jamais éditer generated.ts à la main.
+
+  Éléments lus par le script (par id) :
+    #frame   silhouette complète = liseré ; sert aussi de découpe (reflet, verso)
+    #surface surface intérieure, retrait de 9 du liseré
+    #safe    zone sûre : le gabarit du contenu y est replacé
+    #sheen   boîte où le balayage « foil » peut courir sans sortir de la forme
+    #crest   point d'attache HAUT de la plaque jeu (milieu de son bord supérieur)
+    #footer  point d'attache BAS du pied de carte (milieu de son bord inférieur)
+  Les couleurs ci-dessous ne servent qu'à l'aperçu de ce fichier (rampes du
+  design system) : en production, le skin fournit les siennes.
+
+  Forme PAR DÉFAUT. Au rendu, le bouclier reste calculé depuis CARD_SHAPE
+  (geometry.ts) pour rester identique au pixel près aux cartes existantes ;
+  ce fichier en est la transcription, vérifiée par les tests.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 419.05" width="300" height="419.05">
+  <title>Bouclier</title>
+  <desc>Bouclier crénelé « Founders » — la forme historique et la forme par défaut.</desc>
+  <path id="frame" fill="#5fb21f" d="M48 12.57 L114 4.19 L150 16.76 L186 4.19 L252 12.57 L288 46.1 L294 305.91 L270 368.76 L150 419.05 L30 368.76 L6 305.91 L12 46.1 Z"/>
+  <path id="surface" fill="#123100" d="M53.71 23.6 L116.02 15.69 L150 27.56 L183.98 15.69 L246.29 23.6 L280.27 55.25 L285.94 300.51 L263.28 359.85 L150 407.32 L36.72 359.85 L14.06 300.51 L19.73 55.25 Z"/>
+  <rect id="safe" x="36" y="36.88" width="228" height="323.51" fill="none" stroke="#15c3dd" stroke-dasharray="4 3"/>
+  <rect id="sheen" x="0" y="33.52" width="300" height="335.24" fill="none" stroke="#caad34" stroke-dasharray="2 4"/>
+  <circle id="crest" cx="150" cy="5.03" r="3" fill="#e79d38"/>
+  <circle id="footer" cx="150" cy="390.55" r="3" fill="#e79d38"/>
+</svg>

@@ -61,13 +61,13 @@ function CardArtwork({ draw }: { draw: SkinDraw }) {
           </radialGradient>
         ))}
         <clipPath id={draw.clipId}>
-          <polygon points={draw.surfacePoints} />
+          <path d={draw.surfacePath} />
         </clipPath>
       </defs>
 
-      {/* Liseré extérieur puis surface intérieure. */}
-      <polygon points={draw.framePoints} fill={`url(#${draw.frame.id})`} />
-      <polygon points={draw.surfacePoints} fill={`url(#${draw.surface.id})`} />
+      {/* Liseré extérieur puis surface intérieure — la forme du skin. */}
+      <path d={draw.framePath} fill={`url(#${draw.frame.id})`} />
+      <path d={draw.surfacePath} fill={`url(#${draw.surface.id})`} />
 
       {/* Halos et rayures, bornés à la surface. */}
       <g clipPath={`url(#${draw.clipId})`}>
@@ -89,7 +89,7 @@ function CardArtwork({ draw }: { draw: SkinDraw }) {
       </g>
 
       {/* Anneau intérieur brillant. */}
-      <polygon points={draw.surfacePoints} fill="none" stroke={draw.inner} />
+      <path d={draw.surfacePath} fill="none" stroke={draw.inner} />
     </svg>
   );
 }
@@ -114,6 +114,17 @@ function CardSheen({ draw }: { draw: SkinDraw }) {
     "--pc-sheen-duration": `${sheen.periodMs}ms`,
     top: `${((sheen.top / draw.height) * 100).toFixed(2)}%`,
     height: `${((sheen.height / draw.height) * 100).toFixed(2)}%`,
+    /* Hors bouclier, la bande court dans la boîte que la forme déclare
+       (inscrite dans la silhouette) ; le bouclier garde sa pleine largeur. */
+    ...(sheen.left > 0 || sheen.boxWidth < draw.width
+      ? {
+          left: pct(sheen.left),
+          right: pct(draw.width - sheen.left - sheen.boxWidth),
+          "--pc-sheen-width": pct((sheen.width / sheen.boxWidth) * draw.width),
+          "--pc-sheen-from": pct((sheen.from / sheen.boxWidth) * draw.width),
+          "--pc-sheen-to": pct((sheen.to / sheen.boxWidth) * draw.width),
+        }
+      : null),
   } as CSSProperties;
 
   return <span className="pcard__sheen" style={style} aria-hidden />;

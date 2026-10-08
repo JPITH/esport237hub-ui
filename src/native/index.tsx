@@ -129,6 +129,7 @@ export {
   CardSlot,
   PREMIUM_SKINS,
   useCardScale,
+  useCardShape,
 } from './card-skins';
 export type { CardSkin, CardSkinInput, CardChromeProps } from './card-skins';
 
@@ -152,6 +153,11 @@ export {
   skinAnimated,
   cardScale,
   buildSkinDraw,
+  CARD_SHAPE_NAMES,
+  DEFAULT_CARD_SHAPE,
+  isCardShapeName,
+  cardShape,
+  cardShapes,
 } from '../skins';
 export type {
   SkinSpec,
@@ -159,6 +165,8 @@ export type {
   SkinStripePattern,
   BuiltinSkinKey,
   SkinDraw,
+  CardShapeName,
+  CardShapeGeometry,
 } from '../skins';
 export { SkinCatalogProvider, useSkin, useSkinCatalog, useSkins } from '../skins/context';
 export type { SkinCatalog, SkinCatalogProviderProps } from '../skins/context';

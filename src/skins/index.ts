@@ -66,8 +66,18 @@ export {
   shapeClipPath,
   buildSkinDraw,
   skinAnimated,
+  CARD_SHAPE_NAMES,
+  DEFAULT_CARD_SHAPE,
+  isCardShapeName,
+  cardShape,
+  cardShapes,
 } from './geometry';
 export type {
+  CardShapeName,
+  CardShapeGeometry,
+  CardLayout,
+  CardBackLayout,
+  ShapeBox,
   SkinDraw,
   DrawStop,
   DrawLinear,
