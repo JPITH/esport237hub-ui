@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Crown, Loader2, Radio, RefreshCw, WifiOff } from "lucide-react";
+import { Icon } from "../icons/generated/web";
 
 import {
   LIVE_STATUS_LABEL,
@@ -52,7 +52,7 @@ export function LiveBar({
 }: LiveBarProps) {
   const live = status === "live";
   const connecting = status === "connecting";
-  const Icon = live ? Radio : connecting ? Loader2 : WifiOff;
+  const icon = live ? "radio" : connecting ? "loader" : "wifi-off";
 
   return (
     <div
@@ -68,8 +68,9 @@ export function LiveBar({
           ].join(" ")}
         >
           <Icon
-            className={`size-3.5 ${connecting ? "animate-spin" : ""}`}
-            aria-hidden
+            name={icon}
+            size={14}
+            className={connecting ? "animate-spin" : ""}
           />
           {LIVE_STATUS_LABEL[status]}
         </span>
@@ -85,9 +86,9 @@ export function LiveBar({
         onClick={onRefresh}
         disabled={refreshing}
       >
-        <RefreshCw
+        <Icon
+          name="refresh"
           className={`size-4 ${refreshing ? "animate-spin" : ""}`}
-          aria-hidden
         />
       </IconButton>
     </div>
@@ -225,7 +226,7 @@ export function ChampionSpotlight({
       className={`flex flex-col items-center gap-3 rounded-2xl border border-gold/30 bg-gold/5 p-5 ${className}`.trim()}
     >
       <div className="flex items-center gap-2 text-gold">
-        <Crown className="size-5" aria-hidden />
+        <Icon name="crown" size={20} />
         <span className="font-display text-sm font-bold uppercase tracking-wider">
           Champion{subtitle ? ` · ${subtitle}` : ""}
         </span>

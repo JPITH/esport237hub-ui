@@ -8,15 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import {
-  CalendarDays,
-  Check,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  Clock,
-  Search,
-} from "lucide-react";
+import { Icon } from "../icons/generated/web";
 
 import { useDsT, type DsKey } from "../i18n";
 
@@ -121,7 +113,7 @@ function OptionRow({
       } ${active ? "font-semibold text-accent" : "text-primary"}`}
     >
       <span className="truncate">{children}</span>
-      {active ? <Check className="size-4 shrink-0" /> : null}
+      {active ? <Icon name="check" size={16} className="shrink-0" /> : null}
     </button>
   );
 }
@@ -217,7 +209,8 @@ function PickerTrigger({
         {text}
       </span>
       {list ? (
-        <ChevronDown
+        <Icon
+          name="chevron-down"
           className={`size-4 shrink-0 text-muted transition-transform ${
             open ? "rotate-180" : ""
           }`}
@@ -462,7 +455,7 @@ export function Combobox({
               (fond teinté + bordure interne, aucun ring qui déborde). */}
           <div className="border-b border-edge p-2">
             <div className="flex items-center gap-2 rounded-lg border border-edge bg-raised px-2.5 transition-colors focus-within:border-accent">
-              <Search className="size-4 shrink-0 text-muted" />
+              <Icon name="search" size={16} className="shrink-0 text-muted" />
               <input
                 ref={inputRef}
                 value={query}
@@ -598,7 +591,7 @@ export function DatePicker({
         required={required}
         open={open}
         onClick={() => setOpen((o) => !o)}
-        leading={<CalendarDays className="size-[18px] shrink-0 text-muted" />}
+        leading={<Icon name="calendar" size={18} className="shrink-0 text-muted" />}
         text={display ?? fieldPlaceholder}
         empty={!display}
       />
@@ -612,7 +605,7 @@ export function DatePicker({
               onClick={() => shift(-1)}
               className="grid size-8 place-items-center rounded-md text-secondary transition-colors hover:bg-raised hover:text-primary"
             >
-              <ChevronLeft className="size-4" />
+              <Icon name="chevron-left" size={16} />
             </button>
             <span className="text-sm font-semibold">
               {MONTHS[view.m]} <span className="scoreboard">{view.y}</span>
@@ -623,7 +616,7 @@ export function DatePicker({
               onClick={() => shift(1)}
               className="grid size-8 place-items-center rounded-md text-secondary transition-colors hover:bg-raised hover:text-primary"
             >
-              <ChevronRight className="size-4" />
+              <Icon name="chevron-right" size={16} />
             </button>
           </div>
 
@@ -756,7 +749,7 @@ export function TimePicker({
         required={required}
         open={open}
         onClick={() => setOpen((o) => !o)}
-        leading={<Clock className="size-[18px] shrink-0 text-muted" />}
+        leading={<Icon name="clock" size={18} className="shrink-0 text-muted" />}
         text={value ?? placeholder}
         empty={!value}
         textClassName="scoreboard"

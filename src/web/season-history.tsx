@@ -1,6 +1,6 @@
 "use client";
 
-import { Trophy } from "lucide-react";
+import { Icon } from "../icons/generated/web";
 
 import {
   ROLLOVER_OUTCOME_LABEL,
@@ -102,7 +102,7 @@ export function SeasonHistory({
             ) : null}
 
             <span className="inline-flex items-center gap-1.5 text-sm">
-              <Trophy aria-hidden className="size-3.5 text-gold" />
+              <Icon name="trophy" size={14} className="text-gold" />
               <span className="scoreboard">
                 {seasonResultLabel(entry.state, entry.finalPosition)}
               </span>

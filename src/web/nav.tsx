@@ -8,7 +8,7 @@ import {
   type ComponentType,
   type ReactNode,
 } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Icon } from "../icons/generated/web";
 
 export interface TabDef<T extends string> {
   value: T;
@@ -242,7 +242,7 @@ export function Pagination({
         disabled={page <= 1}
         aria-label="Page précédente"
       >
-        <ChevronLeft className="size-[18px]" />
+        <Icon name="chevron-left" size={18} />
       </button>
 
       {pages.map((p, i) =>
@@ -274,7 +274,7 @@ export function Pagination({
         disabled={page >= pageCount}
         aria-label="Page suivante"
       >
-        <ChevronRight className="size-[18px]" />
+        <Icon name="chevron-right" size={18} />
       </button>
     </nav>
   );

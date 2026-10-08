@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarClock, Info } from "lucide-react";
+import { Icon } from "../icons/generated/web";
 
 import { useDsT, type DsKey } from "../i18n";
 import {
@@ -75,7 +75,7 @@ export function SeasonBanner({
       className={`flex flex-col gap-2 rounded-xl border border-edge bg-surface p-3.5 ${className}`.trim()}
     >
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <CalendarClock aria-hidden className="size-4 shrink-0 text-accent" />
+        <Icon name="calendar-clock" size={16} className="shrink-0 text-accent" />
         <span className="font-display text-sm font-bold">{season.name}</span>
         <span className="rounded-full bg-raised px-2 py-0.5 text-[11px] font-semibold text-secondary">
           {stateKey ? t(stateKey) : season.state}
@@ -105,7 +105,7 @@ export function SeasonBanner({
 
       {todo ? (
         <p className="flex items-start gap-1.5 rounded-md bg-warning/10 p-2 text-xs text-warning">
-          <Info aria-hidden className="mt-px size-3.5 shrink-0" />
+          <Icon name="info" size={14} className="mt-px shrink-0" />
           {todo}
         </p>
       ) : null}

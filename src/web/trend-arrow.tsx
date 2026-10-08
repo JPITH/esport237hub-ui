@@ -1,4 +1,5 @@
-import { ArrowDown, ArrowUp, Minus } from "lucide-react";
+import { Icon } from "../icons/generated/web";
+import type { IconName } from "../icons/names";
 
 /** Sens du mouvement au classement. */
 export type TrendMovement = "up" | "down" | "same";
@@ -31,7 +32,7 @@ export function formatDelta(movement: TrendMovement, delta: number): string {
 /**
  * Flèche de mouvement au classement : haute VERTE (accent) si le joueur
  * monte, basse ROUGE (danger) s'il descend, tiret discret (textMuted) s'il
- * ne bouge pas. Icônes Lucide — jamais d'emoji.
+ * ne bouge pas. Icônes du jeu G-HUB — jamais d'emoji.
  */
 export function TrendArrow({
   movement,
@@ -40,8 +41,8 @@ export function TrendArrow({
   label,
   className = "",
 }: TrendArrowProps) {
-  const Icon =
-    movement === "up" ? ArrowUp : movement === "down" ? ArrowDown : Minus;
+  const icon: IconName =
+    movement === "up" ? "arrow-up" : movement === "down" ? "arrow-down" : "minus";
   const text = MOVEMENT_LABEL[movement];
   const full =
     label ??
@@ -53,7 +54,7 @@ export function TrendArrow({
       aria-label={full}
       title={full}
     >
-      <Icon aria-hidden width={size} height={size} strokeWidth={2.5} />
+      <Icon name={icon} size={size} strokeWidth={2.5} />
       {delta != null ? (
         <span className="e237-trend__delta">{formatDelta(movement, delta)}</span>
       ) : null}

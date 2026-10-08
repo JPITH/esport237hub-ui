@@ -1,7 +1,8 @@
 # Icônes G-HUB
 
-Le jeu d'icônes maison de G-HUB : 108 pictogrammes SVG dessinés à la main dans
-la direction artistique du produit, qui remplacent Lucide dans l'app mobile.
+Le jeu d'icônes maison de G-HUB : 143 pictogrammes SVG dessinés à la main dans
+la direction artistique du produit, qui remplacent Lucide partout : l'app
+mobile, le tableau de bord web et le site vitrine (registre `Glyph`).
 Une seule source (les tracés de `svg/*.svg`), deux rendus (`<svg>` en ligne
 sur le web, `react-native-svg` en natif), aucune couleur en dur.
 
@@ -82,8 +83,9 @@ hex, `rgb()`, nom de couleur, raster, `<image>`, `<use>`, `<style>` ou lien.
 4. Planche de contrôle (normal + actif, 16 / 24 / 32 px, clair et sombre,
    encres des jetons) : `bun scripts/icons.ts --sheet planche.html`.
 
-Poids : 108 sources, **47 862 → 36 521 octets** après SVGO (−24 %) ;
-`generated/data.ts` (la donnée embarquée par l'app) pèse ~16 Ko.
+Poids : 143 sources, **47 493 octets** optimisés par SVGO (les 108 premières :
+47 862 → 36 521 octets, −24 %), budget du test : 48 Ko ;
+`generated/data.ts` (la donnée embarquée par l'app) pèse ~20 Ko.
 
 ## Correspondance avec Lucide
 
@@ -124,3 +126,24 @@ composants (`Record<…, LucideIcon>`) stocke des noms (`Record<…, IconName>`)
 | `LayoutGrid` / `Inbox` | `layout-grid` / `inbox` | `BarChart3` / `Newspaper` | `bar-chart` / `newspaper` |
 | `Package` | `package` (commande) | `MailCheck` / `Lightbulb` / `Hand` / `Scale` | `mail-check` / `lightbulb` / `hand` / `scale` |
 | — | `flame` | | |
+
+Ajoutées pour le web et la vitrine (octobre 2026), dans la même grammaire :
+
+| Lucide | G-HUB | Lucide | G-HUB |
+|---|---|---|---|
+| `Activity` | `activity` (activité, pouls) | `ArrowDownRight` | `arrow-down-right` |
+| `CalendarCheck` / `CalendarPlus` | `calendar-check` / `calendar-plus` | `ChartColumn` / `ChartNoAxesColumn` | `bar-chart` |
+| `Coins` | `coins` (argent, paiement — pas les G-Points) | `Copy` | `copy` |
+| `DoorClosed` / `DoorOpen` | `door-closed` / `door-open` (inscriptions) | `Download` / `ExternalLink` | `download` / `external-link` |
+| `Gauge` | `gauge` (plafond, tableau de bord) | `Gavel` | `gavel` (modération, litige) |
+| `Handshake` | `handshake` (partenariat) | `Languages` | `languages` |
+| `ListChecks` | `list-checks` | `Loader2` | `loader` (avec `animate-spin`) |
+| `LogIn` | `log-in` | `Mail` | `mail` |
+| `Maximize2` | `maximize` | `MonitorPlay` / `Video` | `monitor-play` / `video` |
+| `Moon` / `Sun` | `moon` / `sun` (thème) | `PackageCheck` | `package-check` |
+| `Palette` | `palette` (skins) | `Play` / `Pause` | `play` / `pause` |
+| `Percent` | `percent` | `Radar` | `radar` (trouver des adversaires) |
+| `Save` | `save` | `ScrollText` | `scroll` (journal, règlement) |
+| `Shuffle` | `shuffle` (tirage) | `Square` (bouton d'arrêt) | `stop` |
+| `TrendingUp` | `trending-up` | `Undo2` | `undo` (lever, annuler) |
+| `Settings2` | `settings` | `TriangleAlert` / `House` / `User` | `alert-triangle` / `home` / `user` |

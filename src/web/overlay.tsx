@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
-import { X } from "lucide-react";
+import { Icon } from "../icons/generated/web";
 
 import { IconButton } from "./button";
 
@@ -88,7 +88,7 @@ export function Modal({
                 ) : null}
               </div>
               <IconButton label="Fermer" onClick={onClose}>
-                <X />
+                <Icon name="x" />
               </IconButton>
             </div>
           ) : null}
@@ -137,7 +137,7 @@ export function Drawer({
         <div className="flex items-center justify-between gap-4 border-b border-edge px-5 py-4">
           <h2 className="text-base font-bold">{title}</h2>
           <IconButton label="Fermer" onClick={onClose}>
-            <X />
+            <Icon name="x" />
           </IconButton>
         </div>
         <div className="flex-1 overflow-y-auto px-5 py-4">{children}</div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, type ReactNode } from "react";
-import { Check } from "lucide-react";
+import { Icon } from "../icons/generated/web";
 
 import { Badge } from "./foundation";
 
@@ -29,7 +29,7 @@ export interface CheckboxProps {
  * la main — donc une coche dont le rendu variait d'un navigateur à l'autre et
  * une classe utilitaire recopiée à chaque champ. Ici l'input reste le
  * contrôle réel (clavier, formulaire, lecteurs d'écran) mais il est masqué
- * visuellement : la coche est une icône Lucide sur une boîte aux tokens.
+ * visuellement : la coche est une icône G-HUB sur une boîte aux tokens.
  */
 export function Checkbox({
   checked,
@@ -61,7 +61,7 @@ export function Checkbox({
               : "border-edge bg-surface text-transparent"
           } ${disabled ? "opacity-50" : ""}`}
         >
-          <Check className="size-3" strokeWidth={3} />
+          <Icon name="check" size={12} strokeWidth={3} />
         </span>
       </span>
       <label

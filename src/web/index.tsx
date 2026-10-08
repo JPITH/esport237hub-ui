@@ -55,7 +55,7 @@ export type {
   FaqEntry,
   FeatureCardProps,
   GlyphProps,
-  // `IconName` des glyphes marketing (Lucide) — renommé : `IconName` désigne
+  // `IconName` des glyphes marketing (noms historiques) — renommé : `IconName` désigne
   // désormais le jeu d'icônes G-HUB (`../icons`).
   IconName as GlyphName,
   MarketingFooterColumn,

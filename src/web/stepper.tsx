@@ -1,6 +1,6 @@
 "use client";
 
-import { Check } from "lucide-react";
+import { Icon } from "../icons/generated/web";
 
 import { useDsT } from "../i18n";
 
@@ -44,7 +44,7 @@ export function Stepper({ steps, currentStep, className = "" }: StepperProps) {
                       : "border-edge bg-raised/60 text-muted"
                 }`}
               >
-                {done ? <Check className="size-4" aria-hidden /> : index + 1}
+                {done ? <Icon name="check" size={16} /> : index + 1}
               </span>
               <span
                 className={`max-w-[5.5rem] truncate text-center text-[11px] leading-tight ${
