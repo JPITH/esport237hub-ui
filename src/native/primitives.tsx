@@ -2,7 +2,6 @@
  * Primitives d'interface native (sans composites API).
  * Couleurs via useE237Colors() — light et dark (DESIGN.md).
  */
-import { AlertCircle, BadgeCheck, Inbox } from 'lucide-react-native';
 import { useEffect, useState, type ComponentType, type ReactNode } from 'react';
 import {
   Image,
@@ -36,6 +35,7 @@ import { dsLocale, useDsT } from '../i18n';
 import { initials } from '../lib/initials';
 import { haptic } from './haptics';
 import { Txt } from './text';
+import { Icon } from '../icons/generated/native';
 
 export { Field, Textarea, PhoneField, Stepper, SearchField } from './fields';
 
@@ -111,7 +111,7 @@ export function ErrorNote({ message }: { message: string }) {
         { backgroundColor: `${c.danger}18`, borderColor: `${c.danger}66` },
       ]}
     >
-      <AlertCircle color={c.danger} size={16} />
+      <Icon name="alert-circle" color={c.danger} size={16} />
       <Txt selectable variant="body" tone="danger" style={{ flex: 1 }}>
         {message}
       </Txt>
@@ -123,7 +123,7 @@ export function EmptyState({ children }: { children: ReactNode }) {
   const c = useE237Colors();
   return (
     <View style={[styles.empty, { borderColor: c.border }]}>
-      <Inbox color={c.textMuted} size={22} />
+      <Icon name="inbox" color={c.textMuted} size={22} />
       <Txt variant="body" tone="secondary" align="center">
         {children}
       </Txt>
@@ -305,14 +305,14 @@ export function Avatar({
 }
 
 /**
- * Marque « joueur vérifié » (icône Lucide BadgeCheck) — jumelle du web.
+ * Marque « joueur vérifié » (icône G-HUB `badge-check`) — jumelle du web.
  * Elle manquait au natif : les écrans posaient l'icône à la main.
  */
 export function VerifiedMark({ size = 14 }: { size?: number }) {
   const c = useE237Colors();
   const t = useDsT();
   return (
-    <BadgeCheck
+    <Icon name="badge-check"
       color={c.cyan}
       size={size}
       accessibilityLabel={t('ui.player.verified')}

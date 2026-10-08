@@ -2,36 +2,31 @@
  * Encart d'information teinté (natif) — jumeau de `./web/notice`.
  * Généralise l'`ErrorNote` à tous les tons sémantiques.
  */
-import {
-  AlertTriangle,
-  CheckCircle2,
-  Info,
-  Lightbulb,
-  type LucideIcon,
-} from 'lucide-react-native';
 import type { ReactNode } from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import type { Tone } from '../lib/tone';
 import { radius, spacing, useE237Colors, useToneColor, useToneSurface } from './core';
 import { Txt } from './text';
+import { Icon } from '../icons/generated/native';
+import type { IconName } from '../icons/names';
 
 /** Icône par défaut de chaque ton — jamais d'emoji (règle DESIGN.md). */
-const DEFAULT_ICON: Record<Tone, LucideIcon> = {
-  accent: CheckCircle2,
-  cyan: Info,
-  success: CheckCircle2,
-  info: Info,
-  gold: Lightbulb,
-  danger: AlertTriangle,
-  warning: AlertTriangle,
-  neutral: Info,
+const DEFAULT_ICON: Record<Tone, IconName> = {
+  accent: 'check-circle',
+  cyan: 'info',
+  success: 'check-circle',
+  info: 'info',
+  gold: 'lightbulb',
+  danger: 'alert-triangle',
+  warning: 'alert-triangle',
+  neutral: 'info',
 };
 
 export interface NoticeProps {
   /** Teinte sémantique — `danger` reproduit exactement l'`ErrorNote`. */
   tone?: Tone;
-  /** Icône Lucide personnalisée ; `null` pour aucune icône. */
+  /** Icône personnalisée (`<Icon name=… />`) ; `null` pour aucune icône. */
   icon?: ReactNode | null;
   /** Titre court en gras, au-dessus du corps. */
   title?: string;
@@ -50,11 +45,10 @@ export function Notice({
   const toneColor = useToneColor(tone);
   const surface = useToneSurface(toneColor);
   const textColor = tone === 'neutral' ? c.textSecondary : toneColor;
-  const Icon = DEFAULT_ICON[tone];
 
   return (
     <View style={[styles.note, surface, style]}>
-      {icon === null ? null : (icon ?? <Icon color={textColor} size={16} />)}
+      {icon === null ? null : (icon ?? <Icon name={DEFAULT_ICON[tone]} color={textColor} size={16} />)}
       <View style={styles.body}>
         {title ? (
           <Txt variant="label" color={textColor}>{title}</Txt>

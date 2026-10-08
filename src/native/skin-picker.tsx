@@ -7,7 +7,6 @@
  * pas : c'est un aperçu ; l'équipement reste une action explicite.
  */
 import { useId } from 'react';
-import { Check, Lock } from 'lucide-react-native';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Path, Polygon, Stop } from 'react-native-svg';
 
@@ -21,6 +20,7 @@ import { radius, spacing, useE237Colors } from './core';
 import { haptic } from './haptics';
 import { useNeu } from './neu';
 import { Txt } from './text';
+import { Icon } from '../icons/generated/native';
 
 /** Silhouette « Founders » simplifiée pour la vignette. */
 const SWATCH_SHAPE = '0.12,0 0.88,0 1,0.12 1,0.78 0.5,1 0,0.78 0,0.12';
@@ -128,11 +128,11 @@ export function SkinSwatch({
 
         {locked ? (
           <View style={[styles.swatchBadge, { backgroundColor: `${c.bg}CC` }]}>
-            <Lock color={c.textSecondary} size={14} />
+            <Icon name="lock" color={c.textSecondary} size={14} />
           </View>
         ) : selected ? (
           <View style={[styles.swatchCheck, { backgroundColor: spec.accent }]}>
-            <Check color={stopColor(spec.surface, 2)} size={11} strokeWidth={3.5} />
+            <Icon name="check" color={stopColor(spec.surface, 2)} size={11} strokeWidth={3.5} />
           </View>
         ) : null}
       </View>

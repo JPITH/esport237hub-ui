@@ -5,7 +5,6 @@
  * produit qui porte une ÉCHÉANCE. Un joueur qui découvre en fin de mois qu'il
  * n'était pas classé aura joué pour rien.
  */
-import { CalendarClock, Info } from 'lucide-react-native';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { useDsT, type DsKey } from '../i18n';
@@ -17,6 +16,7 @@ import {
 } from '../lib/ranking';
 import { Card, radius, spacing, useE237Colors } from './core';
 import { Txt } from './text';
+import { Icon } from '../icons/generated/native';
 
 /** Une saison telle que l'API la rend (`GET /rankings/seasons`). */
 export interface SeasonView {
@@ -65,7 +65,7 @@ export function SeasonBanner({
   return (
     <Card style={[styles.card, style]}>
       <View style={styles.head}>
-        <CalendarClock color={c.accent} size={16} />
+        <Icon name="calendar-clock" color={c.accent} size={16} />
         <Txt variant="label">{season.name}</Txt>
         <View style={[styles.state, { backgroundColor: c.surfaceRaised }]}>
           <Txt variant="label" size={11} tone="secondary">
@@ -93,7 +93,7 @@ export function SeasonBanner({
 
       {todo ? (
         <View style={[styles.todo, { backgroundColor: c.surfaceRaised }]}>
-          <Info color={c.warning} size={14} />
+          <Icon name="info" color={c.warning} size={14} />
           <Txt variant="caption" tone="warning" style={styles.todoText}>
             {todo}
           </Txt>

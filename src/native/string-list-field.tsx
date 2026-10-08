@@ -2,7 +2,6 @@
  * Éditeur de liste de courtes lignes de texte (natif) —
  * jumeau de `./web/string-list-field`.
  */
-import { Plus, Trash2 } from 'lucide-react-native';
 import {
   Pressable,
   StyleSheet,
@@ -14,6 +13,7 @@ import {
 import { font, radius, spacing, useE237Colors } from './core';
 import { Field } from './fields';
 import { Txt } from './text';
+import { Icon } from '../icons/generated/native';
 
 export interface StringListFieldProps {
   /** Libellé du groupe (« Avantages », « Restrictions »…). */
@@ -71,7 +71,7 @@ export function StringListField({
               pressed && styles.pressed,
             ]}
           >
-            <Trash2 color={c.textMuted} size={18} />
+            <Icon name="trash" color={c.textMuted} size={18} />
           </Pressable>
         </View>
       ))}
@@ -83,7 +83,7 @@ export function StringListField({
           onPress={() => onChange([...values, ''])}
           style={({ pressed }) => [styles.addBtn, pressed && styles.pressed]}
         >
-          <Plus color={c.accent} size={16} />
+          <Icon name="plus" color={c.accent} size={16} />
           <Txt variant="label" tone="accent">
             {addLabel}
           </Txt>

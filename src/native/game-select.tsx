@@ -6,12 +6,12 @@
  * EA Sports FC est toujours en tête et sert de choix par défaut.
  */
 import { pill, radius, spacing, useE237Colors, useE237Mode, withAlpha } from './core';
-import { Check } from 'lucide-react-native';
 import { useEffect } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { SelectSheet, type SelectOption } from './select-sheet';
 import { Txt } from './text';
+import { Icon } from '../icons/generated/native';
 
 const FC_FIRST = ['fc27', 'ea-sports-fc', 'easportsfc', 'fc26', 'fifa'];
 
@@ -100,7 +100,7 @@ export function GameSelect({
                   borderRadius: radius.full,
                   paddingHorizontal: spacing['3'],
                 }}>
-                {active ? <Check color={c.accent} size={16} /> : null}
+                {active ? <Icon name="check" color={c.accent} size={16} /> : null}
                 <Txt
                   variant={active ? 'label' : 'subtitle'}
                   size={13}

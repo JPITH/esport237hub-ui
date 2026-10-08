@@ -2,16 +2,6 @@
  * Cartes de liste (natif) — jumelles de `./web/cards`, mêmes noms, mêmes
  * props (la navigation passe par `onPress` au lieu de `href`).
  */
-import {
-  CalendarDays,
-  CheckCircle2,
-  Clock,
-  Gift,
-  MapPin,
-  Shirt,
-  Star,
-  Store,
-} from 'lucide-react-native';
 import type { ReactNode } from 'react';
 import {
   Pressable,
@@ -35,6 +25,7 @@ import { Badge, Card, font, radius, spacing, useE237Colors } from './core';
 import { MediaImage } from './media-image';
 import { PerkList } from './perk-list';
 import { Txt } from './text';
+import { Icon } from '../icons/generated/native';
 
 /** Enveloppe pressable optionnelle — sans `onPress`, simple bloc. */
 function Clickable({
@@ -110,12 +101,12 @@ export function EventCard({
         </View>
         <View style={styles.metaRow}>
           <View style={styles.metaItem}>
-            <CalendarDays color={c.textMuted} size={14} />
+            <Icon name="calendar" color={c.textMuted} size={14} />
             <Txt variant="caption" tone="muted">{dateLabel}</Txt>
           </View>
           {placeLabel ? (
             <View style={styles.metaItem}>
-              <MapPin color={c.textMuted} size={14} />
+              <Icon name="map-pin" color={c.textMuted} size={14} />
               <Txt variant="caption" tone="muted">{placeLabel}</Txt>
             </View>
           ) : null}
@@ -230,9 +221,9 @@ export function ProductCard({
             rounded="lg"
             fallbackIcon={
               digital ? (
-                <Gift color={c.textMuted} size={26} strokeWidth={1.25} />
+                <Icon name="gift" color={c.textMuted} size={26} strokeWidth={1.25} />
               ) : (
-                <Shirt color={c.textMuted} size={26} strokeWidth={1.25} />
+                <Icon name="shirt" color={c.textMuted} size={26} strokeWidth={1.25} />
               )
             }
             fallbackLabel="Visuel à venir"
@@ -333,12 +324,12 @@ export function TicketCard({
 
       <View style={styles.metaRow}>
         <View style={styles.metaItem}>
-          <CalendarDays color={c.textMuted} size={14} />
+          <Icon name="calendar" color={c.textMuted} size={14} />
           <Txt variant="caption" tone="muted">{dateLabel}</Txt>
         </View>
         {city ? (
           <View style={styles.metaItem}>
-            <MapPin color={c.textMuted} size={14} />
+            <Icon name="map-pin" color={c.textMuted} size={14} />
             <Txt variant="caption" tone="muted">{city}</Txt>
           </View>
         ) : null}
@@ -357,7 +348,7 @@ export function TicketCard({
             {admitted ? (
               <>
                 <View style={styles.metaItem}>
-                  <CheckCircle2 color={c.accent} size={16} />
+                  <Icon name="check-circle" color={c.accent} size={16} />
                   <Txt variant="label" tone="accent">
                     Déjà admis à l’entrée
                   </Txt>
@@ -424,7 +415,7 @@ export function SubscriptionCard({
       <View style={styles.headRow}>
         <View style={styles.grow}>
           <View style={styles.metaItem}>
-            <Store color={c.accent} size={16} />
+            <Icon name="store" color={c.accent} size={16} />
             <Txt variant="label">
               {venueName}
             </Txt>
@@ -438,7 +429,7 @@ export function SubscriptionCard({
 
       <View style={styles.metaRow}>
         <View style={styles.metaItem}>
-          <Clock color={c.textMuted} size={14} />
+          <Icon name="clock" color={c.textMuted} size={14} />
           <Txt variant="caption" tone="secondary">
             {remainingLabel}
           </Txt>
@@ -448,7 +439,7 @@ export function SubscriptionCard({
         </Txt>
         {city ? (
           <View style={styles.metaItem}>
-            <MapPin color={c.textMuted} size={14} />
+            <Icon name="map-pin" color={c.textMuted} size={14} />
             <Txt variant="caption" tone="secondary">{city}</Txt>
           </View>
         ) : null}
@@ -533,7 +524,7 @@ export function VenueCard({
             ratio={16 / 10}
             rounded="lg"
             fallbackIcon={
-              <Store color={c.textMuted} size={30} strokeWidth={1.25} />
+              <Icon name="store" color={c.textMuted} size={30} strokeWidth={1.25} />
             }
           />
           {isOpen !== undefined ? (
@@ -558,7 +549,7 @@ export function VenueCard({
               {name}
             </Txt>
             <View style={styles.metaItem}>
-              <MapPin color={c.textMuted} size={14} />
+              <Icon name="map-pin" color={c.textMuted} size={14} />
               <Txt variant="caption" tone="muted" numberOfLines={1}>
                 {city}
                 {district ? ` · ${district}` : ''}
@@ -566,7 +557,7 @@ export function VenueCard({
             </View>
             {rated ? (
               <View style={styles.metaItem}>
-                <Star color={c.gold} fill={c.gold} size={13} strokeWidth={1.5} />
+                <Icon name="star" color={c.gold} filled size={13} strokeWidth={1.5} />
                 <Txt variant="numeric" size={font.size.xs} tone="gold">
                   {formatRatingAverage(ratingAvg)}
                 </Txt>

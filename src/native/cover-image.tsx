@@ -7,12 +7,12 @@
  * résolues par l'API (`cover_image_url`, `photo_urls`) : l'application ne
  * fabrique jamais d'URL de stockage.
  */
-import { Building2, CalendarDays } from 'lucide-react-native';
 import { ScrollView, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { useDsT } from '../i18n';
 import { spacing, useE237Colors } from './core';
 import { MediaImage } from './media-image';
+import { Icon } from '../icons/generated/native';
 
 /** Arrondis proposés — sous-ensemble de `MediaRounded` utile aux visuels. */
 export type CoverRounded = 'md' | 'lg' | 'xl';
@@ -44,7 +44,7 @@ export function EventCover({
       alt={t('form.cover.eventAlt', { title })}
       ratio={ratio}
       rounded={rounded}
-      fallbackIcon={<CalendarDays color={c.textMuted} size={26} strokeWidth={1.25} />}
+      fallbackIcon={<Icon name="calendar" color={c.textMuted} size={26} strokeWidth={1.25} />}
       fallbackLabel={t('form.cover.eventFallback')}
       style={style}
     />
@@ -77,7 +77,7 @@ export function VenuePhoto({
       alt={t('form.cover.venueAlt', { name })}
       ratio={ratio}
       rounded={rounded}
-      fallbackIcon={<Building2 color={c.textMuted} size={26} strokeWidth={1.25} />}
+      fallbackIcon={<Icon name="building" color={c.textMuted} size={26} strokeWidth={1.25} />}
       fallbackLabel={t('form.cover.venueFallback')}
       style={style}
     />

@@ -1,5 +1,4 @@
 import { radius, spacing, useE237Colors } from './core';
-import { Check, ChevronDown } from 'lucide-react-native';
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
@@ -7,6 +6,7 @@ import { FieldLabel, requiredFieldLabel } from './fields';
 import { Sheet } from './sheet';
 import { Txt } from './text';
 import { useDsT } from '../i18n';
+import { Icon } from '../icons/generated/native';
 
 export interface SelectOption {
   value: string;
@@ -55,7 +55,7 @@ export function SelectSheet({
           style={{ flex: 1 }}>
           {selected?.label ?? placeholder}
         </Txt>
-        <ChevronDown color={c.textSecondary} size={18} />
+        <Icon name="chevron-down" color={c.textSecondary} size={18} />
       </Pressable>
 
       {/* Pas de vue défilante ici : la feuille défile d'elle-même depuis le
@@ -83,7 +83,7 @@ export function SelectSheet({
                   style={{ flex: 1 }}>
                   {o.label}
                 </Txt>
-                {active ? <Check color={c.accent} size={18} /> : null}
+                {active ? <Icon name="check" color={c.accent} size={18} /> : null}
               </Pressable>
             );
           })}

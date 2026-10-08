@@ -4,7 +4,7 @@
  * (KPI du jour), Revolut Business (rangée d'actions rapides), Whatnot Seller
  * Hub (groupes de tuiles).
  *
- * Les icônes sont passées en ReactNode (Lucide côté app) : le design system
+ * Les icônes sont passées en ReactNode (`<Icon>` du jeu G-HUB) : le design system
  * ne dépend d'aucune librairie d'icônes — et jamais d'emojis.
  */
 import type { ReactNode } from 'react';
@@ -37,7 +37,7 @@ export interface StatTileProps {
   /** Précision optionnelle sous le libellé (ex. « aujourd'hui »). */
   hint?: string;
   trend?: StatTileTrend;
-  /** Icône Lucide (taille conseillée : 18). */
+  /** Icône `<Icon>` (taille conseillée : 18). */
   icon?: ReactNode;
   style?: StyleProp<ViewStyle>;
 }
@@ -81,7 +81,7 @@ export function StatTile({ value, label, hint, trend, icon, style }: StatTilePro
 /* ------------------------------------------------------------------ */
 
 export interface QuickActionProps {
-  /** Icône Lucide (taille conseillée : 20). */
+  /** Icône `<Icon>` (taille conseillée : 20). */
   icon: ReactNode;
   label: string;
   onPress: () => void;
