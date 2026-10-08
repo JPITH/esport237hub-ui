@@ -13,11 +13,7 @@ export const enUi: Record<keyof typeof frUi, string> = {
   'ui.card.flipHint': 'Flips the card to show its detailed statistics',
   'ui.player.verified': 'Verified player',
 
-  'ui.tab.accueil': 'Home',
-  'ui.tab.salles': 'Venues',
-  'ui.tab.duels': 'Duels',
-  'ui.tab.evenements': 'Events',
-  'ui.tab.boutique': 'Shop',
+  'ui.carousel.position': '{label}: item {index} of {total}.',
 
   'ui.loading': 'Loading…',
   'ui.previous': 'Back',
