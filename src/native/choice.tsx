@@ -13,7 +13,8 @@ import {
   type ViewStyle,
 } from 'react-native';
 
-import { radius, spacing, useE237Colors } from './core';
+import { Badge, radius, spacing, useE237Colors } from './core';
+import { FilterChip } from './filter-chip';
 import { Txt } from './text';
 import { Icon } from '../icons/generated/native';
 
@@ -87,6 +88,10 @@ export interface RadioOption<T extends string> {
   hint?: string;
   /** Valeur affichée à droite (prix, disponibilité…). */
   trailing?: ReactNode;
+  /** Icône posée avant le libellé (variante `card`) — parité web. */
+  icon?: ReactNode;
+  /** Courte étiquette neutre à côté du libellé (variante `card`) — parité web. */
+  badge?: string;
   disabled?: boolean;
 }
 
@@ -96,6 +101,8 @@ export interface RadioGroupProps<T extends string> {
   options: readonly RadioOption<T>[];
   value: T | null;
   onChange: (value: T) => void;
+  /** `card` (défaut) = options encadrées ; `inline` = puces alignées (`FilterChip`). */
+  variant?: 'card' | 'inline';
   style?: StyleProp<ViewStyle>;
 }
 
@@ -104,9 +111,26 @@ export function RadioGroup<T extends string>({
   options,
   value,
   onChange,
+  variant = 'card',
   style,
 }: RadioGroupProps<T>) {
   const c = useE237Colors();
+  if (variant === 'inline') {
+    return (
+      <View accessibilityRole="radiogroup" accessibilityLabel={label} style={[styles.inline, style]}>
+        {options.map((option) => (
+          <FilterChip
+            key={option.value}
+            role="radio"
+            label={option.label}
+            active={option.value === value}
+            disabled={option.disabled}
+            onPress={() => onChange(option.value)}
+          />
+        ))}
+      </View>
+    );
+  }
   return (
     <View accessibilityRole="radiogroup" accessibilityLabel={label} style={[styles.group, style]}>
       {options.map((option) => {
@@ -134,8 +158,20 @@ export function RadioGroup<T extends string>({
                   <View style={[styles.radioDot, { backgroundColor: c.accent }]} />
                 ) : null}
               </View>
+              {option.icon ? <View style={styles.optionIcon}>{option.icon}</View> : null}
               <View style={styles.labelBox}>
-                <Txt variant="body">{option.label}</Txt>
+                {option.badge ? (
+                  <View style={styles.labelRow}>
+                    <Txt variant="body" style={styles.shrink}>
+                      {option.label}
+                    </Txt>
+                    <Badge tone="neutral" size="sm">
+                      {option.badge}
+                    </Badge>
+                  </View>
+                ) : (
+                  <Txt variant="body">{option.label}</Txt>
+                )}
                 {option.hint ? (
                   <Txt variant="caption" tone="muted">
                     {option.hint}
@@ -169,6 +205,10 @@ const styles = StyleSheet.create({
   disabled: { opacity: 0.5 },
   pressed: { opacity: 0.85 },
   group: { gap: spacing['2'] },
+  inline: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing['2'] },
+  optionIcon: { width: 28, alignItems: 'center' },
+  labelRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: spacing['2'] },
+  shrink: { flexShrink: 1 },
   option: {
     flexDirection: 'row',
     alignItems: 'flex-start',

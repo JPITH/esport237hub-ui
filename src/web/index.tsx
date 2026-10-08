@@ -87,7 +87,7 @@ export type { Column, TableProps } from './table';
 export { Tabs, FilterChip, Tooltip, Pagination } from './nav';
 export { Switch } from './switch';
 export type { SwitchProps } from './switch';
-export type { TabDef } from './nav';
+export type { TabDef, TabLinkComponent, TabsProps } from './nav';
 
 export { Select, Combobox, DatePicker, TimePicker } from './pickers';
 export type {

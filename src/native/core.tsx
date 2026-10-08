@@ -204,6 +204,8 @@ export type BadgeTone = Tone;
 export interface BadgeProps {
   children: ReactNode;
   tone?: BadgeTone;
+  /** `sm` : pastille compacte (11 px) pour une case dense — parité web. */
+  size?: 'sm' | 'md';
   style?: StyleProp<ViewStyle>;
   /** Surcharge du libellé (taille/police) — le cadre reste celui du DS. */
   textStyle?: StyleProp<TextStyle>;
@@ -230,13 +232,14 @@ export function useToneColor(tone: BadgeTone): string {
  * sur le web et un liseré de la même teinte dessine la forme : sans lui la
  * pilule disparaissait sur un téléphone en plein jour (retour porteur).
  */
-export function Badge({ children, tone = 'accent', style, textStyle }: BadgeProps) {
+export function Badge({ children, tone = 'accent', size = 'md', style, textStyle }: BadgeProps) {
   const toneColor = useToneColor(tone);
   const surface = useToneSurface(toneColor);
+  const sm = size === 'sm';
 
   return (
-    <View style={[styles.badge, surface, style]}>
-      <Text style={[styles.badgeLabel, { color: toneColor }, textStyle]}>
+    <View style={[styles.badge, sm && styles.badgeSm, surface, style]}>
+      <Text style={[styles.badgeLabel, sm && styles.badgeLabelSm, { color: toneColor }, textStyle]}>
         {children}
       </Text>
     </View>
@@ -250,15 +253,28 @@ export function Badge({ children, tone = 'accent', style, textStyle }: BadgeProp
 export interface StatProps {
   value: string | number;
   label: string;
+  /** À droite de la valeur, sur la même ligne (mini-courbe, icône) — parité web. */
+  aside?: ReactNode;
+  /** Lignes complémentaires sous le libellé (variation, précision). */
+  children?: ReactNode;
   style?: StyleProp<ViewStyle>;
 }
 
-export function Stat({ value, label, style }: StatProps) {
+export function Stat({ value, label, aside, children, style }: StatProps) {
   const c = useE237Colors();
+  const valueNode = <Text style={[styles.statValue, { color: c.textPrimary }]}>{value}</Text>;
   return (
     <View style={style}>
-      <Text style={[styles.statValue, { color: c.textPrimary }]}>{value}</Text>
+      {aside != null ? (
+        <View style={styles.statRow}>
+          {valueNode}
+          {aside}
+        </View>
+      ) : (
+        valueNode
+      )}
       <Text style={[styles.statLabel, { color: c.textSecondary }]}>{label}</Text>
+      {children != null ? <View style={styles.statMeta}>{children}</View> : null}
     </View>
   );
 }
@@ -269,13 +285,16 @@ export function Stat({ value, label, style }: StatProps) {
 
 export interface SectionLabelProps {
   children: ReactNode;
+  /** `cyan` (défaut) : titre de section ; `muted` : intertitre discret ; `gold` : palmarès. */
+  tone?: 'cyan' | 'muted' | 'gold';
   style?: StyleProp<TextStyle>;
 }
 
-export function SectionLabel({ children, style }: SectionLabelProps) {
+export function SectionLabel({ children, tone = 'cyan', style }: SectionLabelProps) {
   const c = useE237Colors();
+  const ink = tone === 'muted' ? c.textMuted : tone === 'gold' ? c.gold : c.cyan;
   return (
-    <Text style={[styles.sectionLabel, { color: c.cyan }, style]}>
+    <Text style={[styles.sectionLabel, { color: ink }, style]}>
       {children}
     </Text>
   );
@@ -335,6 +354,8 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.displaySemi,
     fontSize: font.size.xs,
   },
+  badgeSm: { paddingVertical: 0, paddingHorizontal: 6 },
+  badgeLabelSm: { fontSize: 11 },
   statValue: {
     fontFamily: fontFamily.bodyBlack,
     fontSize: font.size.xl,
@@ -344,6 +365,13 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.body,
     fontSize: font.size.xs,
   },
+  statRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    gap: spacing['2'],
+  },
+  statMeta: { marginTop: spacing['1'], gap: 2 },
   sectionLabel: {
     fontFamily: fontFamily.display,
     fontSize: font.size.xs,

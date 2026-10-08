@@ -4,6 +4,8 @@ import {
   useLayoutEffect,
   useRef,
   useState,
+  type AnchorHTMLAttributes,
+  type ComponentType,
   type ReactNode,
 } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -12,22 +14,24 @@ export interface TabDef<T extends string> {
   value: T;
   label: string;
   icon?: ReactNode;
+  /**
+   * Onglet de NAVIGATION : l'onglet est un lien vers cette route (rendu par
+   * `linkAs`) et l'actif porte `aria-current="page"`. Sans `href`, l'onglet
+   * est un bouton (`role="tab"` + `aria-selected`).
+   */
+  href?: string;
 }
 
-/**
- * Onglets segmentés (pilule) — la pastille active GLISSE d'un onglet à
- * l'autre (simple slide en transition CSS, sans rebond), comme sur mobile.
- */
-export function Tabs<T extends string>({
-  tabs,
-  value,
-  onChange,
-  className = "",
-  fill = false,
-}: {
+/** Composant de lien du routeur (ex. `next/link`) — le DS reste agnostique. */
+export type TabLinkComponent = ComponentType<
+  AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }
+>;
+
+export interface TabsProps<T extends string> {
   tabs: TabDef<T>[];
   value: T;
-  onChange: (value: T) => void;
+  /** Obligatoire pour des onglets-boutons ; facultatif pour des onglets-liens. */
+  onChange?: (value: T) => void;
   className?: string;
   /**
    * Occupe toute la largeur disponible, onglets répartis à parts égales —
@@ -35,17 +39,52 @@ export function Tabs<T extends string>({
    * défaut la barre est ajustée à son contenu et défile si elle déborde.
    */
   fill?: boolean;
-}) {
-  const listRef = useRef<HTMLDivElement>(null);
+  /** Nom accessible de la barre (« Sections du panel », « Vue »…). */
+  label?: string;
+  /**
+   * Composant de lien des onglets qui ont un `href` (`next/link` dans le
+   * dashboard). Défaut : `<a>`.
+   */
+  linkAs?: TabLinkComponent;
+}
+
+function PlainLink(
+  props: AnchorHTMLAttributes<HTMLAnchorElement> & { href: string },
+) {
+  return <a {...props} />;
+}
+
+/**
+ * Onglets segmentés (pilule) — la pastille active GLISSE d'un onglet à
+ * l'autre (simple slide en transition CSS, sans rebond), comme sur mobile.
+ *
+ * Deux usages, un seul rendu :
+ * - onglets d'ÉTAT (`onChange`) : `role="tablist"`, boutons `role="tab"` +
+ *   `aria-selected` ;
+ * - onglets de ROUTE (chaque onglet porte un `href`) : `<nav>` de liens,
+ *   l'actif en `aria-current="page"` — clic molette, préchargement et
+ *   historique restent ceux d'un vrai lien.
+ */
+export function Tabs<T extends string>({
+  tabs,
+  value,
+  onChange,
+  className = "",
+  fill = false,
+  label,
+  linkAs: LinkAs = PlainLink,
+}: TabsProps<T>) {
+  const listRef = useRef<HTMLElement | null>(null);
   const [pill, setPill] = useState<{ left: number; width: number } | null>(
     null,
   );
+  const asLinks = tabs.length > 0 && tabs.every((t) => t.href != null);
 
   // Position/largeur de la pastille = celles de l'onglet actif (mesurées).
   useLayoutEffect(() => {
     const measure = () => {
       const el = listRef.current?.querySelector<HTMLElement>(
-        '[aria-selected="true"]',
+        '[aria-selected="true"], [aria-current="page"]',
       );
       if (el) setPill({ left: el.offsetLeft, width: el.offsetWidth });
     };
@@ -55,29 +94,61 @@ export function Tabs<T extends string>({
     return () => ro.disconnect();
   }, [value, tabs]);
 
+  const classes = `seg ${fill ? "seg--fill" : ""} ${className}`;
+  const itemClass = (on: boolean) =>
+    `seg__item [&>svg]:size-4 ${on ? "seg__item--on" : ""}`;
+  const pillNode = pill ? (
+    <span
+      aria-hidden
+      className="seg__pill"
+      style={{ transform: `translateX(${pill.left}px)`, width: pill.width }}
+    />
+  ) : null;
+
+  if (asLinks) {
+    return (
+      <nav
+        ref={(el) => {
+          listRef.current = el;
+        }}
+        className={classes}
+        aria-label={label}
+      >
+        {pillNode}
+        {tabs.map((t) => (
+          <LinkAs
+            key={t.value}
+            href={t.href as string}
+            aria-current={value === t.value ? "page" : undefined}
+            onClick={onChange ? () => onChange(t.value) : undefined}
+            className={itemClass(value === t.value)}
+          >
+            {t.icon}
+            {t.label}
+          </LinkAs>
+        ))}
+      </nav>
+    );
+  }
+
   return (
     <div
-      ref={listRef}
-      className={`seg ${fill ? "seg--fill" : ""} ${className}`}
+      ref={(el) => {
+        listRef.current = el;
+      }}
+      className={classes}
       role="tablist"
+      aria-label={label}
     >
-      {pill ? (
-        <span
-          aria-hidden
-          className="seg__pill"
-          style={{ transform: `translateX(${pill.left}px)`, width: pill.width }}
-        />
-      ) : null}
+      {pillNode}
       {tabs.map((t) => (
         <button
           key={t.value}
           type="button"
           role="tab"
           aria-selected={value === t.value}
-          onClick={() => onChange(t.value)}
-          className={`seg__item [&>svg]:size-4 ${
-            value === t.value ? "seg__item--on" : ""
-          }`}
+          onClick={() => onChange?.(t.value)}
+          className={itemClass(value === t.value)}
         >
           {t.icon}
           {t.label}

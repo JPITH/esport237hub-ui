@@ -37,6 +37,11 @@ export interface FilterChipProps {
   /** Icône `<Icon>` (taille conseillée : 14). */
   icon?: ReactNode;
   disabled?: boolean;
+  /**
+   * Rôle annoncé : `button` (filtre, défaut), `radio` (choix unique dans un
+   * `RadioGroup variant="inline"`), `tab` (onglet d'une rangée de puces).
+   */
+  role?: 'button' | 'radio' | 'tab';
   style?: StyleProp<ViewStyle>;
 }
 
@@ -47,6 +52,7 @@ export function FilterChip({
   count,
   icon,
   disabled = false,
+  role = 'button',
   style,
 }: FilterChipProps) {
   const c = useE237Colors();
@@ -55,8 +61,10 @@ export function FilterChip({
 
   return (
     <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ selected: active, disabled }}
+      accessibilityRole={role}
+      accessibilityState={
+        role === 'radio' ? { checked: active, disabled } : { selected: active, disabled }
+      }
       accessibilityLabel={count != null ? `${label} (${count})` : label}
       disabled={disabled}
       // La puce mesure 36 px ; le débord rétablit une zone tactile de 44 px.

@@ -3,6 +3,8 @@
 import { useId, type ReactNode } from "react";
 import { Check } from "lucide-react";
 
+import { Badge } from "./foundation";
+
 /* ------------------------------------------------------------------ */
 /* Checkbox                                                            */
 /* ------------------------------------------------------------------ */
@@ -86,6 +88,10 @@ export interface RadioOption<T extends string> {
   hint?: ReactNode;
   /** Valeur affichée à droite (prix, disponibilité…). */
   trailing?: ReactNode;
+  /** Icône posée avant le libellé (variante `card`). */
+  icon?: ReactNode;
+  /** Courte étiquette neutre à côté du libellé (« Classé »…), variante `card`. */
+  badge?: ReactNode;
   disabled?: boolean;
 }
 
@@ -158,8 +164,23 @@ export function RadioGroup<T extends string>({
                       }`}
                     />
                   </span>
+                  {option.icon ? (
+                    <span
+                      aria-hidden
+                      className="grid w-7 shrink-0 place-items-center text-accent [&>svg]:size-5"
+                    >
+                      {option.icon}
+                    </span>
+                  ) : null}
                   <span className="flex min-w-0 flex-col gap-0.5">
-                    <span className="text-sm font-medium">{option.label}</span>
+                    <span className="flex flex-wrap items-center gap-2 text-sm font-medium">
+                      {option.label}
+                      {option.badge ? (
+                        <Badge tone="neutral" size="sm">
+                          {option.badge}
+                        </Badge>
+                      ) : null}
+                    </span>
                     {option.hint ? (
                       <span className="text-xs text-muted">{option.hint}</span>
                     ) : null}
