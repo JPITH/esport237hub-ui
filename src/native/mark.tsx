@@ -7,7 +7,7 @@
  * règle 4).
  */
 import Svg, { Path } from 'react-native-svg';
-import type { StyleProp, ViewStyle } from 'react-native';
+import { Platform, type StyleProp, type ViewStyle } from 'react-native';
 
 import {
   MARK_VIEW_BOX,
@@ -53,11 +53,11 @@ export function AppMark({ size = 32, variant, title, contrast, style }: AppMarkP
       style={style}
       accessibilityRole={title ? 'image' : undefined}
       accessibilityLabel={title}
-      // `accessible={false}` (et non `undefined`) descendait jusqu'au DOM via
-      // react-native-svg et faisait crier React : « Received `false` for a
-      // non-boolean attribute ». Le logo est dans la barre du haut de tous les
-      // écrans, donc l'erreur s'affichait partout en développement.
-      accessible={title ? true : undefined}>
+      // `accessible` (vrai OU faux) descend jusqu'au DOM via react-native-svg
+      // sous react-native-web et fait crier React : « Received `true`/`false`
+      // for a non-boolean attribute ». Le logo est dans la barre du haut de
+      // tous les écrans : natif seulement ; sur le web, rôle + libellé suffisent.
+      accessible={title && Platform.OS !== 'web' ? true : undefined}>
       {markParts(size, variant).map((part) => (
         <Path key={part.key} d={part.d} fill={ink[part.role]} fillRule="nonzero" />
       ))}
