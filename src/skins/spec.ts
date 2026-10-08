@@ -15,8 +15,27 @@
  * + seed), par Next.js et par Expo.
  */
 
-/** Version du schéma. Incrémenter uniquement sur un changement incompatible. */
-export const SKIN_SPEC_VERSION = 1;
+import { color as themeColor, ramp } from '../tokens';
+import { CARD_SHAPE_NAMES, type CardShapeName } from './shapes/generated';
+
+/**
+ * Version du schéma.
+ *
+ * - **1** — palette seule : toutes les cartes ont la silhouette du bouclier.
+ * - **2** (08/10/2026) — champ optionnel `shape` : la silhouette de la carte
+ *   (`CARD_SHAPE_NAMES`, dessinées dans `shapes/*.svg`).
+ *
+ * Le passage de 1 à 2 est ADDITIF, dans les deux sens : un spec v1 (sans
+ * `shape`) se lit tel quel et garde le bouclier au pixel près ; un spec v2 lu
+ * par une ancienne version de l'application perd seulement sa forme. La
+ * version stockée est conservée à la relecture — pas de faux diff jsonb.
+ */
+export const SKIN_SPEC_VERSION = 2;
+
+/** Vrai si la valeur nomme une forme de carte connue. */
+function isShapeName(value: unknown): value is CardShapeName {
+  return typeof value === 'string' && (CARD_SHAPE_NAMES as readonly string[]).includes(value);
+}
 
 /** Un arrêt de dégradé : couleur + position dans [0,1]. */
 export interface SkinStop {
@@ -120,6 +139,11 @@ export interface SkinSpec {
   inner: string;
   sheen?: SkinSheen;
   glow?: SkinGlow;
+  /**
+   * Silhouette de la carte (v2). Absente = bouclier, la forme historique.
+   * Une valeur inconnue est ignorée à la lecture (`parseSkinSpec`).
+   */
+  shape?: CardShapeName;
 }
 
 /* ========================================================================== */
@@ -316,6 +340,12 @@ export const BUILTIN_SKIN_KEYS = [
   'indomptable',
   'heritage237',
   'nuit-douala',
+  'hexa-neon',
+  'wouri',
+  'braise',
+  'galons',
+  'blason',
+  'finale',
 ] as const;
 export type BuiltinSkinKey = (typeof BUILTIN_SKIN_KEYS)[number];
 
@@ -472,6 +502,134 @@ export const BUILTIN_SKINS: Record<BuiltinSkinKey, SkinSpec> = {
     sheen: sheen('#35e1e1'),
     glow: glow('rgba(53,225,225,0.42)'),
   }),
+
+  /* --- Skins de FORME (v2) ------------------------------------------------
+     Une silhouette dessinée (`shapes/*.svg`) + une palette tirée des RAMPES
+     du design system, échelon par échelon : aucune couleur inventée. Le
+     fond sombre de « Galons d'or » est la fondation neutre du mode sombre. */
+
+  /* Hexa Néon — l'hexagone du signe, lime du logo, halo cyan. */
+  'hexa-neon': spec({
+    key: 'hexa-neon',
+    label: 'Hexa Néon',
+    premium: true,
+    ink: ramp.accent[50],
+    line: withAlpha(ramp.accent[200], 0.22),
+    accent: ramp.accent[300],
+    frame: frameLinear(ramp.accent[200], ramp.accent[500], ramp.accent[950]),
+    surface: surfaceLinear(ramp.accent[900], ramp.accent[950], themeColor.dark.bg),
+    radials: [
+      { color: ramp.cyan[400], opacity: 0.22, cx: 0.8, cy: -0.05, r: 0.75 },
+      { color: ramp.accent[400], opacity: 0.18, cx: 0.15, cy: 1.05, r: 0.6 },
+    ],
+    stripes: stripes('scanline', ramp.accent[300], 0.04),
+    border: withAlpha(ramp.accent[300], 0.55),
+    inner: withAlpha(ramp.accent[200], 0.32),
+    sheen: sheen(ramp.accent[200]),
+    glow: glow(withAlpha(ramp.accent[400], 0.45)),
+    shape: 'hexa',
+  }),
+
+  /* Lagune du Wouri — angles coupés, eaux cyan de l'estuaire. */
+  wouri: spec({
+    key: 'wouri',
+    label: 'Lagune du Wouri',
+    premium: true,
+    ink: ramp.cyan[50],
+    line: withAlpha(ramp.cyan[200], 0.22),
+    accent: ramp.cyan[300],
+    frame: frameLinear(ramp.cyan[200], ramp.cyan[600], ramp.cyan[950]),
+    surface: surfaceLinear(ramp.cyan[900], ramp.cyan[950], themeColor.dark.bg),
+    radials: [{ color: ramp.info[400], opacity: 0.2, cx: 0.75, cy: -0.05, r: 0.75 }],
+    stripes: stripes('diagonal', ramp.cyan[300], 0.045),
+    border: withAlpha(ramp.cyan[300], 0.55),
+    inner: withAlpha(ramp.cyan[200], 0.3),
+    sheen: sheen(ramp.cyan[200]),
+    glow: glow(withAlpha(ramp.cyan[400], 0.45)),
+    shape: 'coupe',
+  }),
+
+  /* Braise — biseau asymétrique, ambre et rouge de la flamme. */
+  braise: spec({
+    key: 'braise',
+    label: 'Braise',
+    premium: true,
+    ink: ramp.warning[50],
+    line: withAlpha(ramp.warning[200], 0.22),
+    accent: ramp.warning[300],
+    frame: frameLinear(ramp.warning[200], ramp.warning[500], ramp.danger[950]),
+    surface: surfaceLinear(ramp.danger[900], ramp.danger[950], ramp.warning[950]),
+    radials: [
+      { color: ramp.warning[400], opacity: 0.35, cx: 0.8, cy: -0.05, r: 0.7 },
+      { color: ramp.danger[500], opacity: 0.2, cx: 0.2, cy: 1.05, r: 0.6 },
+    ],
+    stripes: stripes('diagonal', ramp.warning[300], 0.05),
+    border: withAlpha(ramp.warning[300], 0.55),
+    inner: withAlpha(ramp.warning[200], 0.32),
+    sheen: sheen(ramp.warning[200]),
+    glow: glow(withAlpha(ramp.danger[400], 0.45)),
+    shape: 'biseau',
+  }),
+
+  /* Galons d'or — chevrons de grade, or sur la nuit neutre. */
+  galons: spec({
+    key: 'galons',
+    label: 'Galons d’or',
+    premium: true,
+    ink: ramp.gold[50],
+    line: withAlpha(ramp.gold[300], 0.22),
+    accent: ramp.gold[300],
+    frame: frameLinear(ramp.gold[100], ramp.gold[400], ramp.gold[950]),
+    surface: surfaceLinear(
+      themeColor.dark.surface,
+      themeColor.dark.frame,
+      themeColor.dark.bg,
+    ),
+    radials: [{ color: ramp.gold[400], opacity: 0.28, cx: 0.5, cy: -0.08, r: 0.8 }],
+    stripes: stripes('chevron', ramp.gold[300], 0.05),
+    border: withAlpha(ramp.gold[300], 0.55),
+    inner: withAlpha(ramp.gold[200], 0.3),
+    sheen: sheen(ramp.gold[200]),
+    glow: glow(withAlpha(ramp.gold[400], 0.42)),
+    shape: 'chevron',
+  }),
+
+  /* Blason royal — écusson bleu nuit, liseré d'or. */
+  blason: spec({
+    key: 'blason',
+    label: 'Blason royal',
+    premium: true,
+    ink: ramp.info[50],
+    line: withAlpha(ramp.gold[200], 0.22),
+    accent: ramp.gold[300],
+    frame: frameLinear(ramp.gold[200], ramp.gold[500], ramp.info[950]),
+    surface: surfaceLinear(ramp.info[800], ramp.info[900], ramp.info[950]),
+    radials: [{ color: ramp.info[400], opacity: 0.3, cx: 0.7, cy: 0.05, r: 0.7 }],
+    border: withAlpha(ramp.gold[300], 0.55),
+    inner: withAlpha(ramp.gold[200], 0.32),
+    sheen: sheen(ramp.gold[100]),
+    glow: glow(withAlpha(ramp.info[400], 0.45)),
+    shape: 'ecusson',
+  }),
+
+  /* Billet de finale — ticket à encoches, pelouse émeraude et or. */
+  finale: spec({
+    key: 'finale',
+    label: 'Billet de finale',
+    premium: true,
+    ink: ramp.success[50],
+    line: withAlpha(ramp.success[200], 0.22),
+    accent: ramp.gold[300],
+    frame: frameLinear(ramp.gold[200], ramp.gold[500], ramp.success[950]),
+    surface: surfaceLinear(ramp.success[800], ramp.success[900], ramp.success[950]),
+    radials: [{ color: ramp.success[400], opacity: 0.25, cx: 0.5, cy: -0.05, r: 0.8 }],
+    stripes: stripes('scanline', ramp.success[300], 0.05),
+    border: withAlpha(ramp.gold[300], 0.55),
+    inner: withAlpha(ramp.gold[200], 0.3),
+    sheen: sheen(ramp.gold[100]),
+    glow: glow(withAlpha(ramp.success[400], 0.45)),
+    shape: 'ticket',
+  }),
 };
 
 /** Vrai si la clé désigne un skin intégré. */
@@ -506,6 +664,8 @@ export interface SkinSeed {
   stripes?: SkinStripePattern | null;
   sheenColor?: string;
   glowColor?: string;
+  /** Silhouette de la carte — bouclier si absente ou inconnue. */
+  shape?: CardShapeName | null;
 }
 
 /**
@@ -541,6 +701,8 @@ export function skinFromSeed(seedInput: SkinSeed): SkinSpec {
     inner: withAlpha(frameHi, 0.32),
     sheen: premium ? sheen(seed.sheenColor ?? frameHi) : undefined,
     glow: premium ? glow(withAlpha(seed.glowColor ?? accent, 0.45)) : undefined,
+    /* Le bouclier est le défaut : inutile de l'écrire en base. */
+    ...(isShapeName(seed.shape) && seed.shape !== CARD_SHAPE_NAMES[0] ? { shape: seed.shape } : {}),
   });
 }
 
@@ -561,6 +723,7 @@ export function seedFromSkin(s: SkinSpec): SkinSeed {
     stripes: s.stripes?.pattern ?? null,
     sheenColor: s.sheen?.color,
     glowColor: s.glow?.color,
+    shape: s.shape ?? null,
   };
 }
 
@@ -765,6 +928,9 @@ export function parseSkinSpec(
     inner: str(o.inner, fallback.inner),
     sheen: parseSheen(o.sheen),
     glow: parseGlow(o.glow),
+    /* v2 : une forme inconnue (faute de frappe, forme retirée, spec venu d'une
+       version plus récente) retombe sur le bouclier au lieu de casser. */
+    ...(isShapeName(o.shape) ? { shape: o.shape } : {}),
   };
 }
 

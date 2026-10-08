@@ -14,25 +14,39 @@
  *
  * Les classes `.pcard--<skin>` n'existent plus : un skin est une donnée.
  */
-import { cardLayoutCssVars, shapeClipPath } from './geometry';
+import { cardLayoutCssVars, cardShape, shapeClipPath, type CardShapeName } from './geometry';
 import { stopColor, type SkinSpec } from './spec';
 
 /** Variables consommées par les règles `.pcard*` de `theme/components.css`. */
 export type SkinCssVars = Record<string, string>;
 
-/** Forme du bouclier au format CSS — partagée par toutes les cartes. */
+/** Forme du bouclier au format CSS (découpe du balayage « foil »). */
 const SHAPE = shapeClipPath();
 
-/** Gabarit du contenu — calculé une fois, identique pour toutes les cartes. */
-const LAYOUT = cardLayoutCssVars();
+/**
+ * Gabarit du contenu, une fois par forme : la zone sûre d'une forme y replace
+ * les blocs, et ses ancrages y posent la plaque jeu et le pied.
+ */
+const LAYOUTS = new Map<CardShapeName, Record<string, string>>();
+function layoutVars(skin: SkinSpec): Record<string, string> {
+  const name = cardShape(skin.shape).name;
+  let vars = LAYOUTS.get(name);
+  if (!vars) {
+    vars = cardLayoutCssVars(name);
+    LAYOUTS.set(name, vars);
+  }
+  return vars;
+}
 
 /** Variables d'un skin, prêtes à poser sur l'élément `.pcard`. */
 export function skinCssVars(skin: SkinSpec): SkinCssVars {
   const vars: SkinCssVars = {
     /* Forme et gabarit : issus de la même géométrie que le tracé SVG et que
        les styles natifs — aucune valeur de position n'est écrite deux fois. */
-    '--pc-shape': SHAPE,
-    ...LAYOUT,
+    /* Hors bouclier, la bande court dans une boîte déjà inscrite dans la
+       forme (`DrawSheen.left/boxWidth`) : rien à découper. */
+    '--pc-shape': cardShape(skin.shape).clipUnit ? 'none' : SHAPE,
+    ...layoutVars(skin),
     /* Texte et filets. */
     '--pc-ink': skin.ink,
     '--pc-line': skin.line,

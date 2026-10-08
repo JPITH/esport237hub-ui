@@ -17,7 +17,7 @@ import {
   BUILTIN_SKIN_KEYS,
   type BuiltinSkinKey,
 } from "../skins/spec";
-import { CARD_BACK_LAYOUT, pct } from "../skins/geometry";
+import { cardShape, pct } from "../skins/geometry";
 import { useSkin } from "../skins/context";
 import { CardChrome, type CardSkinInput } from "./card-chrome";
 import { CardStage, RisingNumber } from "./card-stage";
@@ -313,12 +313,13 @@ function backBox(box: {
 }
 
 /**
- * Verso — les stats détaillées du jeu, sur le même bouclier et le même skin
- * que le recto. Ne lit que les données déjà chargées : les six axes
+ * Verso — les stats détaillées du jeu, sur la même forme et le même skin
+ * que le recto. Exporté pour les aperçus (éditeur de skins, planches) ; une
+ * carte `flippable` le monte d'elle-même au premier retournement. Ne lit que les données déjà chargées : les six axes
  * (`cardStats`, mêmes valeurs qu'au recto) et le bilan (`cardRecord`). Sans
  * défaites connues, pas de taux de réussite inventé.
  */
-function PlayerCardBack({
+export function PlayerCardBack({
   username,
   rating,
   wins,
@@ -331,6 +332,9 @@ function PlayerCardBack({
   skin = "signature",
 }: Omit<PlayerCardProps, "interactive" | "flippable" | "back">) {
   const t = useDsT();
+  /* Le verso suit la forme du skin : son gabarit est replacé dans la zone
+     sûre de la silhouette, comme celui du recto (variables `--pc-l-*`). */
+  const back = cardShape(useSkin(skin).shape).backLayout;
   const rows = cardStats({ gameSlug, rating, stats, seed: username, statDefs });
   const record = cardRecord(wins, losses);
   const cells =
@@ -350,12 +354,12 @@ function PlayerCardBack({
     <CardChrome skin={skin} className="pcard--back">
       {gameName ? <span className="pcard__crest">{gameName}</span> : null}
 
-      <div className="pcard__back-title" style={backBox(CARD_BACK_LAYOUT.title)}>
+      <div className="pcard__back-title" style={backBox(back.title)}>
         <span>{t("ui.card.back.title")}</span>
         {points != null ? <b>{t("ui.card.back.points", { n: points })}</b> : null}
       </div>
 
-      <ul className="pcard__back-stats" style={backBox(CARD_BACK_LAYOUT.stats)}>
+      <ul className="pcard__back-stats" style={backBox(back.stats)}>
         {rows.map((row) => (
           <li key={row.abbr} className="pcard__back-row">
             <span className="pcard__back-label">{row.label}</span>
@@ -367,7 +371,7 @@ function PlayerCardBack({
         ))}
       </ul>
 
-      <dl className="pcard__back-record" style={backBox(CARD_BACK_LAYOUT.record)}>
+      <dl className="pcard__back-record" style={backBox(back.record)}>
         {cells.map((cell) => (
           /* `dt` d'abord (ordre sémantique), la valeur passe au-dessus en CSS. */
           <div key={cell.label} className="pcard__back-cell">

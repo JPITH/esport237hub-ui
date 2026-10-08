@@ -1146,8 +1146,18 @@
 .pcard-stage--interactive .pcard:hover {
   transform: none;
 }
+/* Porteur du clipPath d'une forme non polygonale (unités de boîte) : il doit
+   être RENDU pour que `clip-path: url(#…)` le trouve, mais sans occuper de
+   place — `display: none` le rendrait introuvable. */
+.pcard-stage__clip {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
 /* Reflet holographique : une bande diagonale aux couleurs du skin, découpée
-   au bouclier (`clip-path` inline), qui glisse avec l'inclinaison. */
+   à la forme de la carte (`clip-path` inline), qui glisse avec l'inclinaison. */
 .pcard-stage__holo {
   position: absolute;
   inset: 0;
