@@ -5054,3 +5054,230 @@ a.mkt-social:focus-visible {
     display: none;
   }
 }
+
+/* ---------------------------------------------------------------- */
+/* Écran de chargement : le signe qui se trace (09/10/2026)           */
+/* ---------------------------------------------------------------- */
+/*
+ * Partition : `src/lib/brand-motion.ts` (`BRAND_LOADER_TIMELINE`) — les
+ * pourcentages ci-dessous en sont la copie, le natif interpole les mêmes.
+ * Encres : des rôles, jamais des hex. Le cadre et le « H » portent l'accent,
+ * le « G » le texte courant, la traverse l'accent d'un échelon plus sombre
+ * (comme `AppMark`).
+ */
+.e237-brand-loader {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  color: var(--e237-text-primary);
+}
+
+.e237-brand-loader__mark {
+  overflow: visible;
+  transform-origin: 50% 50%;
+  animation: e237-mark-cycle 2.4s ease-in-out infinite;
+}
+
+/* L'empreinte du cadre : visible entre deux cycles, jamais d'écran vide. */
+.e237-brand-loader__ghost {
+  fill: var(--e237-accent);
+  fill-opacity: 0.18;
+}
+
+.e237-brand-loader__ring {
+  fill: var(--e237-accent);
+  fill-opacity: 0;
+  stroke: var(--e237-accent);
+  stroke-width: 12;
+  stroke-linejoin: miter;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: e237-mark-ring 2.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+.e237-brand-loader__g,
+.e237-brand-loader__h,
+.e237-brand-loader__shade {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+.e237-brand-loader__g {
+  fill: currentColor;
+  animation: e237-mark-g 2.4s ease-out infinite;
+}
+
+.e237-brand-loader__h {
+  fill: var(--e237-accent);
+  animation: e237-mark-h 2.4s ease-out infinite;
+}
+
+.e237-brand-loader__shade {
+  fill: var(--e237-accent-hover);
+  animation: e237-mark-shade 2.4s ease-out infinite;
+}
+
+@keyframes e237-mark-ring {
+  0% {
+    stroke-dashoffset: 1;
+    stroke-opacity: 1;
+    fill-opacity: 0;
+  }
+  35% {
+    fill-opacity: 0;
+  }
+  40% {
+    stroke-dashoffset: 0;
+    stroke-opacity: 1;
+  }
+  55%,
+  88% {
+    stroke-dashoffset: 0;
+    stroke-opacity: 0;
+    fill-opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    stroke-opacity: 0;
+    fill-opacity: 0;
+  }
+}
+
+@keyframes e237-mark-g {
+  0%,
+  30% {
+    opacity: 0;
+    transform: translateY(18%);
+  }
+  50%,
+  88% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+@keyframes e237-mark-h {
+  0%,
+  45% {
+    opacity: 0;
+    transform: translateY(-18%);
+  }
+  60%,
+  88% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+@keyframes e237-mark-shade {
+  0%,
+  55% {
+    opacity: 0;
+  }
+  62%,
+  88% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Une respiration du signe complet, puis il s'efface avec ses pièces. */
+@keyframes e237-mark-cycle {
+  0%,
+  62% {
+    transform: scale(1);
+  }
+  70% {
+    transform: scale(1.06);
+  }
+  78%,
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Le chargement d'une page : centré, et invisible les 150 premières ms —
+   un chargement éclair ne doit pas faire clignoter le logo. */
+.e237-page-loader {
+  display: grid;
+  place-items: center;
+  min-height: 40vh;
+  padding: 48px 16px;
+  animation: ui-fade-in 0.25s ease-out 0.15s both;
+}
+
+.e237-page-loader--screen {
+  min-height: 100dvh;
+  background: var(--e237-bg);
+}
+
+/* Lu par le lecteur d'écran, invisible à l'œil (sans dépendre de Tailwind). */
+.e237-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .e237-brand-loader__mark,
+  .e237-brand-loader__ring,
+  .e237-brand-loader__g,
+  .e237-brand-loader__h,
+  .e237-brand-loader__shade,
+  .e237-page-loader {
+    animation: none !important;
+  }
+  /* Le signe complet, immobile. */
+  .e237-brand-loader__ring {
+    fill-opacity: 1;
+    stroke-opacity: 0;
+  }
+  .e237-brand-loader__g,
+  .e237-brand-loader__h,
+  .e237-brand-loader__shade {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* Compteur d'un champ texte (« 212 / 280 », 09/10/2026)              */
+/* ---------------------------------------------------------------- */
+.e237-field-foot {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.e237-field-counter {
+  margin-left: auto;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--e237-text-muted);
+}
+
+.e237-field-counter--warning {
+  color: var(--e237-warning);
+}
+
+.e237-field-counter--danger {
+  color: var(--e237-danger);
+}

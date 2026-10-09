@@ -24,6 +24,14 @@ export const enUi: Record<keyof typeof frUi, string> = {
   'ui.waiting': 'Waiting',
   'ui.winner': 'Winner',
 
+  'ui.result.win': 'Win',
+  'ui.result.loss': 'Loss',
+  'ui.result.draw': 'Draw',
+
+  'ui.loader.label': 'Loading G-HUB…',
+
+  'ui.field.counter': '{used} of {max} characters',
+
   // Feuille modale : la poignée est manipulable, elle doit se dire.
   'ui.sheet.handle': 'Sheet handle',
   'ui.sheet.handleHint': 'Expand or shrink the sheet',

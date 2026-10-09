@@ -2,7 +2,7 @@
  * Duels (natif) — jumeaux de `./web/duel`, mêmes noms, mêmes props
  * (la navigation passe par `onPress` au lieu de `href`).
  */
-import type { DuelStatus } from '@esport237hub/types';
+import type { DuelSideResult, DuelStatus } from '@esport237hub/types';
 import type { ReactNode } from 'react';
 import {
   Pressable,
@@ -13,9 +13,39 @@ import {
 } from 'react-native';
 
 import { useDsT } from '../i18n';
+import { DUEL_RESULT_META } from '../lib/duel-result';
 import { Badge, Card, font, radius, spacing, useNeu } from './core';
 import { DuelStatusBadge } from './duel-status-badge';
 import { Txt } from './text';
+
+/* ------------------------------------------------------------------ */
+/* DuelResultPill                                                      */
+/* ------------------------------------------------------------------ */
+
+export interface DuelResultPillProps {
+  /** L'issue de CE côté du duel (ou de celui qui regarde). */
+  result: DuelSideResult;
+  /** Score déjà mis en forme (« 3–1 »), dans l'ordre de celui qui lit. */
+  score?: string | null;
+  size?: 'sm' | 'md';
+  style?: StyleProp<ViewStyle>;
+}
+
+/**
+ * La pastille de l'issue d'un duel terminé — jumelle de `../web/duel` :
+ * « Victoire » en vert (`success`), « Défaite » en rouge (`danger`),
+ * « Match nul » en `info`, avec le score quand il est connu. Le mot est
+ * toujours là : la couleur n'est jamais le seul signal.
+ */
+export function DuelResultPill({ result, score, size = 'md', style }: DuelResultPillProps) {
+  const t = useDsT();
+  const meta = DUEL_RESULT_META[result];
+  return (
+    <Badge tone={meta.tone} size={size} style={style} textStyle={styles.resultText}>
+      {score ? `${t(meta.labelKey)} · ${score}` : t(meta.labelKey)}
+    </Badge>
+  );
+}
 
 /* ------------------------------------------------------------------ */
 /* DuelRow                                                             */
@@ -35,6 +65,12 @@ export interface DuelRowProps {
   challengerScore: number | null;
   opponentScore: number | null;
   status: DuelStatus;
+  /**
+   * L'issue du point de vue de celui qui regarde et le score dans SON ordre.
+   * Présente sur un duel validé, elle remplace le score brut et le statut
+   * par la pastille vert / rouge (`DuelResultPill`).
+   */
+  result?: { outcome: DuelSideResult; score: string } | null;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -73,11 +109,13 @@ export function DuelRow({
   challengerScore,
   opponentScore,
   status,
+  result,
   style,
 }: DuelRowProps) {
   const neu = useNeu();
   const t = useDsT();
   const hasScore = challengerScore !== null && opponentScore !== null;
+  const settled = status === 'validated' && result ? result : null;
 
   const body = (pressed: boolean) => (
     <Card style={[styles.row, pressed ? neu.pressedSm : null, style]}>
@@ -91,12 +129,18 @@ export function DuelRow({
         </Txt>
       </View>
       <View style={styles.trailing}>
-        {hasScore ? (
-          <Txt variant="numeric" size={15}>
-            {challengerScore}–{opponentScore}
-          </Txt>
-        ) : null}
-        <DuelStatusBadge status={status} />
+        {settled ? (
+          <DuelResultPill result={settled.outcome} score={settled.score} />
+        ) : (
+          <>
+            {hasScore ? (
+              <Txt variant="numeric" size={15}>
+                {challengerScore}–{opponentScore}
+              </Txt>
+            ) : null}
+            <DuelStatusBadge status={status} />
+          </>
+        )}
       </View>
     </Card>
   );
@@ -127,7 +171,10 @@ export interface ScoreSideProps {
   username?: string | null;
   /** Nom civil sous le pseudo (facultatif). */
   name?: string | null;
+  /** @deprecated — préférer `result`. Vrai = `result: 'win'`. */
   winner?: boolean;
+  /** L'issue de ce côté d'un duel terminé (`DuelResultPill`). */
+  result?: DuelSideResult | null;
   /** Ouverture de la fiche publique du joueur. */
   onPress?: () => void;
   /** Contenu additionnel sous le nom (avatar, drapeau…). */
@@ -136,19 +183,22 @@ export interface ScoreSideProps {
 }
 
 /**
- * Un côté du tableau de score d'un duel : score, pseudo, nom, badge
- * « Vainqueur ».
+ * Un côté du tableau de score d'un duel : score, pseudo, nom, et — duel
+ * terminé — la pastille de son issue (« Victoire » verte, « Défaite »
+ * rouge).
  */
 export function ScoreSide({
   score,
   username,
   name,
   winner = false,
+  result,
   onPress,
   children,
   style,
 }: ScoreSideProps) {
   const t = useDsT();
+  const outcome: DuelSideResult | null = result ?? (winner ? 'win' : null);
   const label = (
     <Txt variant="label">{username ?? t('ui.waiting')}</Txt>
   );
@@ -172,13 +222,14 @@ export function ScoreSide({
       {name ? (
         <Txt variant="caption" tone="muted">{name}</Txt>
       ) : null}
-      {winner ? <Badge tone="gold">{t('ui.winner')}</Badge> : null}
+      {outcome ? <DuelResultPill result={outcome} /> : null}
       {children}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  resultText: { fontVariant: ['tabular-nums'] },
   row: {
     flexDirection: 'row',
     alignItems: 'center',

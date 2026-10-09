@@ -27,6 +27,17 @@ export const frUi = {
   'ui.waiting': 'En attente',
   'ui.winner': 'Vainqueur',
 
+  // Issue d'un duel terminé (pastilles vert / rouge, 09/10/2026)
+  'ui.result.win': 'Victoire',
+  'ui.result.loss': 'Défaite',
+  'ui.result.draw': 'Match nul',
+
+  // Écran de chargement : le logo animé dit « chargement » au lecteur d'écran
+  'ui.loader.label': 'Chargement de G-HUB…',
+
+  // Compteur d'un champ texte (« 212 sur 280 caractères »)
+  'ui.field.counter': '{used} sur {max} caractères',
+
   // Feuille modale : la poignée est manipulable, elle doit se dire.
   'ui.sheet.handle': 'Poignée de la feuille',
   'ui.sheet.handleHint': 'Agrandir ou réduire la feuille',
