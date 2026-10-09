@@ -17,7 +17,12 @@ import { useDsT } from '../i18n';
 import { cardRecord } from '../lib/game-cards';
 import { cardStats, cityAbbr, type StatDef } from '../lib/player-stats';
 import { FLAG_RADIUS, pct, type CardBackLayout, type CardLayout } from '../skins/geometry';
-import { stopColor, type SkinSpec } from '../skins/spec';
+import {
+  DIVISION_CHIP_BACKGROUND,
+  identityBand,
+  stopColor,
+  type SkinSpec,
+} from '../skins/spec';
 import { useSkin } from '../skins/context';
 
 import {
@@ -102,7 +107,13 @@ export function DivisionChip({
         // sans couleur. Le premier arrêt du dégradé est la teinte haute.
         style={[
           s.division,
-          { alignSelf: 'auto', borderColor: spec.frame.stops[0]?.color },
+          {
+            alignSelf: 'auto',
+            borderColor: spec.frame.stops[0]?.color,
+            // Une couleur de division (cyan, or) veut un fond sombre : sur un
+            // skin clair, le voile de 28 % la rendait illisible (lot L3).
+            ...(color ? { backgroundColor: DIVISION_CHIP_BACKGROUND } : null),
+          },
         ]}
         // Inter encode la graisse dans le nom de famille : pas de fontWeight cumulé.
         textStyle={[s.divisionText, { color: color ?? spec.ink, fontWeight: 'normal' }]}
@@ -308,7 +319,9 @@ function PlayerCardBody({
       </View>
       <CardPortrait imageUrl={imageUrl} />
 
-      <View style={[s.identity, { borderTopColor: spec.line }]}>
+      {/* Bandeau teinté à l'opposé de l'encre : le nom reste lisible sur
+          n'importe quel portrait (carte OR + silhouette sombre — lot L3). */}
+      <View style={[s.identity, { borderTopColor: spec.line, backgroundColor: identityBand(spec) }]}>
         <Text
           numberOfLines={1}
           adjustsFontSizeToFit
@@ -441,8 +454,10 @@ function makeStyles(k: number, L: CardLayout) {
       width: pct(L.identity.width),
       alignItems: 'center',
       paddingTop: 7 * k,
-      paddingBottom: 2 * k,
+      paddingBottom: 4 * k,
       borderTopWidth: 1,
+      borderBottomLeftRadius: 6 * k,
+      borderBottomRightRadius: 6 * k,
       zIndex: 7,
     },
     /* Largeur bornée + centrage : indispensable pour qu'adjustsFontSizeToFit

@@ -15,7 +15,7 @@
  * Les classes `.pcard--<skin>` n'existent plus : un skin est une donnée.
  */
 import { cardLayoutCssVars, cardShape, shapeClipPath, type CardShapeName } from './geometry';
-import { stopColor, type SkinSpec } from './spec';
+import { identityBand, stopColor, type SkinSpec } from './spec';
 
 /** Variables consommées par les règles `.pcard*` de `theme/components.css`. */
 export type SkinCssVars = Record<string, string>;
@@ -60,6 +60,8 @@ export function skinCssVars(skin: SkinSpec): SkinCssVars {
     '--pc-bg1': skin.radials[0]?.color ?? stopColor(skin.frame, 0),
     '--pc-bg2': stopColor(skin.surface, 0),
     '--pc-bg3': stopColor(skin.surface, 2),
+    /* Bandeau du nom : teinte de surface opposée à l'encre (lot L3). */
+    '--pc-band': identityBand(skin),
   };
   if (skin.glow) {
     vars['--pc-glowc'] = skin.glow.color;

@@ -22,6 +22,12 @@ import {
   skinCssVars,
   skinFromLegacyDesign,
   skinFromSeed,
+  contrastRatio,
+  identityBand,
+  IDENTITY_BAND_ALPHA,
+  luminance,
+  mixColor,
+  parseColor,
 } from './index';
 
 describe('skins intégrés', () => {
@@ -299,5 +305,33 @@ describe('gabarit du contenu', () => {
     // Une variable par côté de chaque bloc, sans trou, plus l'arrondi.
     const attendu = Object.values(CARD_LAYOUT).reduce((n, b) => n + Object.keys(b).length, 0);
     expect(Object.keys(vars)).toHaveLength(attendu + 1);
+  });
+});
+
+/**
+ * Lot L3 (09/10/2026) : sur la carte OR, le pseudo passait sous la silhouette
+ * de repli et devenait illisible (encre sombre sur portrait sombre). Le
+ * bandeau du nom prend la teinte de surface opposée à l'encre : le nom reste
+ * lisible même quand le portrait derrière est le pire possible (noir pour une
+ * encre sombre, blanc pour une encre claire).
+ */
+describe('bandeau du nom — lisible sur tout skin, quel que soit le portrait', () => {
+  test.each(BUILTIN_SKIN_KEYS.map((k) => [k] as const))('%s', (key) => {
+    const skin = BUILTIN_SKINS[key];
+    const solid = parseColor(identityBand(skin))!;
+    const hex = `#${[solid.r, solid.g, solid.b]
+      .map((v) => Math.round(v).toString(16).padStart(2, '0'))
+      .join('')}`;
+    const worstBehind = luminance(skin.ink) > 0.45 ? '#ffffff' : '#000000';
+    const composite = mixColor(hex, worstBehind, 1 - IDENTITY_BAND_ALPHA);
+    expect(contrastRatio(skin.ink, composite)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('un skin dont aucun arrêt ne porte l’encre retombe sur un fond neutre opposé', () => {
+    const band = identityBand({
+      ink: '#222222',
+      surface: { x1: 0, y1: 0, x2: 0, y2: 1, stops: [{ color: '#333333', offset: 0 }] },
+    });
+    expect(luminance(band)).toBeGreaterThan(0.8);
   });
 });

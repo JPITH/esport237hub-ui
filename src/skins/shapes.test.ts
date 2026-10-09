@@ -254,8 +254,13 @@ describe('un skin sans `shape` rend exactement l’ancien résultat', () => {
       },
     };
     expect(hash(legacy)).toBe(BEFORE.skins[key].draw);
-    /* Positions du contenu web (`--pc-l-*`) et découpe du foil comprises. */
-    expect(hash(skinCssVars(spec))).toBe(BEFORE.skins[key].css);
+    /* Positions du contenu web (`--pc-l-*`) et découpe du foil comprises.
+       `--pc-band` (bandeau du nom, lot L3) est un AJOUT : il ne change rien
+       de ce qui existait, il est donc hors de l'empreinte d'avant. */
+    const before = Object.fromEntries(
+      Object.entries(skinCssVars(spec)).filter(([name]) => name !== '--pc-band'),
+    );
+    expect(hash(before)).toBe(BEFORE.skins[key].css);
     if (d.sheen) {
       expect(d.sheen.left).toBe(0);
       expect(d.sheen.boxWidth).toBe(d.width);
