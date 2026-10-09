@@ -35,6 +35,8 @@ export const MAX_BYTES_BY_KIND: Record<MediaKind, number> = {
   duel_proof: 8 * MB,
   post_cover: 8 * MB,
   social_post_image: 8 * MB,
+  // Pièce d'identité du gérant d'une salle (CNI, migration 0054 du monorepo).
+  identity_document: 8 * MB,
 };
 
 export function maxBytesForKind(kind: MediaKind): number {
