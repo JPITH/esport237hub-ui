@@ -570,6 +570,20 @@ export interface PlayerCardBackProps {
   still?: boolean;
 }
 
+/**
+ * Verso seul, posé dans son chrome — jumeau de `PlayerCardBack` du web, pour
+ * les aperçus qui montrent la face et le dos côte à côte ou au choix (fiche
+ * d'un skin en boutique, lot S1) sans passer par le retournement animé de
+ * `flippable`.
+ */
+export function PlayerCardBack({ skin = 'signature', ...props }: PlayerCardBackProps) {
+  return (
+    <CardChrome skin={skin}>
+      <PlayerCardBackBody skin={skin} {...props} />
+    </CardChrome>
+  );
+}
+
 /** Corps du verso — rendu SOUS `CardChrome` pour recevoir l'échelle mesurée. */
 export function PlayerCardBackBody({
   username,
