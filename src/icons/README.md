@@ -147,3 +147,4 @@ Ajoutées pour le web et la vitrine (octobre 2026), dans la même grammaire :
 | `Shuffle` | `shuffle` (tirage) | `Square` (bouton d'arrêt) | `stop` |
 | `TrendingUp` | `trending-up` | `Undo2` | `undo` (lever, annuler) |
 | `Settings2` | `settings` | `TriangleAlert` / `House` / `User` | `alert-triangle` / `home` / `user` |
+| `Box` | `cube` (vue 3D du plateau — un cube isométrique, sans la sangle du colis) | | |
