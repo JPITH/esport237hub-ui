@@ -64,6 +64,12 @@ export interface DuelRowProps {
    * et le statut par la pastille vert / rouge (`DuelResultPill`).
    */
   result?: { outcome: DuelSideResult; score: string } | null;
+  /**
+   * Remplace la pastille de statut quand son nom dépend de qui regarde : une
+   * demande `sent` est « Envoyée » pour son auteur, « Reçue » pour son
+   * destinataire (visite du 09/10/2026).
+   */
+  statusBadge?: ReactNode;
   className?: string;
 }
 
@@ -87,6 +93,7 @@ export function DuelRow({
   opponentScore,
   status,
   result,
+  statusBadge,
   className = "",
 }: DuelRowProps) {
   const t = useDsT();
@@ -117,7 +124,7 @@ export function DuelRow({
                 {challengerScore}–{opponentScore}
               </span>
             ) : null}
-            <DuelStatusBadge status={status} />
+            {statusBadge ?? <DuelStatusBadge status={status} />}
           </>
         )}
       </div>
