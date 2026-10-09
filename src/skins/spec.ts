@@ -587,7 +587,11 @@ function spec(s: Omit<SkinSpec, 'version'>): SkinSpec {
  * Toute retouche de palette se fait dans ce seul objet : web et natif suivent.
  */
 export const BUILTIN_SKINS: Record<BuiltinSkinKey, SkinSpec> = {
-  /* Or — le skin « brut » historique. */
+  /* Or — le skin « brut » historique.
+     Bas de surface éclairci le 09/10/2026 (`#6f5a1c` → `#a07d23`, même bronze) :
+     les deux dernières rangées de stats du recto et le bilan du verso
+     tombaient à ~3:1 sous l'encre sombre ; 4,55:1 sur l'arrêt lui-même, 4,69
+     au pire point de texte (`skins/card-mark.test.ts`). */
   gold: spec({
     key: 'gold',
     label: 'Or',
@@ -596,7 +600,7 @@ export const BUILTIN_SKINS: Record<BuiltinSkinKey, SkinSpec> = {
     line: 'rgba(36,23,2,0.22)',
     accent: '#8a5a12',
     frame: frameLinear('#fff0a8', '#c89119', '#4a3608'),
-    surface: surfaceLinear('#e9bc3f', '#c89a28', '#6f5a1c'),
+    surface: surfaceLinear('#e9bc3f', '#c89a28', '#a07d23'),
     radials: [{ color: '#fff0a8', opacity: 0.9, cx: 0.72, cy: 0.18, r: 0.6 }],
     border: '#a5810a',
     inner: 'rgba(255,255,255,0.3)',
@@ -632,7 +636,9 @@ export const BUILTIN_SKINS: Record<BuiltinSkinKey, SkinSpec> = {
     inner: 'rgba(255,255,255,0.18)',
   }),
 
-  /* Champion — n°1 du classement : nuit charbon + rayons d'or. */
+  /* Champion — n°1 du classement : nuit charbon + rayons d'or.
+     Halo du haut adouci le 09/10/2026 (opacité 0,5 → 0,44) : le titre du
+     verso (« STATISTIQUES » + points) passait dessus à ~4,4:1. */
   champion: spec({
     key: 'champion',
     label: 'Champion',
@@ -643,7 +649,7 @@ export const BUILTIN_SKINS: Record<BuiltinSkinKey, SkinSpec> = {
     frame: frameLinear('#fff0ad', '#f4cc65', '#5a3a0a'),
     surface: surfaceLinear('#2b1c04', '#140c02', '#241503'),
     radials: [
-      { color: '#ffcc5c', opacity: 0.5, cx: 0.68, cy: 0.04, r: 0.62 },
+      { color: '#ffcc5c', opacity: 0.44, cx: 0.68, cy: 0.04, r: 0.62 },
       { color: '#ffb020', opacity: 0.18, cx: 0.22, cy: 0.3, r: 0.6 },
     ],
     stripes: stripes('diagonal', '#f4cc65', 0.07),

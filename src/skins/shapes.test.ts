@@ -24,6 +24,7 @@ import {
   shapePoints,
   skinCssVars,
   skinFromSeed,
+  surfaceLinear,
   type SkinSpec,
 } from './index';
 import { CARD_SHAPE_SOURCES, CARD_SHAPE_VIEW } from './shapes/generated';
@@ -216,12 +217,29 @@ const BEFORE = {
   } as Record<string, { draw: string; css: string }>,
 };
 
+/**
+ * Palettes d'origine des skins RETOUCHÉS depuis ces empreintes (lisibilité,
+ * 09/10/2026 — `card-mark.test.ts`) : l'empreinte garde le MOTEUR de rendu,
+ * pas la palette. On la recalcule donc sur le spec tel qu'il était en base.
+ */
+const PALETTE_BEFORE: Record<string, Partial<SkinSpec>> = {
+  gold: { surface: surfaceLinear('#e9bc3f', '#c89a28', '#6f5a1c') },
+  champion: {
+    radials: [
+      { color: '#ffcc5c', opacity: 0.5, cx: 0.68, cy: 0.04, r: 0.62 },
+      { color: '#ffb020', opacity: 0.18, cx: 0.22, cy: 0.3, r: 0.6 },
+    ],
+  },
+};
+
 const hash = (v: unknown) => createHash('sha256').update(JSON.stringify(v)).digest('hex').slice(0, 16);
 
 describe('un skin sans `shape` rend exactement l’ancien résultat', () => {
   test.each(Object.keys(BEFORE.skins).map((k) => [k] as const))('%s', (key) => {
     /* Le spec tel qu'il est stocké en base depuis la v1 : sans `shape`. */
-    const stored = JSON.parse(JSON.stringify(BUILTIN_SKINS[key as keyof typeof BUILTIN_SKINS]));
+    const stored = JSON.parse(
+      JSON.stringify({ ...BUILTIN_SKINS[key as keyof typeof BUILTIN_SKINS], ...PALETTE_BEFORE[key] }),
+    );
     expect(stored.shape).toBeUndefined();
     const spec = parseSkinSpec(stored);
     const d = buildSkinDraw(spec, 'fx');
