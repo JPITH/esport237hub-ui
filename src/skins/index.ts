@@ -35,6 +35,10 @@ export {
   darken,
   luminance,
   readableInk,
+  contrastRatio,
+  identityBand,
+  IDENTITY_BAND_ALPHA,
+  DIVISION_CHIP_BACKGROUND,
 } from './spec';
 export type {
   SkinSpec,
