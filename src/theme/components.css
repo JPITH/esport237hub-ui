@@ -183,9 +183,9 @@
    tant que le panneau est ouvert, même quand le focus part dans le panneau. */
 .ui-field[aria-expanded="true"] {
   outline: none;
-  border-color: var(--e237-accent);
-  box-shadow: var(--e237-neu-pressed-sm),
-    0 0 0 3px color-mix(in srgb, var(--e237-accent) 18%, transparent);
+  /* Focus discret, neutre (porteur, 09/10/2026) — voir `.e237-field:focus`. */
+  border-color: color-mix(in srgb, var(--e237-text-muted) 85%, transparent);
+  box-shadow: var(--e237-neu-pressed-sm);
 }
 
 /* Focus clavier visible et cohérent sur TOUT l'interactif non-champ
@@ -999,6 +999,11 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* Une couleur de division (posée en ligne) veut un fond sombre : cyan sur
+   or ne se lisait pas (lot L3). */
+.pcard__division[style*='color'] {
+  background: rgba(0, 0, 0, 0.7);
+}
 
 /* Zone portrait : photo détourée ou fallback (PNG IA / silhouette). */
 .pcard__img {
@@ -1049,10 +1054,13 @@
   width: var(--pc-l-identity-width);
   padding: 4.2% 4% 3.6%;
   text-align: center;
+  /* `--pc-band` : la teinte de surface OPPOSÉE à l'encre (`identityBand`).
+     Le bas de la surface (`--pc-bg3`) était sombre sur la carte OR, dont
+     l'encre est sombre aussi : le nom se perdait sur la silhouette (lot L3). */
   background: linear-gradient(
     90deg,
     transparent,
-    color-mix(in srgb, var(--pc-bg3, #000) 78%, transparent) 18% 82%,
+    var(--pc-band, color-mix(in srgb, var(--pc-bg3, #000) 78%, transparent)) 12% 88%,
     transparent
   );
   border-top: 1px solid color-mix(in srgb, var(--pc-frame1) 35%, transparent);

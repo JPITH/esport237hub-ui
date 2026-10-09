@@ -244,6 +244,45 @@ export function readableInk(background: string): string {
   return luminance(background) > 0.45 ? '#1b1205' : '#f4f8ff';
 }
 
+/** Rapport de contraste WCAG entre deux couleurs opaques (1 à 21). */
+export function contrastRatio(a: string, b: string): number {
+  const la = luminance(a);
+  const lb = luminance(b);
+  return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+}
+
+/** Opacité du bandeau du nom : assez pour lire, assez peu pour laisser voir le portrait. */
+export const IDENTITY_BAND_ALPHA = 0.84;
+
+/**
+ * Fond du bandeau du NOM (lot L3, 09/10/2026) : l'arrêt de la surface qui
+ * contraste le plus avec l'encre du skin, légèrement translucide.
+ *
+ * Le nom passe sous le bas du portrait. Sur le skin OR (encre sombre), la
+ * silhouette de repli — sombre elle aussi — rendait « AKWASNIPER »
+ * illisible à la recette ; le web posait bien un bandeau, mais teinté du bas
+ * de la surface, sombre lui aussi. Le bandeau prend désormais la teinte
+ * opposée à l'encre, quel que soit le skin (y compris ceux du dashboard).
+ */
+export function identityBand(skin: Pick<SkinSpec, 'ink' | 'surface'>): string {
+  const stops = skin.surface.stops.map((stop) => stop.color);
+  let best = stops[0] ?? readableInk(skin.ink);
+  for (const color of stops) {
+    if (contrastRatio(skin.ink, color) > contrastRatio(skin.ink, best)) best = color;
+  }
+  // Aucun arrêt ne porte l'encre : un fond neutre opposé à l'encre.
+  if (contrastRatio(skin.ink, best) < 4.5) best = luminance(skin.ink) > 0.45 ? '#0b0f17' : '#fff8e6';
+  return withAlpha(best, IDENTITY_BAND_ALPHA);
+}
+
+/**
+ * Fond de la pastille de division : sa couleur (cyan, or…) est faite pour un
+ * fond sombre. Sur un skin clair, le voile de 28 % ne suffisait pas (« DIV 3 »
+ * cyan sur or, recette du 09/10) : un voile franc rend la pastille lisible
+ * partout.
+ */
+export const DIVISION_CHIP_BACKGROUND = 'rgba(0,0,0,0.7)';
+
 /* ========================================================================== */
 /* Gabarits de dégradés et de rayures                                         */
 /* ========================================================================== */
