@@ -20,6 +20,12 @@ const RADIUS: Record<MediaRounded, string> = {
 export interface MediaImageProps {
   /** URL distante ; `null`/`undefined` → repli visuel (jamais de carré cassé). */
   src?: string | null;
+  /**
+   * Seconde URL, tentée UNE fois si `src` ne charge pas, avant le repli
+   * illustré (jumelle du natif : variante légère demandée, URL de l'API en
+   * secours).
+   */
+  fallbackSrc?: string | null;
   /** Texte alternatif — obligatoire (produit, événement, salle…). */
   alt: string;
   /** Ratio largeur / hauteur (défaut 16 / 9). */
@@ -47,7 +53,8 @@ type Status = "loading" | "ready" | "error";
  *   `prefers-reduced-motion`).
  */
 export function MediaImage({
-  src,
+  src: primarySrc,
+  fallbackSrc,
   alt,
   ratio = 16 / 9,
   rounded = "md",
@@ -57,11 +64,24 @@ export function MediaImage({
   className = "",
   style,
 }: MediaImageProps) {
+  // 0 = `src`, 1 = `fallbackSrc` après un échec de `src`.
+  const [attempt, setAttempt] = useState<0 | 1>(0);
+  const src = attempt === 1 ? fallbackSrc : primarySrc;
   const [status, setStatus] = useState<Status>(src ? "loading" : "error");
 
   useEffect(() => {
-    setStatus(src ? "loading" : "error");
-  }, [src]);
+    setAttempt(0);
+    setStatus(primarySrc || fallbackSrc ? "loading" : "error");
+  }, [primarySrc, fallbackSrc]);
+
+  const onError = () => {
+    if (attempt === 0 && fallbackSrc && fallbackSrc !== primarySrc) {
+      setAttempt(1);
+      setStatus("loading");
+      return;
+    }
+    setStatus("error");
+  };
 
   const loading = Boolean(src) && status === "loading";
   const failed = !src || status === "error";
@@ -80,7 +100,7 @@ export function MediaImage({
           decoding="async"
           style={{ objectFit: fit, opacity: status === "ready" ? 1 : 0 }}
           onLoad={() => setStatus("ready")}
-          onError={() => setStatus("error")}
+          onError={onError}
         />
       ) : null}
 
