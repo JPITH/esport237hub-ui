@@ -920,8 +920,10 @@
  * DANS le cadre : une icône à gauche, le texte, une ou deux à droite, toutes
  * calées en bas quand le texte prend plusieurs lignes. Une hauteur pour la
  * famille (44 px = icône 36 + 2 × 4), le focus va au cadre entier.
+ * Préfixe `e237-inline-field` : `.e237-composer` est déjà le cadre de
+ * publication du fil (`components.css`).
  */
-.e237-composer {
+.e237-inline-field {
   display: flex;
   align-items: flex-end;
   gap: 2px;
@@ -934,17 +936,17 @@
     border-color 150ms ease,
     box-shadow 150ms ease;
 }
-.e237-composer:focus-within {
+.e237-inline-field:focus-within {
   border-color: var(--e237-accent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--e237-accent) 18%, transparent);
 }
-.e237-composer-slot {
+.e237-inline-field__slot {
   display: flex;
   align-items: center;
   gap: 2px;
   padding: 3px 0;
 }
-.e237-composer-input {
+.e237-inline-field__input {
   flex: 1;
   min-width: 0;
   min-height: 42px;
@@ -959,17 +961,17 @@
   resize: none;
   outline: none;
 }
-.e237-composer-input::placeholder {
+.e237-inline-field__input::placeholder {
   color: var(--e237-text-muted);
 }
-.e237-composer--bare-start .e237-composer-input {
+.e237-inline-field--bare-start .e237-inline-field__input {
   padding-left: 12px;
 }
-.e237-composer--bare-end .e237-composer-input {
+.e237-inline-field--bare-end .e237-inline-field__input {
   padding-right: 12px;
 }
 /* Bouton rond posé dans le champ : icône seule, ou pastille d'accent (envoi). */
-.e237-composer-btn {
+.e237-inline-field__btn {
   display: grid;
   place-items: center;
   width: 36px;
@@ -984,27 +986,27 @@
     background-color 150ms ease,
     opacity 150ms ease;
 }
-.e237-composer-btn:hover:not(:disabled) {
+.e237-inline-field__btn:hover:not(:disabled) {
   background: var(--e237-surface-raised);
   color: var(--e237-accent);
 }
-.e237-composer-btn--accent {
+.e237-inline-field__btn--accent {
   background: var(--e237-accent);
   color: var(--e237-on-accent);
 }
-.e237-composer-btn--accent:hover:not(:disabled) {
+.e237-inline-field__btn--accent:hover:not(:disabled) {
   background: var(--e237-accent-hover, var(--e237-accent));
   color: var(--e237-on-accent);
 }
-.e237-composer-btn:disabled {
+.e237-inline-field__btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
-.e237-composer-btn:focus-visible {
+.e237-inline-field__btn:focus-visible {
   outline: none;
   box-shadow: var(--e237-ring);
 }
-.e237-composer-btn > svg {
+.e237-inline-field__btn > svg {
   width: 18px;
   height: 18px;
 }

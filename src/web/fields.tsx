@@ -767,15 +767,15 @@ export const ComposerField = forwardRef<HTMLTextAreaElement, ComposerFieldProps>
   ({ leading, trailing, className, rows = 1, ...rest }, ref) => (
     <div
       className={cx(
-        'e237-composer',
-        !leading && 'e237-composer--bare-start',
-        !trailing && 'e237-composer--bare-end',
+        'e237-inline-field',
+        !leading && 'e237-inline-field--bare-start',
+        !trailing && 'e237-inline-field--bare-end',
         className,
       )}
     >
-      {leading ? <div className="e237-composer-slot">{leading}</div> : null}
-      <textarea ref={ref} rows={rows} className="e237-composer-input" {...rest} />
-      {trailing ? <div className="e237-composer-slot">{trailing}</div> : null}
+      {leading ? <div className="e237-inline-field__slot">{leading}</div> : null}
+      <textarea ref={ref} rows={rows} className="e237-inline-field__input" {...rest} />
+      {trailing ? <div className="e237-inline-field__slot">{trailing}</div> : null}
     </div>
   ),
 );
@@ -804,7 +804,7 @@ export function ComposerFieldButton({
       title={label}
       onClick={onClick}
       disabled={disabled}
-      className={cx('e237-composer-btn', tone === 'accent' && 'e237-composer-btn--accent')}
+      className={cx('e237-inline-field__btn', tone === 'accent' && 'e237-inline-field__btn--accent')}
     >
       {children}
     </button>
