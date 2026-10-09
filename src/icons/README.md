@@ -1,6 +1,6 @@
 # Icônes G-HUB
 
-Le jeu d'icônes maison de G-HUB : 143 pictogrammes SVG dessinés à la main dans
+Le jeu d'icônes maison de G-HUB : 145 pictogrammes SVG dessinés à la main dans
 la direction artistique du produit, qui remplacent Lucide partout : l'app
 mobile, le tableau de bord web et le site vitrine (registre `Glyph`).
 Une seule source (les tracés de `svg/*.svg`), deux rendus (`<svg>` en ligne
@@ -83,7 +83,7 @@ hex, `rgb()`, nom de couleur, raster, `<image>`, `<use>`, `<style>` ou lien.
 4. Planche de contrôle (normal + actif, 16 / 24 / 32 px, clair et sombre,
    encres des jetons) : `bun scripts/icons.ts --sheet planche.html`.
 
-Poids : 143 sources, **47 493 octets** optimisés par SVGO (les 108 premières :
+Poids : 145 sources, **48 183 octets** optimisés par SVGO (les 108 premières :
 47 862 → 36 521 octets, −24 %), budget du test : 48 Ko ;
 `generated/data.ts` (la donnée embarquée par l'app) pèse ~20 Ko.
 
@@ -147,3 +147,4 @@ Ajoutées pour le web et la vitrine (octobre 2026), dans la même grammaire :
 | `Shuffle` | `shuffle` (tirage) | `Square` (bouton d'arrêt) | `stop` |
 | `TrendingUp` | `trending-up` | `Undo2` | `undo` (lever, annuler) |
 | `Settings2` | `settings` | `TriangleAlert` / `House` / `User` | `alert-triangle` / `home` / `user` |
+| `Volume2` / `VolumeX` | `volume` / `volume-x` (sons des jeux, lot J1) | | |
