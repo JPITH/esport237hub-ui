@@ -148,3 +148,4 @@ Ajoutées pour le web et la vitrine (octobre 2026), dans la même grammaire :
 | `TrendingUp` | `trending-up` | `Undo2` | `undo` (lever, annuler) |
 | `Settings2` | `settings` | `TriangleAlert` / `House` / `User` | `alert-triangle` / `home` / `user` |
 | `Volume2` / `VolumeX` | `volume` / `volume-x` (sons des jeux, lot J1) | | |
+| `Box` | `cube` (vue 3D du plateau — un cube isométrique, sans la sangle du colis) | | |

@@ -445,6 +445,33 @@
   box-shadow: var(--e237-ring);
 }
 
+/*
+ * Variante FLOTTANTE : une pastille ronde posée au-dessus d'une scène (le
+ * plateau 3D des échecs) — fond relevé, trait, ombre courte, parce qu'elle
+ * flotte vraiment (DESIGN.md, « La profondeur »). Une bascule allumée
+ * (`aria-pressed="true"`) prend la teinte d'accent, sans aplat : l'action
+ * principale de l'écran reste ailleurs.
+ */
+.icon-btn--float {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--e237-radius-full, 9999px);
+  color: var(--e237-text-primary);
+  background: var(--e237-surface-raised);
+  border-color: var(--e237-border);
+  box-shadow: var(--e237-shadow-pop);
+}
+.icon-btn--float:hover:not(:disabled) {
+  background: var(--e237-surface-raised);
+  border-color: var(--e237-border-strong);
+}
+.icon-btn--float[aria-pressed='true'],
+.icon-btn--float[aria-expanded='true'] {
+  color: var(--e237-accent);
+  background: var(--e237-accent-subtle);
+  border-color: var(--e237-accent-border);
+}
+
 /* ---------------------------------------------------------------- */
 /* Puces de filtre (avec compteur/stat) + segments d'onglets          */
 /* ---------------------------------------------------------------- */
