@@ -76,6 +76,13 @@ export interface EventCardProps {
   priceLabel: string;
   /** Colore le prix en accent (évènement payant). */
   isPaid?: boolean;
+  /**
+   * Disponibilité SANS chiffre (« Places limitées », « Complet ») — le nombre
+   * d'inscrits est confidentiel (09/10/2026). Absente = rien à signaler.
+   */
+  availabilityLabel?: string | null;
+  /** `warning` (limitées) ou `danger` (complet). */
+  availabilityTone?: "warning" | "danger";
   className?: string;
 }
 
@@ -95,6 +102,8 @@ export function EventCard({
   capacity,
   priceLabel,
   isPaid = false,
+  availabilityLabel,
+  availabilityTone = "warning",
   className = "",
 }: EventCardProps) {
   return (
@@ -105,6 +114,11 @@ export function EventCard({
             <div className="flex flex-wrap items-center gap-2">
               <Badge tone={eventTypeTone(type)}>{eventTypeLabel(type)}</Badge>
               {gameName ? <Badge tone="neutral">{gameName}</Badge> : null}
+              {availabilityLabel ? (
+                <Badge tone={availabilityTone} size="sm">
+                  {availabilityLabel}
+                </Badge>
+              ) : null}
             </div>
             <span className="font-semibold">{title}</span>
           </div>
@@ -151,6 +165,9 @@ export interface CompetitionCardProps {
   /** Date de début déjà mise en forme ; absente = non annoncée. */
   dateLabel?: string | null;
   venueName?: string | null;
+  /** Disponibilité sans chiffre (« Places limitées », « Complet »). */
+  availabilityLabel?: string | null;
+  availabilityTone?: "warning" | "danger";
   className?: string;
 }
 
@@ -165,6 +182,8 @@ export function CompetitionCard({
   city,
   dateLabel,
   venueName,
+  availabilityLabel,
+  availabilityTone = "warning",
   className = "",
 }: CompetitionCardProps) {
   return (
@@ -172,9 +191,16 @@ export function CompetitionCard({
       <Card className="flex flex-col gap-2 transition-colors hover:border-accent">
         <div className="flex items-center justify-between gap-2">
           <span className="font-semibold">{title}</span>
-          <Badge tone={competitionStatusTone(status)}>
-            {competitionStatusLabel(status)}
-          </Badge>
+          <span className="flex shrink-0 items-center gap-1.5">
+            {availabilityLabel ? (
+              <Badge tone={availabilityTone} size="sm">
+                {availabilityLabel}
+              </Badge>
+            ) : null}
+            <Badge tone={competitionStatusTone(status)}>
+              {competitionStatusLabel(status)}
+            </Badge>
+          </span>
         </div>
         <div className="flex flex-wrap gap-2 text-xs text-muted">
           <span>{competitionFormatLabel(format)}</span>
@@ -308,6 +334,12 @@ export interface TicketCardProps {
    * cadre — voir `QrFrame`.
    */
   qr?: ReactNode;
+  /**
+   * À qui est le billet (billets nominatifs, 09/10/2026) : le nom porté, et
+   * le geste pour le corriger tant que le billet n'est pas scanné. L'app
+   * fournit le contenu ; la carte lui donne sa place, sous les infos.
+   */
+  holder?: ReactNode;
   className?: string;
 }
 
@@ -324,6 +356,7 @@ export function TicketCard({
   admitted = false,
   checkedInAtLabel,
   qr,
+  holder,
   className = "",
 }: TicketCardProps) {
   const meta = ticketStatusMeta(status);
@@ -368,6 +401,13 @@ export function TicketCard({
           {priceOrFreeLabel(amountXaf)}
         </span>
       </div>
+
+      {holder ? (
+        <div className="flex items-start gap-2 text-sm text-primary">
+          <Icon name="user" size={16} className="mt-0.5 shrink-0 text-muted" />
+          <div className="min-w-0 flex-1">{holder}</div>
+        </div>
+      ) : null}
 
       {qr ? (
         <div className="flex items-center gap-4 border-t border-edge pt-3">
