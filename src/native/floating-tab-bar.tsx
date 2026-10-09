@@ -4,15 +4,21 @@
  * remplace `E237TabBar` (barre courbée à bouton central, pensée pour cinq
  * onglets), retirée le même jour : plus aucune app ne l'utilisait.
  *
- * Quelques onglets dans une pilule détachée du bas de l'écran. Les onglets
- * inactifs ne montrent que leur icône ; l'onglet actif s'ÉLARGIT et affiche
- * son titre.
+ * Quelques onglets dans une pilule détachée du bas de l'écran. CHAQUE onglet
+ * montre son icône et, dessous, son titre ; l'onglet actif s'élargit un peu
+ * et prend la pastille teintée.
+ *
+ * 09/10/2026 (audit UX) — les onglets inactifs ne montraient que leur icône :
+ * il fallait deviner que l'épée menait aux Duels, et en mode gérant qu'un
+ * comptoir se cachait derrière une icône. À trois onglets la place existe ;
+ * le titre se pose SOUS l'icône (et pas à côté) pour tenir « Boutique » ou
+ * « Comptoir » en entier jusque sur les 360 px des Android d'entrée de gamme.
  *
  * Trois partis pris :
  *
- *  - LE TITRE N'EST JAMAIS PERDU pour un lecteur d'écran. Masqué à l'œil sur
- *    un onglet inactif, il reste son libellé accessible ; chaque onglet porte
- *    le rôle `tab` et son état `selected`, la pilule le rôle `tablist`.
+ *  - LE TITRE N'EST JAMAIS PERDU pour un lecteur d'écran. Visible à l'œil, il
+ *    reste aussi le libellé accessible de l'onglet ; chaque onglet porte le
+ *    rôle `tab` et son état `selected`, la pilule le rôle `tablist`.
  *
  *  - LE MOUVEMENT CÈDE À « RÉDUIRE LES ANIMATIONS ». L'élargissement est une
  *    interpolation Reanimated (fil UI) ; si le téléphone demande moins de
@@ -63,15 +69,12 @@ import {
 import { haptic } from './haptics';
 import { Txt } from './text';
 
-/** Largeur maximale du titre de l'onglet actif — « Boutique » y tient. */
-const LABEL_MAX_WIDTH = 120;
-
 /** Un onglet de la pilule. */
 export interface FloatingTab {
   /** Nom de la route (expo-router / React Navigation) qu'il ouvre. */
   route: string;
   icon: IconName;
-  /** Titre affiché sur l'onglet actif, et libellé accessible de tous. */
+  /** Titre affiché sous l'icône, et libellé accessible de l'onglet. */
   label: string;
 }
 
@@ -213,11 +216,6 @@ function TabItem({
   const itemStyle = useAnimatedStyle(() => ({
     flexGrow: interpolate(progress.value, [0, 1], [1, ACTIVE_GROW]),
   }));
-  const labelStyle = useAnimatedStyle(() => ({
-    opacity: progress.value,
-    maxWidth: interpolate(progress.value, [0, 1], [0, LABEL_MAX_WIDTH]),
-    marginLeft: interpolate(progress.value, [0, 1], [0, spacing['2']]),
-  }));
 
   const tint = focused ? c.accent : c.textSecondary;
 
@@ -251,18 +249,13 @@ function TabItem({
             partiel de l'encre remplit la forme — l'onglet se lit « allumé »
             sans épaissir le dessin (src/icons/README.md). */}
         <Icon name={icon} color={tint} size={22} active={focused} />
-        {/* Le titre n'est PAS démonté à l'inactif : il se replie, pour que
-            l'élargissement s'anime au lieu de sauter. Il est masqué aux
-            lecteurs d'écran, qui lisent déjà le libellé de l'onglet. */}
-        <Animated.View
-          style={[styles.labelClip, labelStyle]}
-          importantForAccessibility="no-hide-descendants"
-          accessibilityElementsHidden
-        >
-          <Txt variant="label" size={font.size.sm} color={tint} numberOfLines={1} style={styles.label}>
+        {/* Masqué aux lecteurs d'écran, qui lisent déjà le libellé de
+            l'onglet : il serait annoncé deux fois. */}
+        <View importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
+          <Txt variant="label" size={font.size.xs} color={tint} numberOfLines={1} style={styles.label}>
             {title}
           </Txt>
-        </Animated.View>
+        </View>
       </Pressable>
     </Animated.View>
   );
@@ -349,17 +342,17 @@ const styles = StyleSheet.create({
     flexBasis: 0,
     height: PILL_ITEM_HEIGHT,
   },
+  // Icône au-dessus du titre : 22 + 2 + ~16 px tiennent dans les 52 px de
+  // l'onglet, et le titre dispose de toute la largeur de sa case.
   item: {
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 2,
     borderRadius: radius.full,
     borderWidth: 1,
-    paddingHorizontal: spacing['3'],
-  },
-  labelClip: {
-    overflow: 'hidden',
+    paddingHorizontal: spacing['2'],
   },
   label: {
     letterSpacing: 0.2,

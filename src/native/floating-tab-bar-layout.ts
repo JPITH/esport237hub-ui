@@ -23,10 +23,11 @@ export const PILL_MIN_BOTTOM_GAP = 12;
 export const CONTENT_BREATHING = 16;
 /**
  * Part de la largeur que prend l'onglet actif, en unités de `flexGrow` : les
- * inactifs valent 1. À 2,2 sur 390 px, l'actif tient « Boutique » en entier
- * à côté de son icône, et les deux autres gardent une cible de plus de 70 px.
+ * inactifs valent 1. 2,2 quand seul l'actif montrait son titre ; depuis que
+ * tous le montrent (09/10/2026), 1,3 : sur 360 px, un onglet inactif garde
+ * ~93 px, assez pour « Boutique » ou « Comptoir » en 12 px sous son icône.
  */
-export const ACTIVE_GROW = 2.2;
+export const ACTIVE_GROW = 1.3;
 /** Durée de l'élargissement d'un onglet — sous le seuil où l'on attend. */
 export const TAB_TRANSITION_MS = 240;
 

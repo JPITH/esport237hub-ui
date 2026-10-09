@@ -168,6 +168,12 @@ export interface CompetitionCardProps {
   /** Disponibilité sans chiffre (« Places limitées », « Complet »). */
   availabilityLabel?: string | null;
   availabilityTone?: "warning" | "danger";
+  /**
+   * Tournoi d'un jeu joué DANS l'app (Ludo, Échecs, Dames) : la pastille
+   * « En ligne · dans l'app » — la partie s'ouvre toute seule, rien à
+   * déclarer. Absent = jeu externe.
+   */
+  inAppLabel?: string | null;
   className?: string;
 }
 
@@ -184,6 +190,7 @@ export function CompetitionCard({
   venueName,
   availabilityLabel,
   availabilityTone = "warning",
+  inAppLabel,
   className = "",
 }: CompetitionCardProps) {
   return (
@@ -192,6 +199,11 @@ export function CompetitionCard({
         <div className="flex items-center justify-between gap-2">
           <span className="font-semibold">{title}</span>
           <span className="flex shrink-0 items-center gap-1.5">
+            {inAppLabel ? (
+              <Badge tone="info" size="sm">
+                {inAppLabel}
+              </Badge>
+            ) : null}
             {availabilityLabel ? (
               <Badge tone={availabilityTone} size="sm">
                 {availabilityLabel}
