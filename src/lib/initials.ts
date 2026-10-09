@@ -17,6 +17,11 @@
  *
  * Les séparateurs de pseudo (`_`, `-`, `.`) comptent comme des espaces :
  * « jean_pierre » rend « JP », comme « Jean Pierre ».
+ *
+ * Une majuscule au milieu d'un pseudo commence un mot (lot L3, 09/10/2026) :
+ * « KingMbappe » rend « KM », comme son nom affiché « King Mbappé ». Le même
+ * joueur s'affichait « KI » dans la discussion d'un duel (qui passe le
+ * pseudo) et « KM » partout ailleurs (qui passe le nom).
  */
 
 /** Longueur maximale rendue — au-delà, la pastille ne tient plus. */
@@ -28,6 +33,9 @@ const SEPARATORS = /[\s_\-.·|]+/;
 /** Tout ce qui n'est ni lettre ni chiffre : accents conservés. */
 const NOT_ALPHANUM = /[^\p{L}\p{N}]/gu;
 
+/** Une minuscule suivie d'une majuscule : la frontière d'un mot en « CamelCase ». */
+const CAMEL_BOUNDARY = /(\p{Ll})(\p{Lu})/gu;
+
 /**
  * Rend 1 à 2 caractères en capitales, ou « ? ».
  *
@@ -38,6 +46,7 @@ export function initials(name: string | null | undefined): string {
 
   const words = name
     .trim()
+    .replace(CAMEL_BOUNDARY, '$1 $2')
     .split(SEPARATORS)
     .map((word) => word.replace(NOT_ALPHANUM, ''))
     .filter((word) => word.length > 0);

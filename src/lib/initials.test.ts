@@ -35,6 +35,17 @@ describe('initials', () => {
     expect(initials(undefined)).toBe('?');
   });
 
+  it('une majuscule au milieu d’un pseudo commence un mot : un seul rendu par joueur', () => {
+    // Le pseudo et le nom affiché du même joueur rendent les MÊMES initiales.
+    expect(initials('KingMbappe')).toBe('KM');
+    expect(initials('King Mbappé')).toBe('KM');
+    expect(initials('AkwaSniper')).toBe('AS');
+    // Sans frontière de casse, la règle du mot unique tient toujours.
+    expect(initials('Bonaberi88')).toBe('BO');
+    expect(initials('MBOA25')).toBe('MB');
+    expect(initials('mbappe')).toBe('MB');
+  });
+
   it('garde les accents', () => {
     expect(initials('Émile')).toBe('ÉM');
   });
