@@ -29,6 +29,12 @@ const GAME_ASSET: Record<string, string> = {
   codm: 'cod',
   'pubg-mobile': 'pubg',
   valorant: 'valorant',
+  // Nos jeux (lot G, 09/10/2026) : visuels ORIGINAUX dessinés pour G-HUB
+  // (`assets/our-games/*.svg` du dépôt principal, rastérisés par
+  // `scripts/our-games-art.ts`) — aucune image empruntée.
+  ludo: 'ludo',
+  echecs: 'echecs',
+  dames: 'dames',
 };
 
 /**
