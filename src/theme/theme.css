@@ -914,6 +914,101 @@
   height: 16px;
 }
 
+/*
+ * Champ à icônes INTÉRIEURES (`ComposerField`) — retour du porteur du
+ * 09/10/2026 : « comme le champ de commentaire du fil ». Les actions vivent
+ * DANS le cadre : une icône à gauche, le texte, une ou deux à droite, toutes
+ * calées en bas quand le texte prend plusieurs lignes. Une hauteur pour la
+ * famille (44 px = icône 36 + 2 × 4), le focus va au cadre entier.
+ */
+.e237-composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  min-height: 44px;
+  padding: 0 4px;
+  background: var(--e237-surface);
+  border: 1px solid var(--e237-border);
+  border-radius: 22px;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+.e237-composer:focus-within {
+  border-color: var(--e237-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--e237-accent) 18%, transparent);
+}
+.e237-composer-slot {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px 0;
+}
+.e237-composer-input {
+  flex: 1;
+  min-width: 0;
+  min-height: 42px;
+  max-height: 8rem;
+  padding: 10px 4px;
+  border: 0;
+  background: transparent;
+  color: var(--e237-text-primary);
+  font: inherit;
+  font-size: 16px;
+  line-height: 22px;
+  resize: none;
+  outline: none;
+}
+.e237-composer-input::placeholder {
+  color: var(--e237-text-muted);
+}
+.e237-composer--bare-start .e237-composer-input {
+  padding-left: 12px;
+}
+.e237-composer--bare-end .e237-composer-input {
+  padding-right: 12px;
+}
+/* Bouton rond posé dans le champ : icône seule, ou pastille d'accent (envoi). */
+.e237-composer-btn {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--e237-text-secondary);
+  cursor: pointer;
+  transition:
+    color 150ms ease,
+    background-color 150ms ease,
+    opacity 150ms ease;
+}
+.e237-composer-btn:hover:not(:disabled) {
+  background: var(--e237-surface-raised);
+  color: var(--e237-accent);
+}
+.e237-composer-btn--accent {
+  background: var(--e237-accent);
+  color: var(--e237-on-accent);
+}
+.e237-composer-btn--accent:hover:not(:disabled) {
+  background: var(--e237-accent-hover, var(--e237-accent));
+  color: var(--e237-on-accent);
+}
+.e237-composer-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.e237-composer-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--e237-ring);
+}
+.e237-composer-btn > svg {
+  width: 18px;
+  height: 18px;
+}
+
 /* Petit spinner (recherche en cours). */
 .e237-spinner {
   width: 16px;

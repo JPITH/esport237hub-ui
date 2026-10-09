@@ -742,3 +742,71 @@ export function SearchField({
     </div>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/* ComposerField — champ à icônes INTÉRIEURES                          */
+/* ------------------------------------------------------------------ */
+
+export interface ComposerFieldProps
+  extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'className'> {
+  /** Icônes à gauche du texte (joindre, partager une salle). */
+  leading?: ReactNode;
+  /** Icônes à droite (envoyer — `ComposerFieldButton tone="accent"`). */
+  trailing?: ReactNode;
+  className?: string;
+}
+
+/**
+ * Champ dont les actions vivent DANS le cadre (porteur, 09/10/2026 :
+ * « comme le champ de commentaire du fil »). Jumeau du `ComposerField`
+ * natif : même hauteur (44 px), icônes calées en bas quand le texte prend
+ * plusieurs lignes, focus sur le cadre entier. Une seule ligne au départ,
+ * jusqu'à 8 rem avant de défiler.
+ */
+export const ComposerField = forwardRef<HTMLTextAreaElement, ComposerFieldProps>(
+  ({ leading, trailing, className, rows = 1, ...rest }, ref) => (
+    <div
+      className={cx(
+        'e237-composer',
+        !leading && 'e237-composer--bare-start',
+        !trailing && 'e237-composer--bare-end',
+        className,
+      )}
+    >
+      {leading ? <div className="e237-composer-slot">{leading}</div> : null}
+      <textarea ref={ref} rows={rows} className="e237-composer-input" {...rest} />
+      {trailing ? <div className="e237-composer-slot">{trailing}</div> : null}
+    </div>
+  ),
+);
+ComposerField.displayName = 'ComposerField';
+
+/** Bouton rond posé dans un `ComposerField` ; `label` obligatoire (accessibilité). */
+export function ComposerFieldButton({
+  label,
+  tone = 'plain',
+  type = 'button',
+  children,
+  onClick,
+  disabled,
+}: {
+  label: string;
+  tone?: 'plain' | 'accent';
+  type?: 'button' | 'submit';
+  children: ReactNode;
+  onClick?: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type={type}
+      aria-label={label}
+      title={label}
+      onClick={onClick}
+      disabled={disabled}
+      className={cx('e237-composer-btn', tone === 'accent' && 'e237-composer-btn--accent')}
+    >
+      {children}
+    </button>
+  );
+}
