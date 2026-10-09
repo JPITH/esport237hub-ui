@@ -90,6 +90,12 @@ is what forced ramp step 700 down to lightness 0.50.
     every store icon and favicon. So: one constant per path, one single-quoted
     literal, never a template or a concatenation — and after any change to the
     shape, run `bun run brand:icons` in the monorepo and commit the PNGs.
+    On the player card (lot M3, 09/10/2026) the watermark
+    (`buildSkinDraw().watermark`) and the animated footer mark (`CardMark`,
+    web + native, where the « G-HUB » pill used to be) paint these SAME paths;
+    their inks come from the skin (`watermarkInk`, `cardMarkInks`), the glint
+    timing from `CARD_MARK_GLINT` in `lib/brand-motion.ts`. Readability is
+    guarded per skin × shape by `src/skins/card-mark.test.ts`.
 
 ## Avant de créer un composant : chercher dans le DS, étendre plutôt que dupliquer
 
