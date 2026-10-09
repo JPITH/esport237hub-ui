@@ -6,7 +6,6 @@ import { useEffect, useState, type ComponentType, type ReactNode } from 'react';
 import {
   Image,
   Pressable,
-  ScrollView,
   StyleSheet,
   View,
   type StyleProp,
@@ -34,6 +33,7 @@ import {
 import { dsLocale, useDsT } from '../i18n';
 import { initials } from '../lib/initials';
 import { haptic } from './haptics';
+import { ScrollView, type ScrollIndicatorInsets } from './scroll';
 import { Txt } from './text';
 import { Icon } from '../icons/generated/native';
 
@@ -47,10 +47,18 @@ type ScreenScrollProps = {
   showsVerticalScrollIndicator?: boolean;
   bottomOffset?: number;
   extraKeyboardSpace?: number;
+  /** Curseur vert du design system (`ScrollView` de `./scroll`). */
+  indicatorInsets?: ScrollIndicatorInsets;
   children?: ReactNode;
 };
 
-/** Fond de page + défilement. Passe `ScrollComponent` pour le clavier-aware. */
+/**
+ * Fond de page + défilement. Passe `ScrollComponent` pour le clavier-aware.
+ *
+ * Le défilement par défaut est celui du design system : curseur vert maison
+ * (natif) ou barre du navigateur peinte en vert (web). Sa piste s'arrête sous
+ * l'encoche et au-dessus de la réserve basse (pilule d'onglets).
+ */
 export function Screen({
   children,
   ScrollComponent = ScrollView,
@@ -76,6 +84,10 @@ export function Screen({
   return (
     <Scroll
       style={{ backgroundColor: c.bg, flex: 1 }}
+      indicatorInsets={{
+        top: (safeTop ? insets.top : 0) + spacing['1'],
+        bottom: (padBottom ?? insets.bottom) + spacing['1'],
+      }}
       contentContainerStyle={[
         styles.screen,
         // Remplace le `paddingTop` du shorthand : encoche + même air que les côtés.
@@ -85,7 +97,6 @@ export function Screen({
       ]}
       contentInsetAdjustmentBehavior="automatic"
       keyboardShouldPersistTaps="handled"
-      showsVerticalScrollIndicator={false}
       bottomOffset={24}
       extraKeyboardSpace={12}
     >

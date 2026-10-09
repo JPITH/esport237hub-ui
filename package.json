@@ -17,6 +17,7 @@
     "./theme": "./src/theme/esport237.ts",
     "./theme.css": "./src/theme/theme.css",
     "./components.css": "./src/theme/components.css",
+    "./scrollbar.css": "./src/theme/scrollbar.css",
     "./css": "./src/css/global.css",
     "./lib": "./src/lib/index.ts",
     "./skins": "./src/skins/index.ts",

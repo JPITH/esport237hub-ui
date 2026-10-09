@@ -1,0 +1,67 @@
+/*
+ * Barre de défilement — UNE seule, verte, partout (lot T1, 09/10/2026).
+ *
+ * Demande du porteur : « notre scroll bar doit être verte custom et utiliser
+ * sur tous les devices la même scroll bar ». Cette feuille peint TOUTES les
+ * zones qui défilent — la page, les panneaux, les listes, les modales — d'un
+ * seul geste : piste transparente et fine, curseur à la couleur d'accent
+ * (palier 700 en clair, 400 en sombre, via `--e237-accent`), plus foncé au
+ * survol (`--e237-accent-hover`). Les applis natives dessinent le même
+ * curseur (`src/native/scroll.tsx`) ; Expo web garde la barre du navigateur
+ * et reçoit cette feuille, avec les couleurs du thème actif passées par
+ * `--e237-scrollbar-thumb` / `--e237-scrollbar-thumb-hover`.
+ *
+ * Fichier À PART de `components.css`, et chargé après lui (`css/global.css`) :
+ * il ne doit rester AUCUNE règle de barre propre à un composant qui le
+ * contredise. Seules exceptions voulues : les rangées de puces horizontales
+ * (`.seg`, filtres du fil, carrousel de la vitrine) qui MASQUENT la leur —
+ * une barre y traverserait la pilule.
+ *
+ * Deux moteurs, deux syntaxes, et elles s'excluent :
+ * - Firefox ne connaît que `scrollbar-width` / `scrollbar-color` ;
+ * - Chromium et Safari ont les pseudo-éléments `::-webkit-scrollbar*`, qui
+ *   seuls permettent l'épaisseur exacte, les bouts arrondis et le survol.
+ *   Chromium ≥ 121 IGNORE ces pseudo-éléments dès que `scrollbar-color` ou
+ *   `scrollbar-width` s'applique à l'élément : les propriétés standard sont
+ *   donc réservées aux navigateurs SANS pseudo-éléments (`@supports`).
+ */
+
+:root {
+  --e237-scrollbar-size: 10px;
+  --e237-scrollbar-thumb: var(--e237-accent);
+  --e237-scrollbar-thumb-hover: var(--e237-accent-hover);
+  --e237-scrollbar-track: transparent;
+}
+
+/* Firefox. */
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--e237-scrollbar-thumb) var(--e237-scrollbar-track);
+  }
+}
+
+/* Chromium, Safari. Un curseur de 4 px dans une piste de 10 px : la bordure
+   transparente le détache du bord, et il s'épaissit au survol. */
+::-webkit-scrollbar {
+  width: var(--e237-scrollbar-size);
+  height: var(--e237-scrollbar-size);
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: var(--e237-scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: var(--e237-radius-full, 9999px);
+  background-clip: padding-box;
+  background-color: var(--e237-scrollbar-thumb);
+}
+
+::-webkit-scrollbar-thumb:hover,
+::-webkit-scrollbar-thumb:active {
+  border-width: 2px;
+  background-color: var(--e237-scrollbar-thumb-hover);
+}

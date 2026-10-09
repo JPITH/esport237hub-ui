@@ -11,6 +11,33 @@ export const FLICK = 900;
 /** Distance tirée vers le bas qui vaut fermeture, même sans vitesse. */
 export const DISMISS_DISTANCE = 90;
 
+/** Plafond par défaut d'une feuille au repos, en fraction de l'écran. */
+export const SHEET_MAX_HEIGHT = 0.88;
+/** Plafond d'une feuille agrandie à la poignée : le fond reste touchable. */
+export const SHEET_EXPANDED_HEIGHT = 0.92;
+/** Plancher d'un plafond demandé : en dessous, la feuille n'a plus de corps. */
+const SHEET_MIN_RATIO = 0.4;
+
+/**
+ * Les deux plafonds d'une feuille, en points, pour un écran de `height`.
+ *
+ * `ratio` est le plafond AU REPOS voulu par l'appelant (0,8 pour une
+ * conversation) ; il est borné entre 0,4 et le plafond agrandi, et la
+ * position agrandie ne descend jamais sous lui — tirer la poignée vers le
+ * haut ne doit pas RÉDUIRE la feuille.
+ */
+export function sheetCaps(
+  height: number,
+  ratio: number = SHEET_MAX_HEIGHT,
+): { collapsedMax: number; expandedMax: number } {
+  const safe = Number.isFinite(ratio) ? ratio : SHEET_MAX_HEIGHT;
+  const bounded = Math.min(SHEET_EXPANDED_HEIGHT, Math.max(SHEET_MIN_RATIO, safe));
+  return {
+    collapsedMax: Math.round(height * bounded),
+    expandedMax: Math.round(height * SHEET_EXPANDED_HEIGHT),
+  };
+}
+
 export type SnapDecision =
   /** On s'en va : l'appelant referme la feuille. */
   | { close: true }

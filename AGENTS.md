@@ -144,6 +144,7 @@ Quel composant pour quel besoin :
 | Fenêtres | `Modal`, `Drawer`, `DropdownMenu`, `Tooltip` | `Sheet`, `SelectSheet` |
 | Personnes | `Avatar`, `AvatarGroup`, `PlayerCell` | `Avatar`, `ProfileAvatar` |
 | Barre d'onglets, carrousel, confettis | — | `FloatingTabBar`, `Carousel` / `PromoSlideCard`, `ConfettiBurst` |
+| Défiler (écran, liste, feuille) | rien : `theme/scrollbar.css` peint toute barre en vert ; jamais de règle de barre par composant | `ScrollView`, `FlatList` (curseur vert dessiné ; jamais ceux de `react-native` à la verticale), `useScrollIndicator` + `ScrollIndicator` pour une autre vue |
 
 ## Briques de page du web (lot R, 09/10/2026)
 

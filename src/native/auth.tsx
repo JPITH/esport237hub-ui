@@ -13,7 +13,6 @@ import {
   ImageBackground,
   Platform,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -35,6 +34,7 @@ import { font, radius, spacing, useE237Colors } from './core';
 import { AppMark } from './mark';
 import { haptic } from './haptics';
 import { useNeu } from './neu';
+import { ScrollView } from './scroll';
 import { fontFamily } from './typography';
 
 // WebP, pas PNG : ce fond s'affiche sur le PREMIER écran, avant toute
@@ -78,7 +78,7 @@ export function AuthScreen({
   background?: ImageSourcePropType;
   /**
    * Scroll clavier-aware (ex. KeyboardAwareScrollView).
-   * Défaut : ScrollView RN.
+   * Défaut : la ScrollView du design system (curseur vert).
    */
   ScrollComponent?: ComponentType<AuthScrollProps>;
 }) {
@@ -106,7 +106,6 @@ export function AuthScreen({
           },
         ]}
         keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
         bottomOffset={48}
         extraKeyboardSpace={24}
       >

@@ -5,10 +5,11 @@
  */
 import { radius, spacing, useE237Colors } from './core';
 import { useEffect, useRef, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View, type ScrollView as RNScrollView } from 'react-native';
 
 import { useDsT, type DsKey } from '../i18n';
 import { FieldLabel, requiredFieldLabel } from './fields';
+import { ScrollView } from './scroll';
 import { Sheet } from './sheet';
 import { Txt } from './text';
 import { Icon } from '../icons/generated/native';
@@ -321,7 +322,7 @@ function TimeColumn({
   onPick: (n: number) => void;
 }) {
   const c = useE237Colors();
-  const ref = useRef<ScrollView>(null);
+  const ref = useRef<RNScrollView>(null);
 
   // À l'ouverture, amène la valeur sélectionnée dans la fenêtre visible.
   useEffect(() => {
