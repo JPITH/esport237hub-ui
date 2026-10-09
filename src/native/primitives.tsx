@@ -360,7 +360,12 @@ export function SegmentedTabs<T extends string>({
   value,
   onChange,
 }: {
-  tabs: { value: T; label: string }[];
+  /**
+   * `badge` (09/10/2026) : un compteur à côté du libellé — « Demandes 3 ».
+   * `warning` quand un geste attend l'utilisateur, `info` sinon ; rien à zéro.
+   * Le compte est aussi dit au lecteur d'écran.
+   */
+  tabs: { value: T; label: string; badge?: { count: number; tone: 'warning' | 'info' } | null }[];
   value: T;
   onChange: (v: T) => void;
 }) {
@@ -411,10 +416,13 @@ export function SegmentedTabs<T extends string>({
       ) : null}
       {tabs.map((t) => {
         const active = t.value === value;
+        const badge = t.badge && t.badge.count > 0 ? t.badge : null;
+        const badgeColor = badge?.tone === 'warning' ? c.warning : c.info;
         return (
           <Pressable
             key={t.value}
             accessibilityRole="tab"
+            accessibilityLabel={badge ? `${t.label}, ${badge.count}` : undefined}
             accessibilityState={{ selected: active }}
             hitSlop={{ top: 3, bottom: 3 }}
             onPress={() => {
@@ -431,6 +439,17 @@ export function SegmentedTabs<T extends string>({
             >
               {t.label}
             </Txt>
+            {badge ? (
+              <View
+                accessibilityElementsHidden
+                importantForAccessibility="no-hide-descendants"
+                style={[styles.segmentBadge, { borderColor: badgeColor }]}
+              >
+                <Txt variant="label" size={10} color={badgeColor}>
+                  {badge.count > 9 ? '9+' : String(badge.count)}
+                </Txt>
+              </View>
+            ) : null}
           </Pressable>
         );
       })}
@@ -473,9 +492,20 @@ const styles = StyleSheet.create({
   segmentItem: {
     flex: 1,
     minHeight: 38,
+    flexDirection: 'row',
+    gap: spacing['1'],
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: radius.full,
     paddingHorizontal: spacing['2'],
+  },
+  segmentBadge: {
+    minWidth: 18,
+    height: 18,
+    paddingHorizontal: 3,
+    borderRadius: radius.full,
+    borderWidth: 1.5,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

@@ -586,6 +586,31 @@
   /* Le fond est porté par la pastille glissante (.seg__pill). */
   color: var(--e237-accent);
 }
+/* Compteur d'un onglet (« Demandes 3 ») : contour et chiffre au ton — ambre
+   « agis », bleu « ça bouge » —, fond de surface, comme la pastille de la
+   barre d'onglets mobile. */
+.seg__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: var(--e237-radius-full);
+  border: 1.5px solid currentColor;
+  background: var(--e237-surface);
+  font-family: var(--e237-font-display);
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+.seg__badge--warning {
+  color: var(--e237-warning);
+}
+.seg__badge--info {
+  color: var(--e237-info);
+}
 
 /* Switch booléen — piste pilule + pouce glissant. */
 .e237-switch {

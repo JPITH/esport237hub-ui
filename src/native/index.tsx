@@ -185,6 +185,7 @@ export { ScoreInput } from './score-board';
 export { FloatingTabBar } from './floating-tab-bar';
 export type {
   FloatingTab,
+  FloatingTabBadge,
   FloatingTabBarGlassProps,
   FloatingTabBarProps,
 } from './floating-tab-bar';
