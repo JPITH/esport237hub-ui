@@ -5,7 +5,6 @@ import {
   Modal,
   Platform,
   Pressable,
-  ScrollView,
   StyleSheet,
   useWindowDimensions,
   View,
@@ -27,7 +26,8 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { radius, spacing, useE237Colors } from './core';
-import { decideSnap } from './sheet-snap';
+import { ScrollView, type ScrollIndicatorInsets } from './scroll';
+import { SHEET_MAX_HEIGHT, decideSnap, sheetCaps } from './sheet-snap';
 import { useDsT } from '../i18n';
 import { Txt } from './text';
 
@@ -38,6 +38,8 @@ type SheetScrollProps = {
   showsVerticalScrollIndicator?: boolean;
   bottomOffset?: number;
   extraKeyboardSpace?: number;
+  /** Curseur vert du design system (`ScrollView` de `./scroll`). */
+  indicatorInsets?: ScrollIndicatorInsets;
   children?: ReactNode;
 };
 
@@ -68,10 +70,22 @@ export interface SheetProps {
    */
   footer?: ReactNode;
   /**
-   * Défilement clavier-aware (ex. KeyboardAwareScrollView). Défaut : ScrollView
-   * RN. N'a d'effet que si `scrollable`.
+   * Défilement clavier-aware (ex. KeyboardAwareScrollView). Défaut : la
+   * `ScrollView` du design system (curseur vert). N'a d'effet que si
+   * `scrollable`.
    */
   ScrollComponent?: ComponentType<SheetScrollProps>;
+  /**
+   * Plafond de hauteur AU REPOS, en fraction de l'écran (0,88 par défaut).
+   * La feuille épouse son contenu jusque-là, puis le corps défile à
+   * l'intérieur. Une conversation (commentaires) passe plus bas, ~0,8 : la
+   * carte commentée reste visible au-dessus, et un long fil défile dans la
+   * feuille au lieu de la pousser contre le haut de l'écran.
+   *
+   * Quel que soit ce plafond, la feuille ne dépasse JAMAIS la place libre
+   * entre l'encoche et le clavier ouvert.
+   */
+  maxHeight?: number;
 }
 
 const SPRING = { damping: 20, stiffness: 220 } as const;
@@ -103,17 +117,28 @@ export function Sheet({
   scrollable = true,
   footer,
   ScrollComponent,
+  maxHeight = SHEET_MAX_HEIGHT,
 }: SheetProps) {
   const c = useE237Colors();
   const t = useDsT();
   const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
   // Position basse : la feuille prend la hauteur de son contenu, plafonnée.
-  const collapsedMax = Math.round(height * 0.88);
   // Position haute : plein écran MOINS une marge. Le backdrop doit rester
   // visible et cliquable — c'est la seule sortie au doigt d'une feuille qui
   // n'offre pas de bouton « fermer ».
-  const expandedMax = Math.round(height * 0.92);
+  const { collapsedMax, expandedMax } = sheetCaps(height, maxHeight);
+  /** Au-dessus de la feuille, toujours : l'encoche, plus de quoi toucher le fond. */
+  const roomPaddingTop = insets.top + spacing['2'];
+  /**
+   * La place RÉELLEMENT libre pour la feuille : de l'encoche au clavier (ou au
+   * bas de l'écran). Mesurée, pas calculée : iOS la réduit par le rembourrage
+   * du `KeyboardAvoidingView`, Android en rétrécissant la fenêtre. Les deux
+   * plafonds ci-dessus sont des fractions de l'ÉCRAN ; sans cette mesure, un
+   * long fil de commentaires plus le clavier poussaient le haut de la feuille
+   * — titre et poignée compris — hors de l'écran. 0 = pas encore mesurée.
+   */
+  const room = useSharedValue(0);
 
   /**
    * Une seule valeur pour les deux moitiés du geste : au-dessus de zéro, ce
@@ -137,9 +162,14 @@ export function Sheet({
   }
 
   /** Ce qu'il reste à gagner en hauteur depuis la position basse. */
-  function room() {
+  function headroom() {
     'worklet';
-    return Math.max(0, expandedMax - natural.value);
+    const top = room.value > 0 ? Math.min(expandedMax, room.value) : expandedMax;
+    return Math.max(0, top - natural.value);
+  }
+
+  function onRoomLayout(e: LayoutChangeEvent) {
+    room.value = Math.max(0, e.nativeEvent.layout.height - roomPaddingTop);
   }
 
   const pan = Gesture.Pan()
@@ -147,10 +177,10 @@ export function Sheet({
       start.value = pos.value;
     })
     .onUpdate((e) => {
-      pos.value = Math.min(start.value - e.translationY, room());
+      pos.value = Math.min(start.value - e.translationY, headroom());
     })
     .onEnd((e) => {
-      const decision = decideSnap(pos.value, e.velocityY, room());
+      const decision = decideSnap(pos.value, e.velocityY, headroom());
       if (decision.close) {
         // L'animation de sortie est celle du Modal (`animationType="slide"`) :
         // rien à jouer ici, sinon la feuille remonterait pour redescendre.
@@ -162,11 +192,14 @@ export function Sheet({
 
   const sheetStyle = useAnimatedStyle(() => {
     const grown = natural.value + Math.max(0, pos.value);
+    // La place libre l'emporte sur tout : clavier ouvert, la feuille rétrécit
+    // et c'est son corps qui défile.
+    const fit = room.value > 0 ? room.value : Number.POSITIVE_INFINITY;
     return {
       // `minHeight` seulement quand on a agrandi : à zéro, la feuille garde son
       // comportement d'origine — elle épouse son contenu.
-      minHeight: pos.value > 0 ? grown : 0,
-      maxHeight: Math.max(collapsedMax, grown),
+      minHeight: pos.value > 0 ? Math.min(grown, fit) : 0,
+      maxHeight: Math.min(Math.max(collapsedMax, grown), fit),
       transform: [{ translateY: Math.max(0, -pos.value) }],
     };
   });
@@ -183,7 +216,6 @@ export function Sheet({
   const body = scrollable ? (
     <Scroll
       keyboardShouldPersistTaps="handled"
-      showsVerticalScrollIndicator={false}
       contentContainerStyle={styles.scrollContent}
       style={styles.scroll}
       {...keyboardProps}
@@ -207,58 +239,68 @@ export function Sheet({
             rétrécit déjà la fenêtre, et c'est cette seconde compensation qui a
             déjà rendu un bouton intouchable dans ce projet.
           */}
-          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-            <AnimatedPressable
-              onLayout={onSheetLayout}
-              style={[
-                styles.sheet,
-                {
-                  backgroundColor: c.surfaceRaised,
-                  borderColor: c.border,
-                  // L'action vit maintenant en pied de feuille : elle ne doit
-                  // pas finir sous la barre de navigation gestuelle.
-                  paddingBottom: spacing['4'] + insets.bottom,
-                },
-                sheetStyle,
-              ]}
-              onPress={(e) => e.stopPropagation()}
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            style={styles.avoider}
+          >
+            {/* La place libre, mesurée : de l'encoche (plus un peu d'air, pour
+                que le backdrop reste touchable au-dessus) jusqu'au clavier. */}
+            <View
+              onLayout={onRoomLayout}
+              style={[styles.room, { paddingTop: roomPaddingTop }]}
             >
-              <GestureDetector gesture={pan}>
-                <View
-                  accessible
-                  accessibilityRole="adjustable"
-                  accessibilityLabel={t('ui.sheet.handle')}
-                  accessibilityHint={t('ui.sheet.handleHint')}
-                  accessibilityActions={[{ name: 'increment' }, { name: 'decrement' }]}
-                  onAccessibilityAction={(e) => {
-                    // Au doigt c'est un glissement ; au lecteur d'écran, deux
-                    // actions. Sans elles la poignée redeviendrait décorative
-                    // pour qui ne peut pas viser une barre de 4 px.
-                    pos.value = withSpring(
-                      e.nativeEvent.actionName === 'increment'
-                        ? Math.max(0, expandedMax - natural.value)
-                        : 0,
-                      SPRING,
-                    );
-                  }}
-                  style={styles.handleZone}
-                >
-                  <View style={[styles.handle, { backgroundColor: c.border }]} />
-                </View>
-              </GestureDetector>
-              {title ? (
-                <View style={styles.header}>
-                  <Txt variant="heading">{title}</Txt>
-                  {subtitle ? (
-                    <Txt variant="caption" tone="secondary">
-                      {subtitle}
-                    </Txt>
-                  ) : null}
-                </View>
-              ) : null}
-              {body}
-              {footer ? <View style={styles.footer}>{footer}</View> : null}
-            </AnimatedPressable>
+              <AnimatedPressable
+                onLayout={onSheetLayout}
+                style={[
+                  styles.sheet,
+                  {
+                    backgroundColor: c.surfaceRaised,
+                    borderColor: c.border,
+                    // L'action vit maintenant en pied de feuille : elle ne doit
+                    // pas finir sous la barre de navigation gestuelle.
+                    paddingBottom: spacing['4'] + insets.bottom,
+                  },
+                  sheetStyle,
+                ]}
+                onPress={(e) => e.stopPropagation()}
+              >
+                <GestureDetector gesture={pan}>
+                  <View
+                    accessible
+                    accessibilityRole="adjustable"
+                    accessibilityLabel={t('ui.sheet.handle')}
+                    accessibilityHint={t('ui.sheet.handleHint')}
+                    accessibilityActions={[{ name: 'increment' }, { name: 'decrement' }]}
+                    onAccessibilityAction={(e) => {
+                      // Au doigt c'est un glissement ; au lecteur d'écran, deux
+                      // actions. Sans elles la poignée redeviendrait décorative
+                      // pour qui ne peut pas viser une barre de 4 px.
+                      pos.value = withSpring(
+                        e.nativeEvent.actionName === 'increment'
+                          ? Math.max(0, expandedMax - natural.value)
+                          : 0,
+                        SPRING,
+                      );
+                    }}
+                    style={styles.handleZone}
+                  >
+                    <View style={[styles.handle, { backgroundColor: c.border }]} />
+                  </View>
+                </GestureDetector>
+                {title ? (
+                  <View style={styles.header}>
+                    <Txt variant="heading">{title}</Txt>
+                    {subtitle ? (
+                      <Txt variant="caption" tone="secondary">
+                        {subtitle}
+                      </Txt>
+                    ) : null}
+                  </View>
+                ) : null}
+                {body}
+                {footer ? <View style={styles.footer}>{footer}</View> : null}
+              </AnimatedPressable>
+            </View>
           </KeyboardAvoidingView>
         </Pressable>
       </GestureHandlerRootView>
@@ -269,7 +311,12 @@ export function Sheet({
 const styles = StyleSheet.create({
   root: { flex: 1 },
   backdrop: { flex: 1, justifyContent: 'flex-end', backgroundColor: '#00000099' },
+  avoider: { flex: 1 },
+  room: { flex: 1, justifyContent: 'flex-end', pointerEvents: 'box-none' },
   sheet: {
+    // C'est elle qui rend la main quand la place manque (clavier ouvert) : son
+    // corps défilant rétrécit, la poignée, le titre et le pied restent.
+    flexShrink: 1,
     borderTopWidth: 1,
     borderLeftWidth: 1,
     borderRightWidth: 1,
@@ -292,7 +339,18 @@ const styles = StyleSheet.create({
   // `flexShrink` : c'est cette vue qui rend la main sous le plafond de hauteur,
   // sinon le pied de page serait poussé hors de l'écran. `flexGrow` : elle
   // absorbe la place gagnée quand on agrandit la feuille à la poignée.
-  scroll: { flexGrow: 1, flexShrink: 1 },
-  scrollContent: { gap: spacing['3'], paddingBottom: spacing['2'] },
+  scroll: {
+    flexGrow: 1,
+    flexShrink: 1,
+    // La zone qui défile va jusqu'aux BORDS de la feuille, et c'est son
+    // contenu qui reprend la gouttière : le curseur vert longe le bord, il ne
+    // vient pas se poser contre les compteurs de j'aime d'un commentaire.
+    marginHorizontal: -spacing['4'],
+  },
+  scrollContent: {
+    gap: spacing['3'],
+    paddingBottom: spacing['2'],
+    paddingHorizontal: spacing['4'],
+  },
   footer: { gap: spacing['2'], paddingTop: spacing['1'] },
 });

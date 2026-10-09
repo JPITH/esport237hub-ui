@@ -117,6 +117,24 @@ export type { StatTileProps, StatTileTrend, QuickActionProps } from './dashboard
 export * from './dialog';
 export { Sheet } from './sheet';
 export type { SheetProps } from './sheet';
+// Défilement à curseur vert (lot T1) : remplacent ScrollView / FlatList de
+// react-native partout où une vue défile à la verticale.
+export { FlatList, ScrollIndicator, ScrollView, useScrollIndicator } from './scroll';
+export type {
+  FlatListProps,
+  ScrollIndicatorInsets,
+  ScrollIndicatorOptions,
+  ScrollIndicatorProps,
+  ScrollIndicatorState,
+  ScrollViewProps,
+} from './scroll';
+export {
+  THUMB_MIN,
+  scrollThumb,
+  splitScrollStyle,
+  thumbTimings,
+} from './scroll-indicator-model';
+export type { ScrollThumb, ScrollThumbInput } from './scroll-indicator-model';
 export { SelectSheet } from './select-sheet';
 export type { SelectOption } from './select-sheet';
 export { DateField, TimeField } from './date-time';

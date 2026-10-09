@@ -2934,71 +2934,8 @@
   }
 }
 
-/* Scrollbars custom (Firefox + WebKit). */
-.e237-scroll,
-html {
-  scrollbar-width: thin;
-  scrollbar-color: var(--e237-border) transparent;
-}
-
-.e237-scroll::-webkit-scrollbar,
-html::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-.e237-scroll::-webkit-scrollbar-track,
-html::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.e237-scroll::-webkit-scrollbar-thumb,
-html::-webkit-scrollbar-thumb {
-  border: 3px solid transparent;
-  background-clip: content-box;
-  border-radius: var(--e237-radius-full);
-  background-color: var(--e237-border);
-}
-
-.e237-scroll::-webkit-scrollbar-thumb:hover,
-html::-webkit-scrollbar-thumb:hover {
-  background-color: var(--e237-accent);
-}
-
-.e237-game-picker__list,
-.e237-global-search__list,
-.e237-match-list__body {
-  scrollbar-width: thin;
-  scrollbar-color: var(--e237-border) transparent;
-}
-
-.e237-game-picker__list::-webkit-scrollbar,
-.e237-global-search__list::-webkit-scrollbar,
-.e237-match-list__body::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-.e237-game-picker__list::-webkit-scrollbar-track,
-.e237-global-search__list::-webkit-scrollbar-track,
-.e237-match-list__body::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.e237-game-picker__list::-webkit-scrollbar-thumb,
-.e237-global-search__list::-webkit-scrollbar-thumb,
-.e237-match-list__body::-webkit-scrollbar-thumb {
-  border: 3px solid transparent;
-  background-clip: content-box;
-  border-radius: var(--e237-radius-full);
-  background-color: var(--e237-border);
-}
-
-.e237-game-picker__list::-webkit-scrollbar-thumb:hover,
-.e237-global-search__list::-webkit-scrollbar-thumb:hover,
-.e237-match-list__body::-webkit-scrollbar-thumb:hover {
-  background-color: var(--e237-accent);
-}
+/* Barres de défilement : une seule règle, pour toute zone qui défile, dans
+   `scrollbar.css` (lot T1). Plus aucune règle de barre par composant ici. */
 
 /* ================================================================ */
 /* Site vitrine (.mkt-*) — chrome, sections et cartes marketing.     */

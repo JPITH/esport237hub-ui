@@ -4,7 +4,8 @@
  *   import '@esport237hub/ui/css';
  *
  * Ordre : reset Astryx → styles composants Astryx → thème neutral (base
- * de variables Astryx) → thème ESPORT 237 (variables --e237-* + surcharges).
+ * de variables Astryx) → thème ESPORT 237 (variables --e237-* + surcharges)
+ * → barre de défilement.
  */
 
 @import '@astryxdesign/core/reset.css';
@@ -12,3 +13,5 @@
 @import '@astryxdesign/theme-neutral/theme.css';
 @import '../theme/theme.css';
 @import '../theme/components.css';
+/* Barre de défilement verte, pour toute zone qui défile (lot T1). */
+@import '../theme/scrollbar.css';
