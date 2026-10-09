@@ -69,6 +69,18 @@ import {
 import { haptic } from './haptics';
 import { Txt } from './text';
 
+/** Compteur posé sur l'icône d'un onglet (09/10/2026). */
+export interface FloatingTabBadge {
+  count: number;
+  /**
+   * `warning` : un geste attend l'utilisateur (« agis ») ; `info` : ça
+   * avance sans lui (« patiente ») — la table des tons d'UX.md.
+   */
+  tone: 'warning' | 'info';
+  /** Ce que le compteur veut dire, pour un lecteur d'écran (« 3 à traiter »). */
+  label?: string;
+}
+
 /** Un onglet de la pilule. */
 export interface FloatingTab {
   /** Nom de la route (expo-router / React Navigation) qu'il ouvre. */
@@ -76,6 +88,11 @@ export interface FloatingTab {
   icon: IconName;
   /** Titre affiché sous l'icône, et libellé accessible de l'onglet. */
   label: string;
+  /**
+   * « À toi d'agir » hors de l'écran concerné (UX.md, onglet Duels) : rien à
+   * zéro ni sans valeur. Le compte est aussi dit au lecteur d'écran.
+   */
+  badge?: FloatingTabBadge | null;
 }
 
 /** Ce que reçoit le verre natif fourni par l'app. */
@@ -193,16 +210,20 @@ function TabItem({
   title,
   icon,
   focused,
+  badge,
   onPress,
   onLongPress,
 }: {
   title: string;
   icon: IconName;
   focused: boolean;
+  badge?: FloatingTabBadge | null;
   onPress: () => void;
   onLongPress: () => void;
 }) {
   const c = useE237Colors();
+  const shownBadge = badge && badge.count > 0 ? badge : null;
+  const badgeColor = shownBadge?.tone === 'warning' ? c.warning : c.info;
   const reduceMotion = useReducedMotion();
   const progress = useSharedValue(focused ? 1 : 0);
 
@@ -226,7 +247,9 @@ function TabItem({
         // ne traduit pas `accessibilityState.selected` en `aria-selected`, et
         // un lecteur d'écran ne saurait pas quel onglet est actif.
         role="tab"
-        aria-label={title}
+        aria-label={
+          shownBadge ? `${title}, ${shownBadge.label ?? String(shownBadge.count)}` : title
+        }
         aria-selected={focused}
         onPress={() => {
           haptic('selection');
@@ -248,7 +271,22 @@ function TabItem({
         {/* Variante ACTIVE du jeu G-HUB : le trait reste le même, un aplat
             partiel de l'encre remplit la forme — l'onglet se lit « allumé »
             sans épaissir le dessin (src/icons/README.md). */}
-        <Icon name={icon} color={tint} size={22} active={focused} />
+        <View>
+          <Icon name={icon} color={tint} size={22} active={focused} />
+          {shownBadge ? (
+            // Même pastille que les compteurs d'en-tête : surface, liseré et
+            // chiffre dans le ton — jamais l'accent, qui n'exprime pas un état.
+            <View
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+              style={[styles.badge, { backgroundColor: c.surface, borderColor: badgeColor }]}
+            >
+              <Txt variant="label" size={10} color={badgeColor}>
+                {shownBadge.count > 9 ? '9+' : String(shownBadge.count)}
+              </Txt>
+            </View>
+          ) : null}
+        </View>
         {/* Masqué aux lecteurs d'écran, qui lisent déjà le libellé de
             l'onglet : il serait annoncé deux fois. */}
         <View importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
@@ -286,6 +324,7 @@ export function FloatingTabBar({
                 title={options?.tabBarAccessibilityLabel ?? title}
                 icon={tab.icon}
                 focused={focused}
+                badge={tab.badge}
                 onPress={() => {
                   const event = navigation.emit({
                     type: 'tabPress',
@@ -307,6 +346,18 @@ export function FloatingTabBar({
 }
 
 const styles = StyleSheet.create({
+  badge: {
+    position: 'absolute',
+    top: -7,
+    right: -10,
+    minWidth: 18,
+    height: 18,
+    paddingHorizontal: 3,
+    borderRadius: radius.full,
+    borderWidth: 1.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   root: {
     position: 'absolute',
     left: PILL_SIDE_MARGIN,

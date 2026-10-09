@@ -20,6 +20,12 @@ export interface TabDef<T extends string> {
    * est un bouton (`role="tab"` + `aria-selected`).
    */
   href?: string;
+  /**
+   * Compteur à côté du libellé (09/10/2026) — « Demandes 3 ». `warning`
+   * quand un geste attend l'utilisateur, `info` sinon ; rien à zéro. Parité
+   * avec `SegmentedTabs` (natif).
+   */
+  badge?: { count: number; tone: "warning" | "info" } | null;
 }
 
 /** Composant de lien du routeur (ex. `next/link`) — le DS reste agnostique. */
@@ -125,6 +131,7 @@ export function Tabs<T extends string>({
           >
             {t.icon}
             {t.label}
+            <TabBadge badge={t.badge} />
           </LinkAs>
         ))}
       </nav>
@@ -152,9 +159,20 @@ export function Tabs<T extends string>({
         >
           {t.icon}
           {t.label}
+          <TabBadge badge={t.badge} />
         </button>
       ))}
     </div>
+  );
+}
+
+/** Le compteur d'un onglet — « 9+ » au-delà de neuf, rien à zéro. */
+function TabBadge({ badge }: { badge?: TabDef<string>["badge"] }) {
+  if (!badge || badge.count <= 0) return null;
+  return (
+    <span className={`seg__badge seg__badge--${badge.tone}`}>
+      {badge.count > 9 ? "9+" : badge.count}
+    </span>
   );
 }
 

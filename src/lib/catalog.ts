@@ -227,8 +227,12 @@ export function competitionStatusTone(status: string | null | undefined): Tone {
 /* Billets d'évènement                                                 */
 /* ------------------------------------------------------------------ */
 
+/**
+ * « Payé » est un état ACQUIS : `success`, jamais l'accent — l'accent est
+ * réservé aux actions (DESIGN.md, couche 2 ; audit UX mobile du 09/10/2026).
+ */
 export const TICKET_STATUS_META: Record<string, { labelKey: DsKey; tone: Tone }> = {
-  paid: { labelKey: 'catalog.ticketStatus.paid', tone: 'accent' },
+  paid: { labelKey: 'catalog.ticketStatus.paid', tone: 'success' },
   reserved: { labelKey: 'catalog.ticketStatus.reserved', tone: 'warning' },
   cancelled: { labelKey: 'catalog.ticketStatus.cancelled', tone: 'danger' },
   refunded: { labelKey: 'catalog.ticketStatus.refunded', tone: 'neutral' },

@@ -37,6 +37,13 @@ export interface MediaImageProps {
   /** URL distante ; `null`/`undefined` → repli visuel. */
   src?: string | null;
   /**
+   * Seconde URL, tentée UNE fois si `src` ne charge pas, avant le repli
+   * illustré. Sert l'« Économie de données » de l'app : `src` demande une
+   * variante légère que les médias anciens n'ont pas, `fallbackSrc` est
+   * l'URL servie par l'API, qui existe toujours.
+   */
+  fallbackSrc?: string | null;
+  /**
    * Source locale déjà résolue (`require(...)`), prioritaire sur `src`.
    * Un asset embarqué n'a pas d'URL : sans ce chemin, l'appelant devait passer
    * un `uri` bidon que `Image` ne sait pas charger.
@@ -60,6 +67,7 @@ type Status = 'loading' | 'ready' | 'error';
 
 export function MediaImage({
   src,
+  fallbackSrc,
   source,
   alt,
   ratio = 16 / 9,
@@ -70,12 +78,25 @@ export function MediaImage({
   style,
 }: MediaImageProps) {
   const c = useE237Colors();
-  const resolved: ImageSourcePropType | null = source ?? (src ? { uri: src } : null);
+  // 0 = `src`, 1 = `fallbackSrc` après un échec de `src`.
+  const [attempt, setAttempt] = useState<0 | 1>(0);
+  const uri = attempt === 1 ? fallbackSrc : src;
+  const resolved: ImageSourcePropType | null = source ?? (uri ? { uri } : null);
   const [status, setStatus] = useState<Status>(resolved ? 'loading' : 'error');
 
   useEffect(() => {
-    setStatus(source || src ? 'loading' : 'error');
-  }, [source, src]);
+    setAttempt(0);
+    setStatus(source || src || fallbackSrc ? 'loading' : 'error');
+  }, [source, src, fallbackSrc]);
+
+  const onError = () => {
+    if (!source && attempt === 0 && fallbackSrc && fallbackSrc !== src) {
+      setAttempt(1);
+      setStatus('loading');
+      return;
+    }
+    setStatus('error');
+  };
 
   const failed = !resolved || status === 'error';
 
@@ -102,7 +123,7 @@ export function MediaImage({
           style={styles.image}
           accessibilityIgnoresInvertColors
           onLoad={() => setStatus('ready')}
-          onError={() => setStatus('error')}
+          onError={onError}
         />
       ) : null}
 
