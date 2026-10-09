@@ -291,12 +291,49 @@ export function Field({
 /* Textarea (Field multiligne)                                         */
 /* ------------------------------------------------------------------ */
 
-/** Zone de texte multiligne — même identité que Field. */
-export function Textarea({ label, required, style, ...props }: FieldProps) {
+/** Seuil du compteur par défaut — miroir de `FIELD_COUNTER_FROM` (types). */
+const COUNTER_FROM = 200;
+
+/**
+ * Le compteur d'un champ borné (09/10/2026, « limitations de caractères »)
+ * — jumeau du `FieldCounter` web : neutre, ambre dans les derniers 10 %,
+ * rouge à la borne ; le nombre est toujours écrit.
+ */
+export function FieldCounter({ length, maxLength }: { length: number; maxLength: number }) {
+  const c = useColors();
+  const t = useDsT();
+  const used = Math.max(0, Math.min(length, maxLength));
+  const tone = used >= maxLength ? c.danger : used >= maxLength * 0.9 ? c.warning : c.textMuted;
+  return (
+    <Text
+      style={[styles.counter, { color: tone }]}
+      accessibilityLabel={t('ui.field.counter', { used, max: maxLength })}
+    >
+      {used} / {maxLength}
+    </Text>
+  );
+}
+
+/**
+ * Zone de texte multiligne — même identité que Field. Avec `maxLength` d'au
+ * moins 200 caractères, un compteur « 212 / 280 » s'affiche sous le champ
+ * (`showCount` force ou coupe ce choix).
+ */
+export function Textarea({
+  label,
+  required,
+  style,
+  showCount,
+  ...props
+}: FieldProps & { showCount?: boolean }) {
   const c = useColors();
   const t = useDsT();
   const neu = useNeu();
   const [focused, setFocused] = useState(false);
+  const [typed, setTyped] = useState(() => String(props.defaultValue ?? '').length);
+  const length = typeof props.value === 'string' ? props.value.length : typed;
+  const max = props.maxLength;
+  const counter = typeof max === 'number' && max > 0 && (showCount ?? max >= COUNTER_FROM);
   return (
     <View style={[{ gap: spacing['1'] }, style]}>
       {label ? <FieldLabel label={label} required={required} /> : null}
@@ -306,6 +343,10 @@ export function Textarea({ label, required, style, ...props }: FieldProps) {
         multiline
         textAlignVertical="top"
         {...props}
+        onChangeText={(text) => {
+          setTyped(text.length);
+          props.onChangeText?.(text);
+        }}
         onFocus={(e) => {
           setFocused(true);
           props.onFocus?.(e);
@@ -322,6 +363,7 @@ export function Textarea({ label, required, style, ...props }: FieldProps) {
           { color: c.textPrimary },
         ]}
       />
+      {counter ? <FieldCounter length={length} maxLength={max as number} /> : null}
     </View>
   );
 }
@@ -545,6 +587,12 @@ export function SearchField({
 }
 
 const styles = StyleSheet.create({
+  counter: {
+    alignSelf: 'flex-end',
+    fontFamily: fontFamily.bodyMedium,
+    fontSize: 12,
+    fontVariant: ['tabular-nums'],
+  },
   fieldLabel: {
     fontFamily: fontFamily.bodyMedium,
     fontSize: 12,

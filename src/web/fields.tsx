@@ -242,12 +242,48 @@ export interface TextareaProps
   extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
   hint?: string;
+  /**
+   * Compteur visible « 212 / 280 » sous le champ. Par défaut : dès que
+   * `maxLength` atteint 200 caractères (`FIELD_COUNTER_FROM` de
+   * `@esport237hub/types`) — un texte qu'on rédige, pas une ville.
+   */
+  showCount?: boolean;
+}
+
+/** Seuil du compteur par défaut — miroir de `FIELD_COUNTER_FROM` (types). */
+const COUNTER_FROM = 200;
+
+/**
+ * Le compteur d'un champ borné (09/10/2026, « limitations de caractères ») :
+ * neutre, ambre dans les derniers 10 %, rouge à la borne. Le texte dit le
+ * nombre — la couleur n'est jamais le seul signal — et le lecteur d'écran
+ * entend « 212 sur 280 caractères ».
+ */
+export function FieldCounter({ length, maxLength }: { length: number; maxLength: number }) {
+  const t = useDsT();
+  const used = Math.max(0, Math.min(length, maxLength));
+  const tone = used >= maxLength ? 'danger' : used >= maxLength * 0.9 ? 'warning' : null;
+  return (
+    <span
+      className={cx('e237-field-counter', tone && `e237-field-counter--${tone}`)}
+      aria-label={t('ui.field.counter', { used, max: maxLength })}
+    >
+      {used} / {maxLength}
+    </span>
+  );
 }
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ label, hint, className, id, rows = 3, ...rest }, ref) => {
+  ({ label, hint, className, id, rows = 3, showCount, onChange, ...rest }, ref) => {
     const autoId = useId();
     const fieldId = id ?? autoId;
+    // Longueur tapée, pour un champ non contrôlé ; un champ contrôlé la donne
+    // par sa `value`.
+    const [typed, setTyped] = useState(() => String(rest.defaultValue ?? '').length);
+    const length = typeof rest.value === 'string' ? rest.value.length : typed;
+    const max = rest.maxLength;
+    const counter =
+      typeof max === 'number' && max > 0 && (showCount ?? max >= COUNTER_FROM);
     return (
       <div className="e237-field-group">
         {label ? (
@@ -260,9 +296,18 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           id={fieldId}
           rows={rows}
           className={cx('e237-field', 'e237-field--area', className)}
+          onChange={(e) => {
+            setTyped(e.target.value.length);
+            onChange?.(e);
+          }}
           {...rest}
         />
-        {hint ? <span className="e237-field-hint">{hint}</span> : null}
+        {hint || counter ? (
+          <div className="e237-field-foot">
+            {hint ? <span className="e237-field-hint">{hint}</span> : null}
+            {counter ? <FieldCounter length={length} maxLength={max as number} /> : null}
+          </div>
+        ) : null}
       </div>
     );
   },
