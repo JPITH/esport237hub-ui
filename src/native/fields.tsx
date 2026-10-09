@@ -8,7 +8,7 @@
  * Un champ `secureTextEntry` reçoit TOUJOURS le bouton œil afficher/masquer.
  * Icônes internes en react-native-svg (aucune dépendance d'icônes lourde).
  */
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import {
   ActivityIndicator,
   Platform,
@@ -594,7 +594,192 @@ export function SearchField({
   );
 }
 
+/* ------------------------------------------------------------------ */
+/* ComposerField — champ à icônes INTÉRIEURES                          */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Hauteur d'une ligne de champ à icônes : l'icône (36) + deux fois la marge
+ * intérieure (4). Le texte, les icônes et le bouton d'envoi partagent cette
+ * ligne — c'est ce qui les aligne.
+ */
+export const COMPOSER_FIELD_HEIGHT = 44;
+const COMPOSER_ICON = 36;
+const COMPOSER_INSET = (COMPOSER_FIELD_HEIGHT - COMPOSER_ICON) / 2;
+
+/**
+ * Bouton ROND posé DANS un champ (`ComposerField`) : joindre une photo,
+ * partager une salle, envoyer. `plain` = icône seule sur le creux du champ ;
+ * `accent` = pastille pleine de la marque (l'action d'envoi, une seule par
+ * champ).
+ */
+export function FieldIconButton({
+  icon,
+  label,
+  onPress,
+  tone = 'plain',
+  disabled = false,
+  loading = false,
+}: {
+  /** L'icône, déjà colorée par l'appelant (`Icon` du DS). */
+  icon: ReactNode;
+  /** Étiquette d'accessibilité — le bouton n'a pas de texte visible. */
+  label: string;
+  onPress: () => void;
+  tone?: 'plain' | 'accent';
+  disabled?: boolean;
+  loading?: boolean;
+}) {
+  const c = useColors();
+  const accent = tone === 'accent';
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ disabled: disabled || loading, busy: loading }}
+      disabled={disabled || loading}
+      onPress={() => {
+        haptic('light');
+        onPress();
+      }}
+      hitSlop={4}
+      style={({ pressed }) => [
+        styles.composerIcon,
+        accent && { backgroundColor: c.accent },
+        { opacity: disabled ? 0.4 : pressed ? 0.7 : 1 },
+      ]}
+    >
+      {loading ? (
+        <ActivityIndicator size="small" color={accent ? c.onAccent : c.accent} />
+      ) : (
+        icon
+      )}
+    </Pressable>
+  );
+}
+
+/**
+ * Champ dont les actions vivent DANS le cadre (retour du porteur du
+ * 09/10/2026 : « comme le champ de commentaire du fil ») — une icône à
+ * gauche (`leading` : joindre, partager une salle), le texte, une ou deux à
+ * droite (`trailing` : envoyer, effacer). Une seule hauteur pour toute la
+ * famille (`COMPOSER_FIELD_HEIGHT`), le texte centré sur la ligne quand il
+ * tient sur une ligne, les icônes calées EN BAS quand il en prend plusieurs
+ * (comme une messagerie). Même creux et même liseré de focus que `Field`.
+ */
+export function ComposerField({
+  value,
+  onChangeText,
+  placeholder,
+  leading,
+  trailing,
+  multiline = true,
+  maxLength,
+  editable = true,
+  accessibilityLabel,
+  onSubmitEditing,
+  style,
+  inputProps,
+}: {
+  value: string;
+  onChangeText: (text: string) => void;
+  placeholder?: string;
+  leading?: ReactNode;
+  trailing?: ReactNode;
+  multiline?: boolean;
+  maxLength?: number;
+  editable?: boolean;
+  accessibilityLabel?: string;
+  onSubmitEditing?: () => void;
+  style?: StyleProp<ViewStyle>;
+  /** Échappatoire : clavier, retour automatique… (jamais le style). */
+  inputProps?: Omit<TextInputProps, 'style' | 'value' | 'onChangeText'>;
+}) {
+  const c = useColors();
+  const neu = useNeu();
+  const [focused, setFocused] = useState(false);
+  return (
+    <View
+      style={[
+        styles.composer,
+        fieldSurface(c, neu, focused),
+        // Le liseré de focus ne doit pas faire sauter le contenu d'un pixel.
+        !focused && { borderWidth: 1, borderColor: 'transparent' },
+        style,
+      ]}
+    >
+      {leading ? <View style={styles.composerSlot}>{leading}</View> : null}
+      <TextInput
+        value={value}
+        onChangeText={onChangeText}
+        placeholder={placeholder}
+        placeholderTextColor={c.textMuted}
+        multiline={multiline}
+        // react-native-web rend un champ multiligne sur DEUX lignes par
+        // défaut : une seule au départ (le téléphone grandit au texte).
+        numberOfLines={multiline && Platform.OS === 'web' ? 1 : undefined}
+        maxLength={maxLength}
+        editable={editable}
+        accessibilityLabel={accessibilityLabel ?? placeholder}
+        onSubmitEditing={onSubmitEditing}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        {...inputProps}
+        style={[
+          styles.composerInput,
+          NO_WEB_OUTLINE,
+          { color: c.textPrimary },
+          !leading && { paddingLeft: spacing['3'] },
+          !trailing && { paddingRight: spacing['3'] },
+        ]}
+      />
+      {trailing ? <View style={styles.composerSlot}>{trailing}</View> : null}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
+  composer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    minHeight: COMPOSER_FIELD_HEIGHT,
+    borderRadius: COMPOSER_FIELD_HEIGHT / 2,
+    borderCurve: 'continuous',
+    paddingHorizontal: COMPOSER_INSET,
+    gap: 2,
+  },
+  composerSlot: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    paddingVertical: COMPOSER_INSET - 1,
+  },
+  composerIcon: {
+    width: COMPOSER_ICON,
+    height: COMPOSER_ICON,
+    borderRadius: COMPOSER_ICON / 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  composerInput: {
+    flex: 1,
+    // Sans `minWidth: 0`, le champ du web garde sa largeur intrinsèque et
+    // pousse l'icône d'envoi hors du cadre.
+    minWidth: 0,
+    minHeight: COMPOSER_FIELD_HEIGHT - 2,
+    maxHeight: 120,
+    // Une ligne de 20 centrée dans la hauteur du champ : le texte d'attente
+    // n'est plus collé en haut (visite du 09/10/2026).
+    paddingTop: (COMPOSER_FIELD_HEIGHT - 2 - 20) / 2,
+    paddingBottom: (COMPOSER_FIELD_HEIGHT - 2 - 20) / 2,
+    paddingHorizontal: spacing['1'],
+    lineHeight: 20,
+    textAlignVertical: 'top',
+    // Android ignore `Chivo_400Regular` dans un `TextInput` : sans famille
+    // explicite, le champ repasse en police du téléphone.
+    fontFamily: fontFamily.bodyMedium,
+    fontSize: 15,
+  },
   counter: {
     alignSelf: 'flex-end',
     fontFamily: fontFamily.bodyMedium,

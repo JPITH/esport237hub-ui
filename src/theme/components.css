@@ -472,6 +472,32 @@
   border-color: var(--e237-accent-border);
 }
 
+/*
+ * Variante NEU : une pastille RONDE en relief doux (les boutons de la marque
+ * sont des pilules ; une action secondaire sans texte — « Partager » sous la
+ * révélation d'un duel — est un cercle). Même relief que le jumeau natif
+ * (`IconButton` de `native/chrome.tsx`, `neu.raisedSm`), clair et sombre par
+ * les jetons `--e237-neu-*`.
+ */
+.icon-btn--neu {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--e237-radius-full, 9999px);
+  color: var(--e237-text-primary);
+  background: var(--e237-surface-raised);
+  /* Sur le web, `--e237-neu-*` est neutralisé (règle 5 : la profondeur vient
+     du trait) : le trait porte le relief ; sur le téléphone, l'ombre douce. */
+  border-color: var(--e237-border);
+  box-shadow: var(--e237-neu-raised-sm);
+}
+.icon-btn--neu:hover:not(:disabled) {
+  background: var(--e237-surface-raised);
+  color: var(--e237-accent);
+}
+.icon-btn--neu:active:not(:disabled) {
+  box-shadow: var(--e237-neu-pressed-sm);
+}
+
 /* ---------------------------------------------------------------- */
 /* Puces de filtre (avec compteur/stat) + segments d'onglets          */
 /* ---------------------------------------------------------------- */

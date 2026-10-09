@@ -212,8 +212,11 @@ export {
   NumberInput,
   PhoneInput,
   SearchField,
+  ComposerField,
+  ComposerFieldButton,
 } from './fields';
 export type {
+  ComposerFieldProps,
   InputProps,
   TextareaProps,
   NumberInputProps,

@@ -11,7 +11,7 @@
  * réaliste et stable — jamais aléatoire.
  */
 
-export type GameCategory = "football" | "pvp_mobile" | "generic";
+export type GameCategory = "football" | "pvp_mobile" | "board" | "ludo" | "generic";
 
 export interface StatDef {
   key: string;
@@ -19,12 +19,20 @@ export interface StatDef {
   label: string;
 }
 
+/*
+ * Échecs, dames et Ludo (nos jeux in-app) avaient les stats d'un TIREUR
+ * (AIM, MAP, CLUTCH…) sur leur carte : visite du 09/10/2026. Chacun a
+ * désormais les siennes.
+ */
 const CATEGORY_BY_SLUG: Record<string, GameCategory> = {
   fc27: "football",
   "call-of-duty": "generic",
   "clash-royale": "pvp_mobile",
   "pubg-mobile": "generic",
   valorant: "generic",
+  echecs: "board",
+  dames: "board",
+  ludo: "ludo",
 };
 
 export function gameCategory(slug: string | undefined): GameCategory {
@@ -47,6 +55,22 @@ export const STAT_DEFS: Record<GameCategory, StatDef[]> = {
     { key: "eli", abbr: "ELI", label: "Élixir" },
     { key: "tro", abbr: "TRO", label: "Trophées" },
     { key: "win", abbr: "WIN", label: "Régularité" },
+  ],
+  board: [
+    { key: "ouv", abbr: "OUV", label: "Ouverture" },
+    { key: "tac", abbr: "TAC", label: "Tactique" },
+    { key: "str", abbr: "STR", label: "Stratégie" },
+    { key: "cal", abbr: "CAL", label: "Calcul" },
+    { key: "fin", abbr: "FIN", label: "Finale" },
+    { key: "con", abbr: "CON", label: "Constance" },
+  ],
+  ludo: [
+    { key: "str", abbr: "STR", label: "Stratégie" },
+    { key: "cap", abbr: "CAP", label: "Captures" },
+    { key: "spr", abbr: "SPR", label: "Sprint" },
+    { key: "pru", abbr: "PRU", label: "Prudence" },
+    { key: "ris", abbr: "RIS", label: "Prise de risque" },
+    { key: "con", abbr: "CON", label: "Constance" },
   ],
   generic: [
     { key: "s1", abbr: "AIM", label: "Précision" },
