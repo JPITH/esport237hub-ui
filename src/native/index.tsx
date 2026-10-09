@@ -175,8 +175,8 @@ export type { SkinCatalog, SkinCatalogProviderProps } from '../skins/context';
 export { SkinPicker, SkinSwatch } from './skin-picker';
 export type { SkinPickerProps, SkinSwatchProps } from './skin-picker';
 
-export { PlayerCard, DivisionChip } from './player-card';
-export type { PlayerCardProps } from './player-card';
+export { PlayerCard, PlayerCardBack, DivisionChip } from './player-card';
+export type { PlayerCardBackProps, PlayerCardProps } from './player-card';
 export { DuelStatusBadge } from './duel-status-badge';
 export { ScoreInput } from './score-board';
 /*
