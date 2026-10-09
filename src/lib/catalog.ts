@@ -27,6 +27,9 @@ const GAME_ASSET: Record<string, string> = {
   fc27: 'fc27',
   'clash-royale': 'clash',
   codm: 'cod',
+  // L'identifiant du catalogue en base est `call-of-duty` (seed 0001) :
+  // sans cette ligne, Call of Duty n'avait jamais son visuel (lot M1).
+  'call-of-duty': 'cod',
   'pubg-mobile': 'pubg',
   valorant: 'valorant',
   // Nos jeux (lot G, 09/10/2026) : visuels ORIGINAUX dessinés pour G-HUB
