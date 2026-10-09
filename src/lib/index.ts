@@ -1,5 +1,6 @@
 export * from './player-stats';
 export * from './duel-status';
+export * from './duel-result';
 export * from './game-cards';
 export * from './tone';
 export * from './money';
@@ -12,6 +13,7 @@ export * from './rating';
 export * from './relative-time';
 export * from './external-url';
 export * from './brand-mark';
+export * from './brand-motion';
 export * from './brand-name';
 export * from './initials';
 export * from './phone-countries';

@@ -208,6 +208,7 @@ export type {
 export {
   Input,
   Textarea,
+  FieldCounter,
   NumberInput,
   PhoneInput,
   SearchField,
@@ -271,6 +272,8 @@ export { SeasonBanner } from './season-banner';
 export type { SeasonBannerProps, SeasonView } from './season-banner';
 
 export { AppMark } from './mark';
+export { BrandLoader, PageLoader } from './brand-loader';
+export type { BrandLoaderProps, PageLoaderProps } from './brand-loader';
 export type { AppMarkProps } from './mark';
 
 export {
@@ -333,8 +336,8 @@ export type {
   TicketCardProps,
 } from './cards';
 
-export { DuelRow, ScoreSide } from './duel';
-export type { DuelRowProps, ScoreSideProps } from './duel';
+export { DuelResultPill, DuelRow, ScoreSide } from './duel';
+export type { DuelResultPillProps, DuelRowProps, ScoreSideProps } from './duel';
 
 export { TierPicker } from './tier-picker';
 export type { TierOption, TierPickerProps } from './tier-picker';
