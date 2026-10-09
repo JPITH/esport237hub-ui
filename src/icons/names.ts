@@ -1,7 +1,7 @@
 // FICHIER GÉNÉRÉ par scripts/icons.ts — ne pas modifier à la main.
 // Source : src/icons/svg/*.svg. Régénérer : `bun scripts/icons.ts`.
 
-/** Les 143 icônes du jeu G-HUB, par ordre alphabétique. */
+/** Les 146 icônes du jeu G-HUB, par ordre alphabétique. */
 export const ICON_NAMES = [
   'activity',
   'alert-circle',
@@ -38,6 +38,7 @@ export const ICON_NAMES = [
   'copy',
   'credit-card',
   'crown',
+  'cube',
   'dice',
   'door-closed',
   'door-open',
@@ -140,6 +141,8 @@ export const ICON_NAMES = [
   'user-plus',
   'users',
   'video',
+  'volume',
+  'volume-x',
   'wallet',
   'wifi',
   'wifi-off',
