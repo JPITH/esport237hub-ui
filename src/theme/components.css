@@ -5078,6 +5078,12 @@ a.mkt-social:focus-visible {
   animation: e237-mark-cycle 2.4s ease-in-out infinite;
 }
 
+/* L'empreinte du cadre : visible entre deux cycles, jamais d'écran vide. */
+.e237-brand-loader__ghost {
+  fill: var(--e237-accent);
+  fill-opacity: 0.18;
+}
+
 .e237-brand-loader__ring {
   fill: var(--e237-accent);
   fill-opacity: 0;

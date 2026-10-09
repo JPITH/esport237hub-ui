@@ -52,6 +52,9 @@ export function BrandLoader({ size = 72, label, className = "", style }: BrandLo
         focusable="false"
         className="e237-brand-loader__mark"
       >
+        {/* L'empreinte du cadre, toujours là (très pâle) : entre deux cycles,
+            l'écran ne redevient jamais vide — sinon le logo « clignote ». */}
+        <path className="e237-brand-loader__ghost" d={MARK_RING_PATH} />
         {/* `pathLength` normalise le pointillé : le cadre se trace de 0 à 1,
             quelle que soit sa taille réelle. */}
         <path className="e237-brand-loader__ring" d={MARK_RING_PATH} pathLength={1} />

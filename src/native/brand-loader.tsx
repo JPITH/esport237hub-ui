@@ -131,6 +131,9 @@ export function BrandLoader({ size = 72, label, style }: BrandLoaderProps) {
     >
       <Animated.View style={[StyleSheet.absoluteFill, breathe]}>
         <Svg viewBox={MARK_VIEW_BOX} width={size} height={size}>
+          {/* L'empreinte du cadre, toujours là (très pâle) : entre deux
+              cycles, l'écran ne redevient jamais vide. */}
+          <Path d={MARK_RING_PATH} fill={c.accent} fillOpacity={0.18} />
           <AnimatedPath
             d={MARK_RING_PATH}
             fill={c.accent}
