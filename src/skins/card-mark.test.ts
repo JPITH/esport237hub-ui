@@ -130,8 +130,9 @@ describe('le filigrane : le signe, gris, derrière le portrait', () => {
     expect(c.g).toBe(c.b);
     // Du côté de l'encre : clair sur une carte sombre, sombre sur la carte OR.
     expect(Math.abs(luminance(wm.color) - luminance(skin.ink))).toBeLessThan(0.01);
-    // La borne basse cède au garde-fou de lisibilité (champion : halo doré sous le verso).
-    expect(wm.opacity).toBeGreaterThanOrEqual(0.03);
+    // La borne basse ne cède au garde-fou de lisibilité que sur un skin du
+    // dashboard aux tons serrés (plus bas) : aucun skin intégré n'y descend.
+    expect(wm.opacity).toBeGreaterThanOrEqual(WATERMARK_OPACITY_RANGE[0]);
     expect(wm.opacity).toBeLessThanOrEqual(WATERMARK_OPACITY_RANGE[1]);
     // Visible : il se distingue de la surface qu'il recouvre.
     const box = cardShape(skin.shape).watermark;
@@ -210,10 +211,13 @@ describe('lisibilité avec le filigrane (4,5:1)', () => {
 
   /*
    * Relevés pendant le lot M3, ANTÉRIEURS au filigrane (qui ne passe sur
-   * aucun de ces points — vérifié ci-dessus) : la surface y est trop proche
-   * de l'encre. Mesuré sur une capture pour la carte OR (~3:1).
+   * aucun de ces points — vérifié ci-dessus) : la surface y était trop proche
+   * de l'encre — ~3:1 mesuré sur une capture de la carte OR, ~4,4:1 sous le
+   * titre du verso de Champion. Corrigé dans la palette (09/10/2026) : bas de
+   * la surface OR `#6f5a1c` → `#a07d23` (même bronze, éclairci), halo du haut
+   * de Champion 0,5 → 0,44.
    */
-  const everywhere = (key: 'gold' | 'champion') => () => {
+  const everywhere = (key: (typeof BUILTIN_SKIN_KEYS)[number]) => () => {
     const skin = BUILTIN_SKINS[key];
     const shape = cardShape(skin.shape);
     const points = [...grid(shape.layout.stats, 0.15), ...cardTextProbes(shape)];
@@ -221,11 +225,15 @@ describe('lisibilité avec le filigrane (4,5:1)', () => {
       expect(contrastRatio(skin.ink, backgroundAt(skin, x, y))).toBeGreaterThanOrEqual(AA);
     }
   };
-  test.todo(
-    'or : les deux dernières rangées de stats du recto et le bilan du verso à 4,5:1 (bas de surface #6f5a1c)',
+  test(
+    'or : les deux dernières rangées de stats du recto et le bilan du verso à 4,5:1',
     everywhere('gold'),
   );
-  test.todo('champion : le titre du verso à 4,5:1 sur le halo doré du haut', everywhere('champion'));
+  test('champion : le titre du verso à 4,5:1 sur le halo doré du haut', everywhere('champion'));
+  // Et qu'aucun autre skin intégré ne tombe dans le même piège.
+  test.each(BUILTIN_SKIN_KEYS.map((k) => [k] as const))('%s : stats du recto et verso à 4,5:1', (key) =>
+    everywhere(key)(),
+  );
 });
 
 describe('le signe du pied, là où était la pilule', () => {
