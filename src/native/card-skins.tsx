@@ -266,6 +266,20 @@ function CardArtwork({ draw }: { draw: SkinDraw }) {
             strokeWidth={l.width}
           />
         ))}
+        {/* Filigrane du signe (lot M3) : dans le tracé du fond, sous le
+            contenu — aucun `Svg` ni rendu de plus. */}
+        <G
+          opacity={draw.watermark.opacity}
+          transform={`translate(${draw.watermark.x.toFixed(2)} ${draw.watermark.y.toFixed(2)}) scale(${draw.watermark.scale.toFixed(5)})`}>
+          {draw.watermark.parts.map((part) => (
+            <Path
+              key={part.key}
+              d={part.d}
+              fill={draw.watermark.color}
+              fillOpacity={part.opacity}
+            />
+          ))}
+        </G>
       </G>
 
       {/* Anneau intérieur brillant. */}

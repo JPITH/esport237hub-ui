@@ -142,6 +142,8 @@ export type {
 
 export { CardChrome } from './card-chrome';
 export type { CardChromeProps, CardSkinInput } from './card-chrome';
+export { CardMark } from './card-mark';
+export type { CardMarkProps } from './card-mark';
 
 /**
  * Socle des skins : mêmes données et même géométrie que le mobile (voir

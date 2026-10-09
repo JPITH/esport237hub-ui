@@ -39,6 +39,13 @@ export {
   identityBand,
   IDENTITY_BAND_ALPHA,
   DIVISION_CHIP_BACKGROUND,
+  surfaceColorAt,
+  neutralOf,
+  watermarkInk,
+  markInksOn,
+  WATERMARK_VISIBILITY,
+  WATERMARK_OPACITY_RANGE,
+  MARK_MIN_CONTRAST,
 } from './spec';
 export type {
   SkinSpec,
@@ -51,6 +58,8 @@ export type {
   SkinSheen,
   SkinGlow,
   BuiltinSkinKey,
+  WatermarkInk,
+  CardMarkInks,
 } from './spec';
 
 export {
@@ -75,6 +84,14 @@ export {
   isCardShapeName,
   cardShape,
   cardShapes,
+  CARD_WATERMARK,
+  WATERMARK_GAP,
+  WATERMARK_LETTER_G_OPACITY,
+  CARD_MARK_SIZE,
+  cardMarkInks,
+  watermarkRing,
+  cardTextProbes,
+  TEXT_BLOCK_HEIGHTS,
 } from './geometry';
 export type {
   CardShapeName,
@@ -88,6 +105,7 @@ export type {
   DrawRadial,
   DrawLine,
   DrawSheen,
+  DrawWatermark,
 } from './geometry';
 
 export { skinCssVars, skinCssText } from './css';

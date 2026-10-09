@@ -4,7 +4,8 @@
  * plaque jeu posée sur le liseré, colonne badge (OVR / ville / drapeau /
  * division), photo du joueur ou silhouette IA de repli, nom + victoires
  * (sans bordure basse), stats en deux colonnes dont le séparateur est porté
- * par les cellules, marque en pied.
+ * par les cellules, signe G-HUB animé en pied et en filigrane dans le fond
+ * (lot M3, 09/10/2026 — plus de pilule « G-HUB »).
  *
  * Tailles pilotées par l'échelle de CardChrome (équivalent natif des `cqw`
  * du web) ; polices Space Grotesk / Chivo (comme le web).
@@ -12,11 +13,16 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 
-import { BRAND_NAME } from '../lib/brand-name';
 import { useDsT } from '../i18n';
 import { cardRecord } from '../lib/game-cards';
 import { cardStats, cityAbbr, type StatDef } from '../lib/player-stats';
-import { FLAG_RADIUS, pct, type CardBackLayout, type CardLayout } from '../skins/geometry';
+import {
+  CARD_MARK_SIZE,
+  FLAG_RADIUS,
+  pct,
+  type CardBackLayout,
+  type CardLayout,
+} from '../skins/geometry';
 import {
   DIVISION_CHIP_BACKGROUND,
   identityBand,
@@ -32,6 +38,7 @@ import {
   useCardShape,
   type CardSkinInput,
 } from './card-skins';
+import { CardMark } from './card-mark';
 import { CardStage, RisingNumber } from './card-motion';
 import { DivisionBadge } from './division-badge';
 import { Flag } from './flag';
@@ -164,14 +171,16 @@ export function CardPortrait({ imageUrl }: { imageUrl?: string | null }) {
   );
 }
 
-/** Pied de carte : marque du hub. */
-export function CardFooter({ spec }: { spec: SkinSpec }) {
+/**
+ * Pied de carte : le signe G-HUB animé, là où était la pilule « G-HUB »
+ * (lot M3). Côté = `CARD_MARK_SIZE` à l'échelle de la carte.
+ */
+export function CardFooter({ spec, still = false }: { spec: SkinSpec; still?: boolean }) {
   const s = useCardStyles();
+  const k = useCardScale();
   return (
     <View style={s.footer} pointerEvents="none">
-      <View style={[s.chip, { borderColor: stopColor(spec.frame, 1) }]}>
-        <Text style={[s.chipText, { color: spec.ink }]}>{BRAND_NAME}</Text>
-      </View>
+      <CardMark spec={spec} size={CARD_MARK_SIZE * k} still={still} />
     </View>
   );
 }
@@ -213,6 +222,11 @@ export interface PlayerCardProps {
   flippable?: boolean;
   /** Verso personnalisé ; par défaut les stats détaillées du jeu. */
   back?: ReactNode;
+  /**
+   * Signe du pied IMMOBILE (pas d'éclat) : exports et captures. « Réduire les
+   * animations » l'immobilise de lui-même, sans cette prop.
+   */
+  still?: boolean;
 }
 
 /**
@@ -286,6 +300,7 @@ function PlayerCardBody({
   imageUrl,
   skin = 'signature',
   country = 'CM',
+  still = false,
 }: Omit<PlayerCardProps, 'animated' | 'interactive' | 'flippable' | 'back'>) {
   const t = useDsT();
   const spec = useSkin(skin);
@@ -354,7 +369,7 @@ function PlayerCardBody({
         ))}
       </View>
 
-      <CardFooter spec={spec} />
+      <CardFooter spec={spec} still={still} />
     </>
   );
 }
@@ -517,14 +532,6 @@ function makeStyles(k: number, L: CardLayout) {
       alignItems: 'center',
       zIndex: 7,
     },
-    chip: {
-      borderWidth: 1,
-      borderRadius: 3,
-      paddingVertical: 3 * k,
-      paddingHorizontal: 9 * k,
-      backgroundColor: 'rgba(0,0,0,0.22)',
-    },
-    chipText: { fontFamily: CARD_FONTS.extraBold, fontSize: 8 * k, letterSpacing: 0.65 * k },
   });
 }
 
@@ -559,6 +566,8 @@ export interface PlayerCardBackProps {
   stats?: Record<string, number> | null;
   statDefs?: StatDef[];
   skin?: CardSkinInput;
+  /** Signe du pied immobile (voir `PlayerCardProps.still`). */
+  still?: boolean;
 }
 
 /** Corps du verso — rendu SOUS `CardChrome` pour recevoir l'échelle mesurée. */
@@ -573,6 +582,7 @@ export function PlayerCardBackBody({
   stats,
   statDefs,
   skin = 'signature',
+  still = false,
 }: PlayerCardBackProps) {
   const t = useDsT();
   const spec = useSkin(skin);
@@ -653,7 +663,7 @@ export function PlayerCardBackBody({
         ))}
       </View>
 
-      <CardFooter spec={spec} />
+      <CardFooter spec={spec} still={still} />
     </>
   );
 }
