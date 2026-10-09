@@ -5,6 +5,7 @@
  * accent : DESIGN.md interdit à l'accent de dire un état, et une note EST un
  * état ; l'or est le jeton « podium, décoratif » prévu pour ça.
  */
+import type { ReactNode } from 'react';
 import {
   Pressable,
   StyleSheet,
@@ -242,6 +243,11 @@ export interface VenueReviewProps {
   comment?: string | null;
   /** Repère « a joué ici » — c'est ce qui rend l'avis crédible. */
   verified?: boolean;
+  /**
+   * Réponse du gérant, quand il y en a une — le jumeau de la prop web
+   * (`../web/rating`) : posée sous l'avis, dans un encart en retrait.
+   */
+  reply?: ReactNode;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -251,6 +257,7 @@ export function VenueReview({
   score,
   comment,
   verified = true,
+  reply,
   style,
 }: VenueReviewProps) {
   const c = useE237Colors();
@@ -275,6 +282,11 @@ export function VenueReview({
         <Txt variant="body" tone="secondary">
           {comment}
         </Txt>
+      ) : null}
+      {reply ? (
+        <View style={[styles.reply, { backgroundColor: c.surfaceRaised, borderColor: c.border }]}>
+          {reply}
+        </View>
       ) : null}
     </View>
   );
@@ -341,6 +353,7 @@ const styles = StyleSheet.create({
   // `overline` capitalise et espace déjà ; la pastille veut moins d'approche.
   playedHereText: { letterSpacing: 0.4 },
   when: { marginLeft: 'auto' },
+  reply: { borderWidth: 1, borderRadius: radius.md, padding: spacing['2'], gap: spacing['1'] },
 
   gate: {
     flexDirection: 'row',
