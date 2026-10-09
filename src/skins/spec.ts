@@ -284,6 +284,191 @@ export function identityBand(skin: Pick<SkinSpec, 'ink' | 'surface'>): string {
 export const DIVISION_CHIP_BACKGROUND = 'rgba(0,0,0,0.7)';
 
 /* ========================================================================== */
+/* Le signe sur la carte : filigrane et logo du pied (lot M3, 09/10/2026)      */
+/* ========================================================================== */
+
+function toHex(c: { r: number; g: number; b: number }): string {
+  const h = (n: number) => clamp255(n).toString(16).padStart(2, '0');
+  return `#${h(c.r)}${h(c.g)}${h(c.b)}`;
+}
+
+/** Couleur opaque (`#rrggbb`), l'alpha éventuel ignoré. `null` si illisible. */
+function opaqueHex(css: string): string | null {
+  const c = parseColor(css);
+  return c ? toHex(c) : null;
+}
+
+/** Couleur au point `t` (0-1) d'une suite d'arrêts, interpolée comme un dégradé SVG. */
+function stopsAt(stops: readonly SkinStop[], t: number): string {
+  if (stops.length === 0) return '#000000';
+  const u = Math.max(0, Math.min(1, t));
+  if (u <= stops[0].offset) return stops[0].color;
+  for (let i = 0; i < stops.length - 1; i++) {
+    const a = stops[i];
+    const b = stops[i + 1];
+    if (u <= b.offset) {
+      const span = b.offset - a.offset;
+      return mixColor(a.color, b.color, span > 0 ? (u - a.offset) / span : 1);
+    }
+  }
+  return stops[stops.length - 1].color;
+}
+
+/**
+ * Couleur du FOND de la carte en un point (x, y en fraction de la carte) :
+ * le dégradé de surface puis les halos, composés comme le tracé SVG les
+ * peint (`gradientUnits` par défaut : la boîte de l'objet). Les rayures —
+ * deux pixels à 5 % — sont négligées.
+ *
+ * C'est une approximation du rendu, pas une capture : elle sert à choisir des
+ * encres lisibles (logo du pied, filigrane) et aux tests de lisibilité, qui
+ * vérifient chaque skin au-dessus de ce même calcul.
+ */
+export function surfaceColorAt(skin: Pick<SkinSpec, 'surface' | 'radials'>, x: number, y: number): string {
+  const g = skin.surface;
+  const dx = g.x2 - g.x1;
+  const dy = g.y2 - g.y1;
+  const len = dx * dx + dy * dy;
+  const t = len > 0 ? ((x - g.x1) * dx + (y - g.y1) * dy) / len : 0;
+  let color = opaqueHex(stopsAt(g.stops, t)) ?? '#000000';
+  for (const r of skin.radials) {
+    const ink = parseColor(r.color);
+    if (!ink || r.r <= 0) continue;
+    const d = Math.hypot(x - r.cx, y - r.cy) / r.r;
+    if (d >= 1) continue;
+    color = mixColor(color, toHex(ink), Math.max(0, Math.min(1, r.opacity * ink.a * (1 - d))));
+  }
+  return color;
+}
+
+/**
+ * Le GRIS de même luminance qu'une couleur : sa teinte retirée, sa clarté
+ * gardée. Le filigrane est « gris » au sens du porteur — une encre du skin
+ * sans sa couleur, jamais un gris inventé à part.
+ */
+export function neutralOf(css: string): string {
+  const y = luminance(css);
+  const v = y <= 0.0031308 ? 12.92 * y : 1.055 * y ** (1 / 2.4) - 0.055;
+  const n = clamp255(v * 255);
+  return toHex({ r: n, g: n, b: n });
+}
+
+/**
+ * Visibilité visée du filigrane : le rapport de contraste entre la surface
+ * nue et la surface sous le signe. Assez pour qu'on le voie sur tous les
+ * skins, assez peu pour qu'il reste un filigrane. L'opacité en DÉCOULE, skin
+ * par skin : un gris clair sur une nuit presque noire n'a pas besoin de la
+ * même dose que sur un vert moyen.
+ */
+export const WATERMARK_VISIBILITY = 1.3;
+/**
+ * Bornes de la dose du filigrane. La borne basse cède au garde-fou de
+ * lisibilité (`watermarkInk`) : un texte lisible prime sur un filigrane visible.
+ */
+export const WATERMARK_OPACITY_RANGE = [0.04, 0.16] as const;
+
+/** Encre et dose du filigrane d'une carte. */
+export interface WatermarkInk {
+  color: string;
+  opacity: number;
+}
+
+/**
+ * Filigrane du signe sur la carte : le gris de l'ENCRE du skin (clair sur une
+ * carte sombre, sombre sur la carte OR), dosé pour une visibilité constante
+ * (`WATERMARK_VISIBILITY`, mesurée sur la surface `under`).
+ *
+ * Garde-fou : là où l'encre était lisible à 4,5:1, le filigrane ne la fait
+ * jamais passer dessous — la dose baisse plutôt (skin du dashboard aux tons
+ * serrés). `under` : la couleur de surface au centre du signe (elle dose),
+ * puis celles des points de texte qui passent dessus (le garde-fou).
+ */
+export function watermarkInk(skin: Pick<SkinSpec, 'ink'>, under: readonly string[]): WatermarkInk {
+  const color = neutralOf(skin.ink);
+  const [min, max] = WATERMARK_OPACITY_RANGE;
+  const base = under[0] ?? color;
+  const visibility = (alpha: number) => contrastRatio(base, mixColor(base, color, alpha));
+
+  // Dichotomie : le contraste surface/filigrane croît avec l'opacité.
+  let lo = 0;
+  let hi = 1;
+  for (let i = 0; i < 18; i++) {
+    const mid = (lo + hi) / 2;
+    if (visibility(mid) < WATERMARK_VISIBILITY) lo = mid;
+    else hi = mid;
+  }
+  let opacity = Math.max(min, Math.min(max, hi));
+
+  /* Une marge de 0,1 au-dessus du seuil : le garde-fou sonde une grille, le
+     texte tombe entre ses points. */
+  const keepsInk = (alpha: number) =>
+    under.every((bg) => {
+      const before = contrastRatio(skin.ink, bg);
+      return before < 4.5 || contrastRatio(skin.ink, mixColor(bg, color, alpha)) >= Math.min(before, 4.6);
+    });
+  while (opacity > 0 && !keepsInk(opacity)) opacity = Math.max(0, opacity - 0.01);
+
+  return { color, opacity: Number(opacity.toFixed(3)) };
+}
+
+/** Encres du signe posé sur une carte — mêmes rôles que `AppMark`, plus le reflet. */
+export interface CardMarkInks {
+  /** Cadre hexagonal et « H ». */
+  accent: string;
+  /** Le « G ». */
+  contrast: string;
+  /** Facette de la traverse : l'accent d'un cran plus sombre. */
+  accentShade: string;
+  /** Monogramme de la variante pleine (sous 20 px), posé sur l'accent. */
+  onAccent: string;
+  /** Lumière de l'éclat qui traverse le signe. */
+  glint: string;
+}
+
+/** Contraste minimal d'un élément graphique (WCAG 1.4.11). */
+export const MARK_MIN_CONTRAST = 3;
+
+/** Premier candidat lisible sur `bg`, sinon le plus contrasté. */
+function firstReadable(candidates: readonly string[], bg: string, min: number): string {
+  let best = candidates[0];
+  for (const c of candidates) {
+    if (contrastRatio(c, bg) >= min) return c;
+    if (contrastRatio(c, bg) > contrastRatio(best, bg)) best = c;
+  }
+  return best;
+}
+
+/**
+ * Encres du signe du PIED de carte (là où était la pilule « G-HUB »), tirées
+ * de la palette du skin et non de l'accent de l'application : sur la carte, le
+ * « thème », c'est le skin. Le cadre et le « H » prennent l'accent du skin, le
+ * « G » son encre — comme le lime et le blanc du signe sur un fond sombre.
+ *
+ * Chaque encre doit tenir 3:1 sur le fond du pied (`background`, voir
+ * `surfaceColorAt`), sinon elle cède la place au clair du liseré puis à
+ * l'encre lisible : sur la carte OR, l'accent brun se perdait dans le bas
+ * sombre de la surface.
+ */
+export function markInksOn(
+  skin: Pick<SkinSpec, 'ink' | 'accent' | 'frame'>,
+  background: string,
+): CardMarkInks {
+  const bg = opaqueHex(background) ?? '#000000';
+  const frameHi = opaqueHex(stopColor(skin.frame, 0)) ?? skin.ink;
+  const ink = opaqueHex(skin.ink) ?? readableInk(bg);
+  const accentRaw = opaqueHex(skin.accent) ?? frameHi;
+  const accent = firstReadable([accentRaw, frameHi, ink, readableInk(bg)], bg, MARK_MIN_CONTRAST);
+  const contrast = firstReadable([ink, readableInk(bg)], bg, MARK_MIN_CONTRAST);
+  return {
+    accent,
+    contrast,
+    accentShade: darken(accent, 0.18),
+    onAccent: firstReadable([bg, readableInk(accent)], accent, MARK_MIN_CONTRAST),
+    glint: lighten(luminance(frameHi) >= luminance(ink) ? frameHi : ink, 0.6),
+  };
+}
+
+/* ========================================================================== */
 /* Gabarits de dégradés et de rayures                                         */
 /* ========================================================================== */
 

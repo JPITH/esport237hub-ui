@@ -13,13 +13,37 @@
 
 import { useId, useMemo, type CSSProperties, type ReactNode } from "react";
 
-import { buildSkinDraw, skinAnimated, type SkinDraw } from "../skins/geometry";
+import {
+  buildSkinDraw,
+  skinAnimated,
+  type DrawWatermark,
+  type SkinDraw,
+} from "../skins/geometry";
 import { skinCssVars } from "../skins/css";
 import type { SkinSpec } from "../skins/spec";
 import { useSkin } from "../skins/context";
 
 /** Ce qu'un composant de carte accepte pour son apparence. */
 export type CardSkinInput = string | SkinSpec;
+
+/**
+ * Filigrane du signe (lot M3) : un groupe dans le tracé du fond, donc SOUS le
+ * contenu (portrait, nom, stats) et sans élément ni rendu de plus. Les tracés
+ * sont ceux de `lib/brand-mark`, l'encre et la dose celles du skin.
+ */
+function CardWatermark({ watermark: wm }: { watermark: DrawWatermark }) {
+  return (
+    <g
+      className="pcard__watermark"
+      opacity={wm.opacity}
+      transform={`translate(${wm.x.toFixed(2)} ${wm.y.toFixed(2)}) scale(${wm.scale.toFixed(5)})`}
+    >
+      {wm.parts.map((part) => (
+        <path key={part.key} d={part.d} fill={wm.color} fillOpacity={part.opacity} />
+      ))}
+    </g>
+  );
+}
 
 /** Traduit la liste de tracé partagée en SVG DOM. */
 function CardArtwork({ draw }: { draw: SkinDraw }) {
@@ -86,6 +110,7 @@ function CardArtwork({ draw }: { draw: SkinDraw }) {
             strokeWidth={l.width}
           />
         ))}
+        <CardWatermark watermark={draw.watermark} />
       </g>
 
       {/* Anneau intérieur brillant. */}

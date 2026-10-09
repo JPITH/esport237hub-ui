@@ -72,3 +72,80 @@ export function stageProgress(t: number, [from, to]: readonly [number, number]):
   if (t >= to) return 1;
   return (t - from) / (to - from);
 }
+
+/**
+ * Boîte englobante d'un tracé fait de segments droits, dans le repère du
+ * signe (800). Sert à poser le filigrane de la carte au-dessus des stats sans
+ * recopier une seule coordonnée du signe.
+ */
+export function polylineBounds(d: string): { minX: number; minY: number; maxX: number; maxY: number } {
+  const tokens = d.trim().split(/[\s,]+/);
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (let i = 0; i < tokens.length; ) {
+    const cmd = tokens[i];
+    if (cmd === 'M' || cmd === 'L') {
+      const x = Number(tokens[i + 1]);
+      const y = Number(tokens[i + 2]);
+      minX = Math.min(minX, x);
+      minY = Math.min(minY, y);
+      maxX = Math.max(maxX, x);
+      maxY = Math.max(maxY, y);
+      i += 3;
+    } else if (cmd === 'Z' || cmd === 'z') {
+      i += 1;
+    } else {
+      return { minX: NaN, minY: NaN, maxX: NaN, maxY: NaN };
+    }
+  }
+  return { minX, minY, maxX, maxY };
+}
+
+/* ========================================================================== */
+/* Le signe au pied de la carte joueur (lot M3, 09/10/2026)                    */
+/* ========================================================================== */
+
+/**
+ * Retour du porteur (09/10/2026) : « Enlève la pilule. Mets le logo en
+ * filigrane gris sur la carte. Et là où était la pilule, mets le logo avec une
+ * petite animation en boucle. »
+ *
+ * Le mouvement est un ÉCLAT : une bande de lumière inclinée traverse le signe
+ * de gauche à droite, puis le signe se repose. Au repos il est complet et
+ * immobile — une capture prise à n'importe quel instant montre le logo tel
+ * qu'il est, et « réduire les animations » n'a qu'à retirer la bande.
+ *
+ *   0 %  ──── 34 %  la bande traverse le signe (adoucie au départ et à l'arrivée)
+ *   34 % ──── 100 % repos
+ *
+ * Web : `@keyframes pc-mark-glint` (components.css) recopie 34 % — un
+ * sélecteur de keyframe ne peut pas être une variable ; un test compare.
+ * Natif : une horloge Reanimated partagée par toutes les cartes, sur le fil UI.
+ */
+export const CARD_MARK_CYCLE_MS = 3200;
+
+export const CARD_MARK_GLINT = {
+  /** Fraction du cycle pendant laquelle la bande traverse le signe. */
+  sweep: [0, 0.34],
+  /** Inclinaison de la bande par rapport à la verticale, en degrés. */
+  angleDeg: 20,
+  /** Largeur de la bande, en fraction du côté du signe. */
+  band: 0.42,
+  /** Opacité du reflet au cœur de la bande. */
+  peak: 0.8,
+} as const;
+
+/**
+ * Avancement de la bande dans le cycle (0 → 1 pendant la traversée, puis 1
+ * jusqu'à la fin du cycle), adouci en entrée et en sortie. `'worklet'` : le
+ * natif l'appelle depuis le fil UI ; ailleurs la directive est une chaîne nue.
+ */
+export function glintTravel(t: number): number {
+  'worklet';
+  const from = CARD_MARK_GLINT.sweep[0];
+  const to = CARD_MARK_GLINT.sweep[1];
+  const p = t <= from ? 0 : t >= to ? 1 : (t - from) / (to - from);
+  return p < 0.5 ? 2 * p * p : 1 - ((-2 * p + 2) * (-2 * p + 2)) / 2;
+}
