@@ -143,7 +143,7 @@ export function RadioGroup<T extends string>({
               variant === "inline"
                 ? `chip ${selected ? "chip--on" : ""}`
                 : `flex w-full items-start justify-between gap-3 rounded-xl border p-3 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
-                    selected ? "border-accent bg-accent/5" : "border-edge"
+                    selected ? "border-accent bg-accent-subtle" : "border-edge"
                   }`
             }
           >

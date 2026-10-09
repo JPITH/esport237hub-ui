@@ -276,7 +276,7 @@ export function Pagination({
             aria-current={p === page}
             className={`grid size-9 place-items-center rounded-full border text-sm font-medium tabular-nums transition-colors ${
               p === page
-                ? "border-accent/45 bg-accent/12 text-accent shadow-[var(--e237-neu-pressed-sm)]"
+                ? "border-accent-border bg-accent-subtle text-accent shadow-[var(--e237-neu-pressed-sm)]"
                 : "border-edge bg-surface text-secondary shadow-[var(--e237-neu-raised-sm)] hover:border-accent hover:text-accent"
             }`}
           >

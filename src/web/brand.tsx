@@ -101,7 +101,7 @@ export function sidebarLinkClass({
     "group relative flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
     collapsed ? "justify-center px-0" : "",
     active
-      ? `${rail ? "nav-active " : ""}bg-accent/12 font-semibold text-accent`
+      ? `${rail ? "nav-active " : ""}bg-accent-subtle font-semibold text-accent`
       : "text-secondary hover:bg-raised hover:text-primary",
   ]
     .filter(Boolean)
@@ -258,7 +258,7 @@ export function AuthBrandPanel({
     >
       <div className="pitch-line absolute inset-x-0 top-1/2" aria-hidden />
       <div
-        className="absolute -right-24 -top-24 size-80 rounded-full border border-accent/20"
+        className="absolute -right-24 -top-24 size-80 rounded-full border border-accent-border"
         aria-hidden
       />
       <div className="relative">

@@ -275,7 +275,7 @@ export function ProductCard({
       <Card
         aria-disabled={soldOut || undefined}
         className={`flex h-full flex-col gap-3 transition-colors ${
-          soldOut ? "opacity-60" : "hover:border-accent/40"
+          soldOut ? "opacity-60" : "hover:border-accent-border"
         }`}
       >
         <div className="relative">

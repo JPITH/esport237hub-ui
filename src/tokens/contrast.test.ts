@@ -25,8 +25,8 @@ const AA = 4.5;
 const AA_UI = 3;
 
 const SURFACES = {
-  light: ['bg', 'frame', 'surface', 'surfaceRaised'],
-  dark: ['bg', 'frame', 'surface', 'surfaceRaised'],
+  light: ['bg', 'frame', 'surface', 'surfaceRaised', 'surfaceSunken'],
+  dark: ['bg', 'frame', 'surface', 'surfaceRaised', 'surfaceSunken'],
 } as const;
 
 const TEXTS = ['textStrong', 'textPrimary', 'textSecondary', 'textMuted'] as const;

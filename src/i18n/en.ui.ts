@@ -56,4 +56,11 @@ export const enUi: Record<keyof typeof frUi, string> = {
   'ui.stat.consistency': 'Consistency',
   'ui.stat.accuracy': 'Accuracy',
   'ui.stat.reflexes': 'Reflexes',
+
+  'ui.page.back': 'Back',
+  'ui.page.more': 'More actions',
+  'ui.alert.dismiss': 'Dismiss alert: {title}',
+  'ui.alert.region': 'Alerts',
+  'ui.settings.nav': 'Sections',
+  'ui.settings.backToList': 'All sections',
 };

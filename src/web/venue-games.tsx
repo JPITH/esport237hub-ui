@@ -58,7 +58,7 @@ export function VenueGameList({
           <span
             className={`shrink-0 whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-semibold ${
               game.duels_open
-                ? "bg-accent/15 text-accent"
+                ? "bg-accent-subtle text-accent"
                 : "bg-raised text-muted"
             }`}
           >

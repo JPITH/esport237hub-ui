@@ -62,7 +62,7 @@ export function TierPicker({
           <div
             key={tier.id}
             className={`rounded-xl border p-3 transition-colors ${
-              selected ? "border-accent bg-accent/5" : "border-edge"
+              selected ? "border-accent bg-accent-subtle" : "border-edge"
             } ${tier.buyable ? "" : "opacity-60"}`}
           >
             <button

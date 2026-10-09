@@ -1,6 +1,7 @@
 import { Icon } from "../icons/generated/web";
 
 import { Picture } from "./picture";
+import { Badge } from "./foundation";
 import { formatRatingAverage, ratingCountLabel } from "../lib/rating";
 
 export interface VenueCardProps {
@@ -71,28 +72,29 @@ export function VenueCard({
         )}
 
         {rank !== undefined ? (
-          <span className="absolute right-2.5 top-2.5 grid size-7 place-items-center rounded-full bg-black/60 text-xs font-bold text-white backdrop-blur">
+          <span className="absolute right-2.5 top-2.5 grid size-7 place-items-center rounded-full bg-[var(--e237-media-scrim)] text-xs font-bold text-[var(--e237-on-media)]">
             {rank}
           </span>
         ) : null}
 
         {isOpen !== undefined ? (
-          <span
-            className={`absolute left-2.5 top-2.5 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold backdrop-blur ${
-              isOpen
-                ? "bg-accent/85 text-on-accent"
-                : "bg-black/55 text-white/80"
-            }`}
+          // Sur la photo : la pastille « sur image » du DS (lot R) — l'état
+          // en émeraude, jamais dans l'accent des boutons.
+          <Badge
+            variant="on-media"
+            tone={isOpen ? "success" : "neutral"}
+            size="sm"
+            className="absolute left-2.5 top-2.5"
           >
             <Icon name="clock" size={12} />
             {isOpen ? "Ouvert" : "Fermé"}
-          </span>
+          </Badge>
         ) : null}
 
         {pricePerHour != null ? (
-          <span className="absolute bottom-2.5 right-2.5 rounded-full bg-black/60 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur">
+          <Badge variant="on-media" tone="neutral" className="absolute bottom-2.5 right-2.5">
             <span className="scoreboard">{pricePerHour}</span> FCFA/h
-          </span>
+          </Badge>
         ) : null}
       </div>
 

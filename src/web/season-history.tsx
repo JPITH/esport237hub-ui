@@ -39,9 +39,9 @@ export interface SeasonHistoryProps {
 }
 
 const TONE_CLASS: Record<string, string> = {
-  success: "bg-success/12 text-success",
-  danger: "bg-danger/12 text-danger",
-  neutral: "bg-raised text-secondary",
+  success: "bg-success-subtle text-success",
+  danger: "bg-danger-subtle text-danger",
+  neutral: "bg-sunken text-secondary",
 };
 
 /**

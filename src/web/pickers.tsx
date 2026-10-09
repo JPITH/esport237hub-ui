@@ -648,7 +648,7 @@ export function DatePicker({
                     isSelected
                       ? "bg-accent font-bold text-on-accent"
                       : isToday
-                        ? "border border-accent/50 text-accent hover:bg-raised"
+                        ? "border border-accent-border text-accent hover:bg-raised"
                         : "text-primary hover:bg-raised"
                   }`}
                 >

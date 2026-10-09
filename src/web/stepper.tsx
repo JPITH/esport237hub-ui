@@ -40,7 +40,7 @@ export function Stepper({ steps, currentStep, className = "" }: StepperProps) {
                   done
                     ? "border-accent bg-accent text-on-accent"
                     : active
-                      ? "border-accent bg-accent/15 text-accent"
+                      ? "border-accent bg-accent-subtle text-accent"
                       : "border-edge bg-raised/60 text-muted"
                 }`}
               >

@@ -237,6 +237,14 @@ export interface ColorScale {
   /* — Les quatre niveaux de texte — */
 
   /** Titres importants. Le plus sombre du système — jamais du noir pur. */
+  /**
+   * En CREUX dans une carte (lot R, 09/10/2026) : tuile de chiffre, piste de
+   * jauge, vignette vide. Le fond de la page, dans les deux modes. Jusque-là
+   * on y posait `surfaceRaised` — qui vaut `#fff` en clair, comme la carte :
+   * la tuile disparaissait en clair et n'apparaissait qu'en sombre (audit RA,
+   * C10). `surfaceRaised` reste pour ce qui FLOTTE (menus, modales).
+   */
+  surfaceSunken: string;
   textStrong: string;
   /** Corps de texte : l'essentiel de ce qui se lit. */
   textPrimary: string;
@@ -290,6 +298,7 @@ export const color: { light: ColorScale; dark: ColorScale } = {
     frame: '#ebeef2',
     surface: '#ffffff',
     surfaceRaised: '#ffffff',
+    surfaceSunken: '#f4f6f9',
     border: '#dee2e7',
     borderStrong: '#ccd1d8',
     textStrong: '#171f28',
@@ -319,6 +328,7 @@ export const color: { light: ColorScale; dark: ColorScale } = {
     frame: '#171c21',
     surface: '#21262d',
     surfaceRaised: '#2c323a',
+    surfaceSunken: '#0e1116',
     border: '#353c45',
     borderStrong: '#4a525e',
     textStrong: '#f4f7fb',
@@ -482,6 +492,25 @@ export const pill: {
   stroke: { light: 0.55, dark: 0.45 },
 };
 
+/**
+ * Sur une IMAGE (couverture d'évènement, photo de salle) — lot R, 09/10/2026.
+ *
+ * Une pastille posée sur une photo ne voit ni la page ni le thème : son fond
+ * et son encre sont donc FIXES, ceux du thème sombre (`bg`, `textStrong`).
+ * C'est la seule pastille translucide du design system (`Badge
+ * variant="on-media"`) ; partout ailleurs, fond « subtle » du ton, opaque.
+ * `on-media.test.ts` vérifie l'encre sur le pire cas (voile sur une image
+ * blanche).
+ */
+export const onMedia = {
+  /** Teinte du voile (le fond du thème sombre). */
+  scrim: '#0e1116',
+  /** Opacité du voile. */
+  scrimAlpha: 0.74,
+  /** Encre posée sur le voile (le texte fort du thème sombre). */
+  ink: '#f4f7fb',
+} as const;
+
 /** Regroupement pratique pour un accès unique. */
 export const tokens = {
   color,
@@ -491,6 +520,7 @@ export const tokens = {
   radius,
   font,
   pill,
+  onMedia,
   ROLE,
 } as const;
 

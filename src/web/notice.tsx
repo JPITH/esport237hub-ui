@@ -17,18 +17,13 @@ const DEFAULT_ICON: Record<Tone, ReactNode> = {
   neutral: <Icon name="info" />,
 };
 
-/** Classes de teinte — bordure 40 %, fond 10 %, texte plein (parité native). */
-const TONE_CLASS: Record<Tone, string> = {
-  accent: "border-accent/40 bg-accent/10 text-accent",
-  cyan: "border-cyan/40 bg-cyan/10 text-cyan",
-  success: "border-success/40 bg-success/10 text-success",
-  info: "border-info/40 bg-info/10 text-info",
-  gold: "border-gold/40 bg-gold/10 text-gold",
-  danger: "border-danger/40 bg-danger/10 text-danger",
-  warning: "border-warning/40 bg-warning/10 text-warning",
-  neutral: "border-edge bg-raised text-secondary",
-};
-
+/**
+ * Teintes : fond « subtle » et liseré du ton (`.e237-notice--<ton>`, feuille
+ * du design system). Jusqu'au lot R (09/10/2026) c'était un voile translucide
+ * (`bg-x/10 border-x/40`) : posé sur une carte ou sur la page, le même
+ * encart changeait de couleur — le porteur l'a relevé (« souvent les pills
+ * sont translucides, souvent pas »). Mêmes couples que `Badge`, tous AA.
+ */
 export interface NoticeProps {
   /** Teinte sémantique — `danger` reproduit exactement l'`ErrorNote`. */
   tone?: Tone;
@@ -60,15 +55,13 @@ export function Notice({
   return (
     <div
       role={tone === "danger" ? "alert" : undefined}
-      className={`flex items-start gap-2 rounded-md border px-3 py-2 text-sm ${TONE_CLASS[tone]} ${className}`.trim()}
+      className={`e237-notice e237-notice--${tone} ${className}`.trim()}
     >
       {resolved ? (
-        <span className="mt-px grid shrink-0 place-items-center [&>svg]:size-4">
-          {resolved}
-        </span>
+        <span className="e237-notice__icon">{resolved}</span>
       ) : null}
-      <span className="flex min-w-0 flex-col gap-0.5">
-        {title ? <span className="font-semibold">{title}</span> : null}
+      <span className="e237-notice__text">
+        {title ? <span className="e237-notice__title">{title}</span> : null}
         <span>{children}</span>
       </span>
     </div>

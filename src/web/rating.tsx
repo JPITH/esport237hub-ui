@@ -304,7 +304,7 @@ export function VenueReview({
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
         <span className="text-sm font-semibold">{author}</span>
         {verified ? (
-          <span className="rounded-full bg-accent/12 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-accent">
+          <span className="rounded-full bg-accent-subtle px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-accent">
             {t("rating.review.played_here")}
           </span>
         ) : null}

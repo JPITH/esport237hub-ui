@@ -96,7 +96,7 @@ export function TransactionRow({
       <span
         aria-hidden
         className={`grid size-9 shrink-0 place-items-center rounded-full ${
-          credit ? "bg-success/15 text-success" : "bg-danger/15 text-danger"
+          credit ? "bg-success-subtle text-success" : "bg-danger-subtle text-danger"
         }`}
       >
         {credit ? (

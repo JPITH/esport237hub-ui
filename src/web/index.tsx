@@ -187,7 +187,6 @@ export type { SkinCatalog, SkinCatalogProviderProps } from '../skins/context';
 
 export {
   BackLink,
-  PageHeader,
   PageContainer,
   DuelStatusBadge,
   Spinner,
@@ -237,6 +236,50 @@ export type { StringListFieldProps } from './string-list-field';
 
 export { Notice } from './notice';
 export type { NoticeProps } from './notice';
+
+/*
+ * Briques de page (lot R, 09/10/2026) — la structure commune de TOUTES les
+ * pages du web : en-tête sur une rangée, alertes fermables, un conteneur,
+ * une colonne latérale utile, la disposition des réglages. Voir
+ * `docs/refonte-web.md` (« Briques ») et l'AGENTS.md de ce dépôt.
+ */
+export {
+  AlertBanner,
+  ButtonLink,
+  DsLinkProvider,
+  PageAlerts,
+  PageHeader,
+  PageLayout,
+  SectionHeader,
+  nodeText,
+  useDsLink,
+} from './page-layout';
+export type {
+  AlertBannerProps,
+  AlertTone,
+  ButtonLinkProps,
+  PageHeaderAction,
+  PageHeaderProps,
+  PageLayoutProps,
+  PageWidth,
+  SectionHeaderProps,
+} from './page-layout';
+
+export {
+  NavGroup,
+  NavItem,
+  SettingsLayout,
+  SettingsRow,
+  SettingsSection,
+} from './settings-layout';
+export type {
+  NavItemProps,
+  NavItemTone,
+  SettingsLayoutProps,
+  SettingsNavItem,
+  SettingsRowProps,
+  SettingsSectionProps,
+} from './settings-layout';
 
 export { PerkList } from './perk-list';
 export type { PerkListProps } from './perk-list';

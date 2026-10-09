@@ -27,6 +27,10 @@
   --e237-surface: light-dark(#ffffff, #21262d);
   /* 4/4 · modales, menus, survols de ligne. */
   --e237-surface-raised: light-dark(#ffffff, #2c323a);
+  /* En creux DANS une carte (tuile de chiffre, piste de jauge, vignette
+     vide) : le fond de la page. `surface-raised` vaut le blanc de la carte
+     en clair — pour ce qui flotte seulement (menus, modales). Lot R. */
+  --e237-surface-sunken: light-dark(#f4f6f9, #0e1116);
 
   /* Deux traits : le discret pose un bord, l'affirmé se lit. */
   --e237-border: light-dark(#dee2e7, #353c45);
@@ -107,6 +111,12 @@
   --e237-gold: light-dark(#7b6000, #caad34);
   --e237-gold-subtle: light-dark(#fdf6da, #322700);
   --e237-gold-border: light-dark(#ecd995, #665100);
+
+  /* Sur une image : voile et encre FIXES (tokens `onMedia`), les mêmes dans
+     les deux thèmes — la photo ne change pas avec le thème. Seule pastille
+     translucide permise : `Badge variant="on-media"` (lot R, 09/10/2026). */
+  --e237-media-scrim: color-mix(in srgb, #0e1116 74%, transparent);
+  --e237-on-media: #f4f7fb;
 
   /* Spectre des graphiques : huit teintes de MÊME clarté et MÊME chroma
      perçus (OKLCH, pas +42° de teinte). Un vert vif paraît bien plus

@@ -65,4 +65,12 @@ export const frUi = {
   'ui.stat.consistency': 'Régularité',
   'ui.stat.accuracy': 'Précision',
   'ui.stat.reflexes': 'Réflexes',
+
+  // Briques de page (lot R, 09/10/2026) : en-tête, alertes, réglages.
+  'ui.page.back': 'Retour',
+  'ui.page.more': 'Plus d’actions',
+  'ui.alert.dismiss': 'Fermer l’alerte : {title}',
+  'ui.alert.region': 'Alertes',
+  'ui.settings.nav': 'Sections',
+  'ui.settings.backToList': 'Toutes les sections',
 } as const;

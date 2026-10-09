@@ -128,15 +128,78 @@ Quel composant pour quel besoin :
 | Cocher (formulaire, consentement) | `Checkbox` | `Checkbox` |
 | Chiffre clé / tuile de KPI | `Card` + `Stat` (`aside` pour une mini-courbe, enfants pour variation et précision) | `Stat`, `StatTile` |
 | Statut | `Badge tone=…` (`size="sm"` en case dense), `DuelStatusBadge`, `OrderStatusBadge` | idem |
-| Intitulé de section / de bloc | `SectionLabel` (`tone="muted"` dans une carte, `gold` palmarès) | `SectionLabel`, `SectionTitle`, `SectionHeader` |
-| En-tête de page | `PageHeader` (+ `PageContainer`) | `TopBar`, `Screen` |
+| Étiquette neutre (jeu, catégorie, « 2 jeux ») | `Badge tone="neutral"` | `Badge` |
+| Pastille posée SUR une image | `Badge variant="on-media"` (la seule translucide) | — |
+| Titre de bloc + compteur + actions sur la rangée | `SectionHeader` (`count`, `actions`) | `SectionHeader` |
+| Intertitre DANS une carte | `SectionLabel tone="muted"` (`gold` palmarès) | `SectionLabel`, `SectionTitle` |
+| Page entière (conteneur, colonne latérale, trois zones) | `PageLayout` (`header`, `alerts`, `aside`, `start`, `width`) | `Screen` |
+| En-tête de page (titre + actions, UNE rangée) | `PageHeader` (`back`, `actions`, `more`, `subtitle`, `meta`) | `TopBar` |
+| Alerte en haut de page, fermable | `AlertBanner` dans `PageAlerts` | `Notice` |
+| Profil et réglages (navigation + section) | `SettingsLayout`, `SettingsSection`, `SettingsRow` | `SettingsList` (`./native/expo`) |
+| Liste à chevrons (raccourcis, sections) | `NavGroup` + `NavItem` | `NavGroup` + `NavItem` |
 | Vide, erreur, chargement | `EmptyState`, `ErrorNote` / `Notice`, `Skeleton` / `Spinner` | idem |
 | Tableau, pagination | `Table`, `Pagination` | `ListRow` |
-| Boutons | `Button` (`ghost` pour une action secondaire), `LinkButton`, `IconButton` | `Button`, `IconButton`, `PillButton` |
+| Boutons | `Button` (`ghost` pour une action secondaire), `ButtonLink` (un lien du routeur qui a l'air d'un bouton), `LinkButton` (`<a>`, ou `as`), `IconButton` | `Button`, `IconButton`, `PillButton` |
 | Champs | `Input`, `Select` (prop `label`), `SearchField`, `NumberInput`, `DatePicker` | `Field`, `SelectSheet`, `DateField` |
 | Fenêtres | `Modal`, `Drawer`, `DropdownMenu`, `Tooltip` | `Sheet`, `SelectSheet` |
 | Personnes | `Avatar`, `AvatarGroup`, `PlayerCell` | `Avatar`, `ProfileAvatar` |
 | Barre d'onglets, carrousel, confettis | — | `FloatingTabBar`, `Carousel` / `PromoSlideCard`, `ConfettiBurst` |
+
+## Briques de page du web (lot R, 09/10/2026)
+
+Demande du porteur : « là où il y a le titre les actions doivent être sur la
+mm row, ce sont seulement les alerts qui doivent s'afficher en haut avec une
+croix ; bcp d'espace vide à combler » puis « toutes les pages n'ont pas la
+même min width, souvent les pills / chips sont translucides, souvent pas ».
+`src/web/page-layout.tsx` et `src/web/settings-layout.tsx` ; documentation
+complète (props, exemples, références Mobbin) : `docs/refonte-web-briques.md`
+du monorepo.
+
+1. **Un seul conteneur de page : `PageLayout`.** Deux largeurs, pas une de
+   plus : `default` (1 600 px au plus) et `full` (consoles, plateaux). Les
+   gouttières viennent du cadre de l'app (16 px). `PageContainer` est
+   DÉPRÉCIÉ : il rend désormais le même conteneur, quelle que soit la largeur
+   demandée (`wide`/`detail`/`readable` n'existent plus à l'écran).
+2. **Une seule colonne latérale** : `aside` de `PageLayout` (340 px, à droite,
+   à partir de 1 280 px ; dessous avant ; `stickyAside` par défaut) et
+   `start` (zone gauche à partir de 1 440 px — trois zones). Pas d'autre
+   seuil, pas d'autre largeur de colonne.
+3. **`PageHeader` = une rangée.** Retour à GAUCHE du titre (`back`), méta sous
+   le titre (`subtitle`), action principale à droite (`actions`), secondaires
+   dans `more` (boutons discrets au large, menu « … » sous 640 px). Le titre
+   se tronque, les actions ne tombent jamais dessous. `section` (surtitre)
+   est accepté mais n'est PLUS affiché.
+4. **Seules les alertes au-dessus du contenu** : `AlertBanner({ id, tone,
+   title, body?, action?, dismissible? })` dans `PageAlerts` (ou la prop
+   `alerts` de `PageLayout`). La croix est mémorisée par identifiant ET par
+   contenu (`lib/alert-dismissal.ts`, `localStorage` sous try/catch) : un
+   autre montant, un autre compte fait revenir l'alerte. `danger` →
+   `role="alert"`, les autres `role="status"` ; fermer passe le focus à la
+   croix voisine, sinon au titre. Un encart PERMANENT n'est pas une alerte :
+   il va dans sa section (`Notice`) ou disparaît.
+5. **Un seul système de pastilles, toutes OPAQUES** : statut `Badge tone`
+   (fond `--e237-<ton>-subtle`, liseré `--e237-<ton>-border`), étiquette
+   `Badge tone="neutral"`, filtre `FilterChip` (sélection = accent subtle),
+   sur une image `Badge variant="on-media"` (voile `--e237-media-scrim`, la
+   seule translucide). `Notice` et `ErrorNote` utilisent la même recette que
+   `Badge` (plus de `bg-x/10 border-x/40`). Côté app : `bg-<ton>-subtle`,
+   `border-<ton>-border`, jamais `bg-<ton>/10`.
+6. **Une hauteur de contrôle** : puce (`.chip`), choix (`RadioGroup inline`)
+   et bouton `sm` font 34 px.
+7. **En creux dans une carte : `--e237-surface-sunken`** (`bg-sunken`) — tuile
+   de chiffre, piste de jauge, vignette vide. `--e237-surface-raised` vaut le
+   blanc de la carte en clair : il est réservé à ce qui FLOTTE (menus,
+   modales).
+8. **Les liens du routeur** : l'application pose une fois
+   `<DsLinkProvider component={Link}>` ; `ButtonLink`, le retour de
+   `PageHeader`, ses actions « … », `SettingsLayout` et `NavItem` naviguent
+   alors sans recharger.
+
+Parité native : `PageHeader`, `PageLayout`, `PageAlerts`, `AlertBanner` et
+`SettingsLayout` n'ont pas de jumeau natif — c'est le chrome de PAGE du web
+(le mobile a `Screen`, `TopBar`, `Notice`, `SettingsList`). `NavGroup` /
+`NavItem` ont le même nom et les mêmes props que le natif
+(`tint` → `tone`, `onPress` → `href` / `onClick`).
 
 ## Structure
 

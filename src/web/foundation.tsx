@@ -25,11 +25,27 @@ export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
    * dense — légende d'une rencontre, ligne de tableau. `md` par défaut.
    */
   size?: 'sm' | 'md';
+  /**
+   * `subtle` (défaut) : fond et liseré « subtle » du ton — la pastille de
+   * statut, la seule recette sur une page ou une carte.
+   * `on-media` : posée SUR une image (couverture, photo de salle) — voile
+   * sombre et encre claire, identiques dans les deux thèmes, le ton ne
+   * colore que la pastille d'état. La seule pastille translucide du DS.
+   */
+  variant?: 'subtle' | 'on-media';
 }
 
+/**
+ * Pastille — LE système de pilules du web (lot R, 09/10/2026) :
+ * - statut : `<Badge tone=…>` (fond et liseré « subtle » du ton) ;
+ * - étiquette neutre (jeu, catégorie, « 2 jeux ») : `<Badge tone="neutral">` ;
+ * - sur une image : `<Badge variant="on-media">` ;
+ * - filtre cliquable : `FilterChip` (`./nav`), pas une pastille.
+ */
 export function Badge({
   tone = 'accent',
   size = 'md',
+  variant = 'subtle',
   className,
   ...rest
 }: BadgeProps) {
@@ -39,6 +55,7 @@ export function Badge({
         'e237-badge',
         tone !== 'accent' && `e237-badge--${tone}`,
         size === 'sm' && 'e237-badge--sm',
+        variant === 'on-media' && 'e237-badge--on-media',
         className,
       )}
       {...rest}

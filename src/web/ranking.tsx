@@ -63,7 +63,7 @@ export function LiveBar({
           className={[
             "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium",
             live
-              ? "border-accent/40 bg-accent/10 text-accent"
+              ? "border-accent-border bg-accent-subtle text-accent"
               : "border-edge bg-surface text-muted",
           ].join(" ")}
         >
@@ -223,7 +223,7 @@ export function ChampionSpotlight({
 }: ChampionSpotlightProps) {
   return (
     <div
-      className={`flex flex-col items-center gap-3 rounded-2xl border border-gold/30 bg-gold/5 p-5 ${className}`.trim()}
+      className={`flex flex-col items-center gap-3 rounded-2xl border border-gold-border bg-gold-subtle p-5 ${className}`.trim()}
     >
       <div className="flex items-center gap-2 text-gold">
         <Icon name="crown" size={20} />

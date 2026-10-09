@@ -4,6 +4,7 @@ import {
   forwardRef,
   type AnchorHTMLAttributes,
   type ButtonHTMLAttributes,
+  type ElementType,
   type ReactNode,
 } from "react";
 
@@ -74,10 +75,16 @@ export interface LinkButtonProps
   block?: boolean;
   icon?: ReactNode;
   iconRight?: ReactNode;
+  /**
+   * Composant de lien du routeur (`next/link`…) à la place de `<a>` — pour
+   * une navigation côté client sans recopier les classes `.btn` à la main
+   * (lot R, 09/10/2026 : « un seul Button, ses variantes seulement »).
+   */
+  as?: ElementType;
 }
 
 /**
- * Même habillage que `Button`, rendu en `<a>`.
+ * Même habillage que `Button`, rendu en `<a>` (ou le lien passé en `as`).
  *
  * Un CTA qui navigue est un lien, pas un bouton : indispensable pour les pages
  * statiques (site vitrine) où l'on veut le style du DS sans embarquer de JS.
@@ -91,14 +98,16 @@ export const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
       block = false,
       icon,
       iconRight,
+      as,
       className = "",
       children,
       ...rest
     },
     ref,
   ) => {
+    const Anchor = (as ?? "a") as ElementType;
     return (
-      <a
+      <Anchor
         ref={ref}
         className={`btn btn--${variant} btn--${size} ${
           block ? "btn--block" : ""
@@ -116,7 +125,7 @@ export const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
             {iconRight}
           </span>
         ) : null}
-      </a>
+      </Anchor>
     );
   },
 );

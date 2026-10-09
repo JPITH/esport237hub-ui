@@ -17,6 +17,7 @@ export * from './brand-motion';
 export * from './brand-name';
 export * from './initials';
 export * from './phone-countries';
+export * from './alert-dismissal';
 /*
  * Le STORE seul, pas les hooks.
  *

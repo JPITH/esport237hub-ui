@@ -6,7 +6,7 @@ import type { DuelStatus } from "@esport237hub/types";
 
 import { DUEL_STATUS_META } from "../lib/duel-status";
 import { useDsT } from "../i18n";
-import { Badge, SectionLabel } from "./foundation";
+import { Badge } from "./foundation";
 
 /** Lien de retour avec chevron — placé en haut à gauche des pages. */
 export function BackLink({
@@ -27,60 +27,29 @@ export function BackLink({
   );
 }
 
-/** En-tête de page cohérent : back top-left, eyebrow, titre, actions à droite. */
-export function PageHeader({
-  section,
-  title,
-  backHref,
-  backLabel,
-  children,
-}: {
-  section: string;
-  title: string;
-  backHref?: string;
-  backLabel?: string;
-  children?: ReactNode;
-}) {
-  return (
-    <div className="mb-6 flex flex-col gap-3">
-      {backHref ? <BackLink href={backHref}>{backLabel}</BackLink> : null}
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div className="flex flex-col gap-1">
-          <SectionLabel>{section}</SectionLabel>
-          <h1 className="text-2xl font-bold">{title}</h1>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
-}
-
 /**
- * Conteneur de page — deux tiers de largeur.
- * - `wide` (défaut) : consoles, listes, tableaux de bord → remplit le desktop,
- *   jusqu'à 1 600 px (1 440 avant le 01/10/2026 : le shell de l'app va
- *   désormais jusqu'aux bords de l'écran, c'est le CONTENU qui se borne).
- * - `detail` : pages de détail (événement, salle, duel, produit…) → 1 200 px,
- *   pour une colonne principale et une colonne latérale au large.
- * - `readable` : formulaires et pages de lecture → longueur de ligne confortable.
+ * @deprecated Utiliser `PageLayout` (`./page-layout`).
+ *
+ * Conteneur de page d'AVANT le lot R (09/10/2026) : trois largeurs
+ * (`wide` 1 600 px, `detail` 1 200 px, `readable` 760 px) — d'où « toutes les
+ * pages n'ont pas la même min width » (retour du porteur). Il rend désormais
+ * le conteneur UNIQUE du web (`.e237-page`) quelle que soit la largeur
+ * demandée : les pages pas encore migrées ont déjà la même largeur que les
+ * autres. `full` est la seule variante qui demeure (consoles, plateaux).
  */
 export function PageContainer({
   width = "wide",
   className = "",
   children,
 }: {
-  width?: "wide" | "detail" | "readable";
+  width?: "wide" | "detail" | "readable" | "full";
   className?: string;
   children: ReactNode;
 }) {
-  const max =
-    width === "readable"
-      ? "max-w-[760px]"
-      : width === "detail"
-        ? "max-w-[1200px]"
-        : "max-w-[1600px]";
   return (
-    <div className={`mx-auto flex w-full flex-col gap-6 ${max} ${className}`}>
+    <div
+      className={`e237-page ${width === "full" ? "e237-page--full" : ""} ${className}`.trim()}
+    >
       {children}
     </div>
   );
@@ -121,9 +90,11 @@ export function EmptyState({ children }: { children: ReactNode }) {
 
 export function ErrorNote({ message }: { message: string }) {
   return (
-    <div className="flex items-center gap-2 rounded-md border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger">
-      <Icon name="alert-triangle" size={16} className="shrink-0" />
-      {message}
+    <div className="e237-notice e237-notice--danger" role="alert">
+      <span className="e237-notice__icon">
+        <Icon name="alert-triangle" size={16} />
+      </span>
+      <span className="e237-notice__text">{message}</span>
     </div>
   );
 }

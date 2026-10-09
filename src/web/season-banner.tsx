@@ -104,7 +104,7 @@ export function SeasonBanner({
       <p className="text-xs text-secondary">{RANKING_SCOPE_HINT.season}</p>
 
       {todo ? (
-        <p className="flex items-start gap-1.5 rounded-md bg-warning/10 p-2 text-xs text-warning">
+        <p className="flex items-start gap-1.5 rounded-md bg-warning-subtle p-2 text-xs text-warning">
           <Icon name="info" size={14} className="mt-px shrink-0" />
           {todo}
         </p>
