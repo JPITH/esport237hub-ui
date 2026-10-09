@@ -68,6 +68,9 @@ export interface EventCardProps {
   priceLabel: string;
   /** Colore le prix en accent (évènement payant). */
   isPaid?: boolean;
+  /** Disponibilité sans chiffre (« Places limitées », « Complet ») — 09/10/2026. */
+  availabilityLabel?: string | null;
+  availabilityTone?: 'warning' | 'danger';
   style?: StyleProp<ViewStyle>;
 }
 
@@ -81,6 +84,8 @@ export function EventCard({
   capacity,
   priceLabel,
   isPaid = false,
+  availabilityLabel,
+  availabilityTone = 'warning',
   style,
 }: EventCardProps) {
   const c = useE237Colors();
@@ -92,6 +97,11 @@ export function EventCard({
             <View style={styles.badges}>
               <Badge tone={eventTypeTone(type)}>{eventTypeLabel(type)}</Badge>
               {gameName ? <Badge tone="neutral">{gameName}</Badge> : null}
+              {availabilityLabel ? (
+                <Badge tone={availabilityTone} size="sm">
+                  {availabilityLabel}
+                </Badge>
+              ) : null}
             </View>
             <Txt variant="label">{title}</Txt>
           </View>
@@ -137,6 +147,9 @@ export interface CompetitionCardProps {
   /** Date de début déjà mise en forme ; absente = non annoncée. */
   dateLabel?: string | null;
   venueName?: string | null;
+  /** Disponibilité sans chiffre (« Places limitées », « Complet »). */
+  availabilityLabel?: string | null;
+  availabilityTone?: 'warning' | 'danger';
   style?: StyleProp<ViewStyle>;
 }
 
@@ -149,6 +162,8 @@ export function CompetitionCard({
   city,
   dateLabel,
   venueName,
+  availabilityLabel,
+  availabilityTone = 'warning',
   style,
 }: CompetitionCardProps) {
   const parts = [
@@ -165,6 +180,11 @@ export function CompetitionCard({
           <Txt variant="label" style={styles.grow}>
             {title}
           </Txt>
+          {availabilityLabel ? (
+            <Badge tone={availabilityTone} size="sm">
+              {availabilityLabel}
+            </Badge>
+          ) : null}
           <Badge tone={competitionStatusTone(status)}>
             {competitionStatusLabel(status)}
           </Badge>
@@ -273,6 +293,8 @@ export interface TicketCardProps {
    * `QrFrame`.
    */
   qr?: ReactNode;
+  /** À qui est le billet (billets nominatifs, 09/10/2026), fourni par l'app. */
+  holder?: ReactNode;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -288,6 +310,7 @@ export function TicketCard({
   admitted = false,
   checkedInAtLabel,
   qr,
+  holder,
   style,
 }: TicketCardProps) {
   const c = useE237Colors();
@@ -340,6 +363,13 @@ export function TicketCard({
           {priceOrFreeLabel(amountXaf)}
         </Txt>
       </View>
+
+      {holder ? (
+        <View style={styles.metaItem}>
+          <Icon name="user" color={c.textMuted} size={16} />
+          <View style={styles.grow}>{holder}</View>
+        </View>
+      ) : null}
 
       {qr ? (
         <View style={[styles.qrRow, { borderTopColor: c.border }]}>
