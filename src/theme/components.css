@@ -183,9 +183,9 @@
    tant que le panneau est ouvert, même quand le focus part dans le panneau. */
 .ui-field[aria-expanded="true"] {
   outline: none;
-  border-color: var(--e237-accent);
-  box-shadow: var(--e237-neu-pressed-sm),
-    0 0 0 3px color-mix(in srgb, var(--e237-accent) 18%, transparent);
+  /* Focus discret, neutre (porteur, 09/10/2026) — voir `.e237-field:focus`. */
+  border-color: color-mix(in srgb, var(--e237-text-muted) 85%, transparent);
+  box-shadow: var(--e237-neu-pressed-sm);
 }
 
 /* Focus clavier visible et cohérent sur TOUT l'interactif non-champ

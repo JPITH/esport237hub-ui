@@ -631,11 +631,15 @@
 }
 .e237-field:focus,
 .e237-field:focus-visible,
-/* Composites (NumberInput, PhoneInput) : le ring va au conteneur. */
+/* Composites (NumberInput, PhoneInput) : le liseré va au conteneur. */
 .e237-field:focus-within {
   outline: none;
-  border-color: var(--e237-accent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--e237-accent) 18%, transparent);
+  /* Focus DISCRET (retour du porteur, 09/10/2026, lot M1) : plus de liseré
+     vert ni de halo pendant qu'on écrit — l'œil reste sur le texte. Le
+     focus reste visible : trait neutre ≥ 3:1 sur la surface (WCAG 1.4.11),
+     plus foncé que le survol, en plus du curseur. */
+  border-color: color-mix(in srgb, var(--e237-text-muted) 85%, transparent);
+  box-shadow: none;
 }
 .e237-field:disabled {
   opacity: 0.55;
