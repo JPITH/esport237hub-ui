@@ -132,6 +132,8 @@ export {
   useCardShape,
 } from './card-skins';
 export type { CardSkin, CardSkinInput, CardChromeProps } from './card-skins';
+export { CardMark } from './card-mark';
+export type { CardMarkProps } from './card-mark';
 
 /**
  * Socle des skins : mêmes données et même géométrie que le web (voir

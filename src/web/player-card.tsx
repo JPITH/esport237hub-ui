@@ -20,6 +20,7 @@ import {
 import { cardShape, pct } from "../skins/geometry";
 import { useSkin } from "../skins/context";
 import { CardChrome, type CardSkinInput } from "./card-chrome";
+import { CardMark } from "./card-mark";
 import { CardStage, RisingNumber } from "./card-stage";
 import { Flag } from "./flag";
 import { Picture } from './picture';
@@ -29,8 +30,6 @@ import { Picture } from './picture';
  * acceptée — un skin créé dans le dashboard est une clé arbitraire, résolue
  * par le catalogue (`SkinCatalogProvider`).
  */
-import { BRAND_NAME } from '../lib/brand-name';
-
 export type CardSkin = BuiltinSkinKey | (string & {});
 
 /**
@@ -182,13 +181,20 @@ export interface PlayerCardProps {
   flippable?: boolean;
   /** Verso personnalisé ; par défaut les stats détaillées du jeu. */
   back?: ReactNode;
+  /**
+   * Signe du pied IMMOBILE (pas d'éclat) : planches, exports et captures
+   * générées côté serveur. « Réduire les animations » l'immobilise de
+   * lui-même, sans cette prop.
+   */
+  still?: boolean;
 }
 
 /**
  * Carte joueur FUT « Founders » (forme bouclier crénelée, un même template
  * pour tous les jeux) : plaque jeu sur le liseré, OVR + ville + drapeau +
  * division en colonne, portrait (ou fallback IA), nom + victoires, stats de
- * la catégorie du jeu (séparateur porté par les cellules), marque en pied.
+ * la catégorie du jeu (séparateur porté par les cellules), signe G-HUB animé
+ * en pied et en filigrane dans le fond (lot M3).
  *
  * Sans `interactive` ni `flippable`, le DOM est exactement celui d'avant (un
  * seul `.pcard`) : l'API reste rétrocompatible. Avec l'un des deux, la carte
@@ -248,8 +254,10 @@ function PlayerCardFront({
   className = "",
   style,
   animated = false,
+  still = false,
 }: Omit<PlayerCardProps, "interactive" | "flippable" | "back">) {
   const t = useDsT();
+  const spec = useSkin(skin);
   const rows = cardStats({ gameSlug, rating, stats, seed: username, statDefs });
 
   return (
@@ -288,7 +296,7 @@ function PlayerCardFront({
       </div>
 
       <div className="pcard__footer">
-        <span className="pcard__chip">{BRAND_NAME}</span>
+        <CardMark spec={spec} still={still} />
       </div>
     </CardChrome>
   );
@@ -330,11 +338,13 @@ export function PlayerCardBack({
   stats,
   statDefs,
   skin = "signature",
+  still = false,
 }: Omit<PlayerCardProps, "interactive" | "flippable" | "back">) {
   const t = useDsT();
+  const spec = useSkin(skin);
   /* Le verso suit la forme du skin : son gabarit est replacé dans la zone
      sûre de la silhouette, comme celui du recto (variables `--pc-l-*`). */
-  const back = cardShape(useSkin(skin).shape).backLayout;
+  const back = cardShape(spec.shape).backLayout;
   const rows = cardStats({ gameSlug, rating, stats, seed: username, statDefs });
   const record = cardRecord(wins, losses);
   const cells =
@@ -382,7 +392,7 @@ export function PlayerCardBack({
       </dl>
 
       <div className="pcard__footer">
-        <span className="pcard__chip">{BRAND_NAME}</span>
+        <CardMark spec={spec} still={still} />
       </div>
     </CardChrome>
   );

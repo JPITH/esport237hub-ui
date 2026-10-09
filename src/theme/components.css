@@ -1153,7 +1153,10 @@
   opacity: 0.72;
 }
 
-/* Pied de carte : marque du hub. */
+/* Pied de carte : le SIGNE G-HUB, là où était la pilule « G-HUB » (lot M3,
+   09/10/2026). Encres du skin (`cardMarkInks`), posées en ligne par
+   `CardMark` ; côté = 22 px à la largeur de référence (`CARD_MARK_SIZE`),
+   borné comme l'échelle du natif (0,5 → 1,2). */
 .pcard__footer {
   position: absolute;
   z-index: 7;
@@ -1163,20 +1166,68 @@
   display: flex;
   justify-content: center;
 }
-.pcard__chip {
-  display: grid;
-  place-items: center;
-  min-height: clamp(14px, 5.8cqw, 20px);
-  padding: 0 8%;
-  background: rgba(0, 0, 0, 0.22);
-  border: 1px solid color-mix(in srgb, var(--pc-frame1) 40%, transparent);
-  border-radius: 3px;
-  font-family: var(--e237-font-display);
-  font-weight: 850;
-  font-size: clamp(6px, 2.8cqw, 10px);
-  line-height: 1;
-  letter-spacing: 0.08em;
-  white-space: nowrap;
+.pcard__mark {
+  position: relative;
+  display: block;
+  flex: none;
+  width: clamp(11px, 7.333cqw, 26.4px);
+  aspect-ratio: 1;
+}
+.pcard__mark svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* Sous 20 px de côté, le contour du cadre se bouche (`MARK_SOLID_BELOW`) :
+   20 / 7,333cqw ≈ 272 px de carte. */
+.pcard__mark-solid {
+  display: none;
+}
+@container (max-width: 272px) {
+  .pcard__mark-outline {
+    display: none;
+  }
+  .pcard__mark-solid {
+    display: inline;
+  }
+}
+/* L'ÉCLAT : une copie claire du signe, révélée par une bande inclinée de 20°
+   (`CARD_MARK_GLINT` : largeur 0,42 du signe, pic 0,8) qui glisse de gauche à
+   droite. La bande est hors du signe aux deux bouts du trajet : 100 % la pose
+   à gauche, 0 % à droite. 34 % = `CARD_MARK_GLINT.sweep[1]` (un test compare),
+   3,2 s = `CARD_MARK_CYCLE_MS`. Le masque est de l'alpha, pas une couleur. */
+.pcard__mark-glint {
+  opacity: 0.8;
+  -webkit-mask-image: linear-gradient(110deg, transparent 43.4%, #000 50%, transparent 56.6%);
+  mask-image: linear-gradient(110deg, transparent 43.4%, #000 50%, transparent 56.6%);
+  -webkit-mask-size: 300% 100%;
+  mask-size: 300% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: 100% 0;
+  mask-position: 100% 0;
+  animation: pc-mark-glint 3200ms infinite;
+}
+@keyframes pc-mark-glint {
+  0% {
+    -webkit-mask-position: 100% 0;
+    mask-position: 100% 0;
+    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+  }
+  34%,
+  100% {
+    -webkit-mask-position: 0% 0;
+    mask-position: 0% 0;
+  }
+}
+/* `.pcard__mark svg` (0,1,1) pose `display: block` : le sélecteur doit
+   peser autant pour retirer l'éclat. */
+@media (prefers-reduced-motion: reduce) {
+  .pcard__mark .pcard__mark-glint {
+    display: none;
+  }
 }
 
 /* ---------------------------------------------------------------- */
