@@ -39,19 +39,27 @@ function useColors(): ColorScale {
   return scheme === 'light' ? color.light : color.dark;
 }
 
-/** Champ = creux neu (`pressed-sm`) ; focus = liseré accent. */
-/** Surface creusée d'un champ — compatible `View` comme `TextInput`. */
+/**
+ * Surface creusée d'un champ (`pressed-sm`) — compatible `View` comme
+ * `TextInput`. Focus = un liseré NEUTRE et fin.
+ *
+ * 09/10/2026 (retour du porteur, lot M1) : le liseré vert de l'accent, à
+ * chaque frappe, attirait l'œil sur le CADRE au lieu du texte qu'on écrit.
+ * Le focus reste visible — trait gris de 1 px (`textMuted`, ≥ 3:1 sur la
+ * surface, WCAG 1.4.11) en plus du curseur —, mais discret : le vert reste
+ * réservé à ce qui se touche (règle de l'accent, DESIGN.md).
+ */
 function fieldSurface(c: ColorScale, neu: ReturnType<typeof useNeu>, focused: boolean) {
   return {
     backgroundColor: c.surface,
     borderWidth: focused ? 1 : 0,
-    borderColor: focused ? c.accent : 'transparent',
+    borderColor: focused ? c.textMuted : 'transparent',
     ...neu.pressedSm,
   };
 }
 
 /**
- * Focus visible ARRONDI : le liseré du champ passe à l'accent. Sur le web
+ * Focus visible ARRONDI : le liseré du champ passe au gris neutre. Sur le web
  * (react-native-web), l'outline navigateur par défaut est rectangulaire et
  * ignore le border-radius — on le neutralise ici, le liseré prend le relais.
  */

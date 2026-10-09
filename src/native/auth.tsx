@@ -1,6 +1,11 @@
 /**
- * Chrome auth — layout SpeechLab-like (logo flottant, switch, form, CTA).
+ * Chrome auth — layout SpeechLab-like (switch, titre, form, CTA).
  * Polices produit = web (Space Grotesk + Chivo). Néomorphisme via useNeu().
+ *
+ * 09/10/2026 (retour du porteur, lot M1) : plus de tuile « logo dans une
+ * carte » au-dessus du titre de la connexion, du mot de passe oublié et de
+ * la création de compte — elle ne disait rien de plus que l'icône de l'app
+ * qu'on vient d'ouvrir et repoussait le formulaire. Le titre porte l'écran.
  */
 import { forwardRef, useState, type ComponentType, type ReactNode } from 'react';
 import {
@@ -61,7 +66,6 @@ export function AuthScreen({
   children,
   footer,
   background = DEFAULT_AUTH_BG,
-  logo,
   ScrollComponent = ScrollView,
 }: {
   title: string;
@@ -72,7 +76,6 @@ export function AuthScreen({
   children: ReactNode;
   footer?: ReactNode;
   background?: ImageSourcePropType;
-  logo?: ImageSourcePropType;
   /**
    * Scroll clavier-aware (ex. KeyboardAwareScrollView).
    * Défaut : ScrollView RN.
@@ -80,7 +83,6 @@ export function AuthScreen({
   ScrollComponent?: ComponentType<AuthScrollProps>;
 }) {
   const c = useE237Colors();
-  const neu = useNeu();
   const insets = useSafeAreaInsets();
   const Scroll = ScrollComponent;
 
@@ -121,30 +123,9 @@ export function AuthScreen({
           </Pressable>
         </View>
 
-        {/* Hero centré dans l'espace libre au-dessus du formulaire. */}
+        {/* Hero centré dans l'espace libre au-dessus du formulaire — le
+            titre seul, sans tuile de logo (porteur, 09/10/2026). */}
         <View style={styles.centerBlock}>
-          <View
-            style={[
-              styles.logoTile,
-              { backgroundColor: c.surfaceRaised },
-              neu.card,
-            ]}
-          >
-            <View
-              style={[
-                styles.logoGlow,
-                { backgroundColor: `${c.accent}33` },
-              ]}
-            />
-            {/* Sans image fournie, le SIGNE vectoriel : il suit le thème et
-                reste net à toutes les densités, ce qu'un PNG ne fait pas. */}
-            {logo ? (
-              <Image source={logo} style={styles.logoTileImg} resizeMode="contain" />
-            ) : (
-              <AppMark size={64} />
-            )}
-          </View>
-
           <Text style={[styles.screenTitle, { color: c.textPrimary }]}>{title}</Text>
           {subtitle ? (
             <Text style={[styles.screenSubtitle, { color: c.textSecondary }]}>
@@ -421,27 +402,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing['3'],
-    paddingVertical: spacing['6'],
-    minHeight: 160,
-  },
-  logoTile: {
-    width: 108,
-    height: 108,
-    borderRadius: radius.xl,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderCurve: 'continuous',
-    overflow: 'hidden',
-  },
-  logoGlow: {
-    position: 'absolute',
-    width: 64,
-    height: 64,
-    borderRadius: 999,
-  },
-  logoTileImg: {
-    width: 64,
-    height: 64,
+    paddingVertical: spacing['8'],
+    minHeight: 120,
   },
   screenTitle: {
     fontFamily: fontFamily.display,
