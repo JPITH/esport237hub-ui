@@ -68,17 +68,23 @@ export function scrollThumb({
   offset,
   insetStart = 0,
   insetEnd = 0,
-  minSize = THUMB_MIN,
+  minSize,
   inverted = false,
 }: ScrollThumbInput): ScrollThumb {
   'worklet';
+  // `THUMB_MIN` se lit dans le CORPS, jamais en valeur par défaut : le plugin
+  // des worklets n'emporte pas sur le fil UI une variable du module citée
+  // dans un défaut de paramètre — « Property 'THUMB_MIN' doesn't exist », et
+  // l'app entière se démontait sur Android (11/10/2026,
+  // `worklet-defaults.test.ts`).
+  const minThumb = minSize ?? THUMB_MIN;
   const track = viewport - insetStart - insetEnd;
   const maxOffset = content - viewport;
   if (!(track > 0) || !(viewport > 0) || !(maxOffset > FITS_EPSILON)) {
     return { scrollable: false, size: 0, position: insetStart };
   }
 
-  const floor = Math.min(minSize, track);
+  const floor = Math.min(minThumb, track);
   const proportional = (track * viewport) / content;
   const base = clamp(proportional, floor, track);
 
