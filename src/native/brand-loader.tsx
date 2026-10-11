@@ -38,8 +38,14 @@ import {
   MARK_RING_PATH,
   MARK_VIEW_BOX,
 } from '../lib/brand-mark';
-import { BRAND_LOADER_CYCLE_MS, BRAND_LOADER_TIMELINE as T, polylinePathLength } from '../lib/brand-motion';
-import { useE237Colors } from './core';
+import {
+  BRAND_LOADER_CYCLE_MS,
+  BRAND_LOADER_TIMELINE as T,
+  PAGE_LOADER_MARK_SIZE,
+  polylinePathLength,
+} from '../lib/brand-motion';
+import type { ThemeMode } from '../tokens';
+import { color, useE237Colors } from './core';
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 
@@ -51,11 +57,14 @@ export interface BrandLoaderProps {
   size?: number;
   /** Ce que lit le lecteur d'écran ; défaut « Chargement de G-HUB… ». */
   label?: string;
+  /** Encres d'un thème imposé (le voile de chargement est toujours sombre) ; défaut : celui de l'appareil. */
+  mode?: ThemeMode;
   style?: StyleProp<ViewStyle>;
 }
 
-export function BrandLoader({ size = 72, label, style }: BrandLoaderProps) {
-  const c = useE237Colors();
+export function BrandLoader({ size = 72, label, mode, style }: BrandLoaderProps) {
+  const device = useE237Colors();
+  const c = mode ? color[mode] : device;
   const t = useDsT();
   const reduced = useReducedMotion();
   const clock = useSharedValue(reduced ? 0.7 : 0);
@@ -159,13 +168,14 @@ export interface PageLoaderProps {
 
 /**
  * Le chargement d'un ÉCRAN entier (démarrage, garde de session, rappel
- * d'authentification) : le signe animé, centré sur le fond du thème.
+ * d'authentification) : un voile SOMBRE, le signe animé en grand au centre
+ * (porteur, 11/10/2026 : « un overlay dark et le logo au centre en gros ») —
+ * sombre dans les deux thèmes, comme le web.
  */
 export function PageLoader({ label, style }: PageLoaderProps) {
-  const c = useE237Colors();
   return (
-    <View style={[styles.page, { backgroundColor: c.bg }, style]}>
-      <BrandLoader size={88} label={label} />
+    <View style={[styles.page, { backgroundColor: color.dark.bg }, style]}>
+      <BrandLoader size={PAGE_LOADER_MARK_SIZE} label={label} mode="dark" />
     </View>
   );
 }

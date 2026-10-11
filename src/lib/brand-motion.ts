@@ -21,6 +21,12 @@
 export const BRAND_LOADER_CYCLE_MS = 2400;
 
 /**
+ * Côté du signe sur le voile de chargement d'une page (web et natif) : « le
+ * logo au centre, en gros » (porteur, 11/10/2026).
+ */
+export const PAGE_LOADER_MARK_SIZE = 160;
+
+/**
  * Les étapes du cycle, en fraction de `BRAND_LOADER_CYCLE_MS`. Le CSS du web
  * (`.e237-brand-loader*`, `components.css`) reprend ces pourcentages ; le
  * natif les interpole tels quels.

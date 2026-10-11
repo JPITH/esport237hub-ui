@@ -25,6 +25,7 @@ import {
   MARK_RING_PATH,
   MARK_VIEW_BOX,
 } from "../lib/brand-mark";
+import { PAGE_LOADER_MARK_SIZE } from "../lib/brand-motion";
 
 export interface BrandLoaderProps {
   /** Côté du signe, en pixels (défaut 72). */
@@ -69,8 +70,8 @@ export function BrandLoader({ size = 72, label, className = "", style }: BrandLo
 
 export interface PageLoaderProps {
   /**
-   * Plein écran (démarrage, garde de session) : occupe toute la hauteur de la
-   * fenêtre. Sinon, la zone de contenu d'une page (route qui charge).
+   * Démarrage, garde de session : le voile est plein (rien derrière). Sinon,
+   * il laisse deviner la page, assombrie et floutée (route qui charge).
    */
   fullScreen?: boolean;
   label?: string;
@@ -78,16 +79,17 @@ export interface PageLoaderProps {
 }
 
 /**
- * Le chargement d'une PAGE : le signe animé, centré, qui n'apparaît qu'après
- * un court instant (un chargement de 100 ms ne doit pas faire clignoter le
- * logo).
+ * Le chargement d'une PAGE : un voile sombre sur tout l'écran, le signe
+ * animé en grand au centre (porteur, 11/10/2026) — dans les deux thèmes. Il
+ * n'apparaît qu'après un court instant (un chargement de 100 ms ne doit pas
+ * faire clignoter le logo).
  */
 export function PageLoader({ fullScreen = false, label, className = "" }: PageLoaderProps) {
   return (
     <div
       className={`e237-page-loader ${fullScreen ? "e237-page-loader--screen" : ""} ${className}`.trim()}
     >
-      <BrandLoader size={fullScreen ? 88 : 64} label={label} />
+      <BrandLoader size={PAGE_LOADER_MARK_SIZE} label={label} />
     </div>
   );
 }

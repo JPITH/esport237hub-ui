@@ -5287,16 +5287,34 @@ a.mkt-social:focus-visible {
 
 /* Le chargement d'une page : centré, et invisible les 150 premières ms —
    un chargement éclair ne doit pas faire clignoter le logo. */
+/* Le chargement d'une page : un VOILE SOMBRE sur tout l'écran, le signe en
+   grand au centre (porteur, 11/10/2026 : « pour le chargement il faut un
+   overlay dark et le logo au centre en gros »). Sombre dans les deux thèmes :
+   le voile reprend les valeurs SOMBRES des rôles qu'il lit (fond, « G »
+   ivoire, cadre vert). `color-scheme: dark` ne suffit pas : le navigateur
+   résout `light-dark()` des variables à la racine, en clair (vérifié le
+   11/10/2026). Sous les modales (60), au-dessus des plateaux plein écran et
+   des bulles (50). */
 .e237-page-loader {
+  --e237-bg: #0e1116;
+  --e237-text-primary: #e2e7ec;
+  --e237-accent: var(--e237-accent-400);
+  --e237-accent-hover: var(--e237-accent-500);
+  position: fixed;
+  inset: 0;
+  z-index: 55;
   display: grid;
   place-items: center;
-  min-height: 40vh;
-  padding: 48px 16px;
+  padding: 16px;
+  color-scheme: dark;
+  background: color-mix(in srgb, var(--e237-bg) 92%, transparent);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
   animation: ui-fade-in 0.25s ease-out 0.15s both;
 }
 
+/* Démarrage, garde de session : rien derrière, le voile est plein. */
 .e237-page-loader--screen {
-  min-height: 100dvh;
   background: var(--e237-bg);
 }
 
