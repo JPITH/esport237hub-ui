@@ -861,7 +861,7 @@ export function StoreBadge({ store, href, soonLabel = 'Bientôt', className }: S
     return (
       <span
         className={cx('mkt-store mkt-store--soon', className)}
-        aria-label={`${copy.kicker} ${copy.name} — ${soonLabel.toLowerCase()}`}
+        aria-label={`${copy.kicker} ${copy.name} (${soonLabel.toLowerCase()})`}
         data-store={store}
       >
         {body}
@@ -1002,7 +1002,7 @@ export function MarketingFooter({
                       ) : (
                         <span
                           className="mkt-social mkt-social--soon"
-                          aria-label={`${s.label} — bientôt`}
+                          aria-label={`${s.label} (bientôt)`}
                           data-tip={`${s.label} · bientôt`}
                         >
                           <BrandIcon name={s.network} size={18} />

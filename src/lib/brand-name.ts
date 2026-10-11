@@ -35,4 +35,4 @@ export const BRAND_NAME_ACCENT = 'G';
 export const BRAND_NAME_REST = '-HUB';
 
 /** Étiquette d'accessibilité du bloc de marque cliquable. */
-export const BRAND_HOME_LABEL = `${BRAND_NAME} — accueil`;
+export const BRAND_HOME_LABEL = `${BRAND_NAME}, accueil`;

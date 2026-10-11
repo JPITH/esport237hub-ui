@@ -37,7 +37,7 @@ export function divisionLabel(rank: number): string {
 
 /** Libellé long, lu par les lecteurs d'écran (garde le nom de la division). */
 export function divisionAccessibleLabel(rank: number, name?: string): string {
-  return name ? `Division ${rank} — ${name}` : `Division ${rank}`;
+  return name && name !== `Division ${rank}` ? `Division ${rank} : ${name}` : `Division ${rank}`;
 }
 
 export function DivisionBadge({
