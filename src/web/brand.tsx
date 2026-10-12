@@ -226,9 +226,21 @@ export interface AuthMetric {
   label: string;
 }
 
+/** Un bénéfice concret du produit, dans la colonne de marque. */
+export interface AuthPoint {
+  icon: ReactNode;
+  title: string;
+  body: string;
+}
+
 export interface AuthBrandPanelProps {
   title: ReactNode;
   subtitle: string;
+  /**
+   * Trois bénéfices concrets sous le slogan (audit du 12/10/2026 : la moitié
+   * gauche était une grande zone vide à 1440 px).
+   */
+  points?: readonly AuthPoint[];
   /**
    * Chiffres mis en avant. Ils étaient CODÉS EN DUR dans le composant
    * (« 12 duels validés », « 6 salles »…) : des données produit figées dans
@@ -249,6 +261,7 @@ export function AuthBrandPanel({
   title,
   subtitle,
   metrics = [],
+  points = [],
   footer,
   className = "",
 }: AuthBrandPanelProps) {
@@ -256,7 +269,6 @@ export function AuthBrandPanel({
     <aside
       className={`relative hidden flex-col justify-between overflow-hidden border-r border-edge bg-surface p-10 lg:flex ${className}`.trim()}
     >
-      <div className="pitch-line absolute inset-x-0 top-1/2" aria-hidden />
       <div
         className="absolute -right-24 -top-24 size-80 rounded-full border border-accent-border"
         aria-hidden
@@ -279,6 +291,21 @@ export function AuthBrandPanel({
               </div>
             ))}
           </div>
+        ) : null}
+        {points.length ? (
+          <ul className="flex max-w-md flex-col gap-4 pt-2">
+            {points.map((p) => (
+              <li key={p.title} className="flex items-start gap-3">
+                <span className="grid size-10 shrink-0 place-items-center rounded-xl border border-edge bg-raised text-secondary">
+                  {p.icon}
+                </span>
+                <span className="flex flex-col gap-0.5">
+                  <span className="text-sm font-semibold text-strong">{p.title}</span>
+                  <span className="text-sm text-secondary">{p.body}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
         ) : null}
       </div>
 

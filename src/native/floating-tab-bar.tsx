@@ -60,6 +60,7 @@ import { font, radius, spacing, useE237Colors, useE237Mode, withAlpha, type Them
 import {
   ACTIVE_GROW,
   PILL_HEIGHT,
+  PILL_SURFACE_OPACITY,
   PILL_ITEM_HEIGHT,
   PILL_PADDING,
   PILL_SIDE_MARGIN,
@@ -184,10 +185,13 @@ function PillSurface({
     });
   }
 
-  // Repli : la surface la plus élevée du thème, translucide. Sans flou natif
-  // (Android), elle reste presque opaque — un texte qui défile dessous ne
-  // doit pas se lire à travers les icônes.
-  const opacity = reduceTransparency ? 1 : Platform.OS === 'web' ? 0.78 : 0.94;
+  // Repli : la surface la plus élevée du thème, presque opaque. Sans flou
+  // natif (Android), un texte qui défile dessous ne doit pas se lire à
+  // travers les icônes. Le web avait 78 % sous un flou : les photos claires
+  // du fil brouillaient encore « Duels » et « Boutique », et en mode gérant
+  // un bouton « Confirmer » se lisait sous « Comptoir » (audit UI/UX du
+  // 12/10/2026). 95 % partout ; le flou du web n'adoucit plus que le liseré.
+  const opacity = reduceTransparency ? 1 : PILL_SURFACE_OPACITY;
   return (
     <View
       style={[
@@ -376,12 +380,13 @@ const styles = StyleSheet.create({
   // l'être : iOS rognerait son ombre avec.
   glassClip: { overflow: 'hidden' },
   // L'ombre courte de ce qui FLOTTE (DESIGN.md, « la profondeur ») : la
-  // pilule est posée sur le contenu, pas dans la page.
+  // pilule est posée sur le contenu, pas dans la page. Plus nette depuis le
+  // 12/10/2026 : elle détache la pilule d'une photo de même teinte.
   pillShadow: {
     shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.16,
-    shadowRadius: 16,
-    elevation: 8,
+    shadowOpacity: 0.24,
+    shadowRadius: 18,
+    elevation: 10,
   },
   row: {
     flex: 1,

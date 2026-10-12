@@ -198,7 +198,9 @@ export function PlayerCell({ username, city, verified }: PlayerCellProps) {
         {username}
         {verified ? <VerifiedMark /> : null}
       </span>
-      <span className="text-xs text-muted">{city ?? "—"}</span>
+      {/* Pas de ligne secondaire vide : un « — » sous chaque pseudo se lisait
+          comme une donnée manquante (audit du 12/10/2026). */}
+      {city ? <span className="text-xs text-muted">{city}</span> : null}
     </div>
   );
 }

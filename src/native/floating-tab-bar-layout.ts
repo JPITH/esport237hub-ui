@@ -28,6 +28,12 @@ export const CONTENT_BREATHING = 16;
  * ~93 px, assez pour « Boutique » ou « Comptoir » en 12 px sous son icône.
  */
 export const ACTIVE_GROW = 1.3;
+/**
+ * Opacité de la surface de repli (sans verre natif : Android, web, iOS < 26).
+ * 95 % depuis l'audit du 12/10/2026 : à 78 % (web), les photos du fil se
+ * lisaient à travers les libellés des onglets.
+ */
+export const PILL_SURFACE_OPACITY = 0.95;
 /** Durée de l'élargissement d'un onglet — sous le seuil où l'on attend. */
 export const TAB_TRANSITION_MS = 240;
 

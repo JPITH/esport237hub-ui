@@ -605,6 +605,11 @@
   font-size: 11px;
   color: var(--e237-text-muted);
 }
+/* Erreur d'un champ, sous lui (prop `error` de `Input`). */
+.e237-field-hint--error {
+  font-size: 12px;
+  color: var(--e237-danger);
+}
 
 /* Conteneur relatif d'un champ simple (icône gauche + input + œil droite). */
 .e237-field-box {

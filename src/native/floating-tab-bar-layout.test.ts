@@ -4,6 +4,7 @@ import {
   CONTENT_BREATHING,
   PILL_HEIGHT,
   PILL_MIN_BOTTOM_GAP,
+  PILL_SURFACE_OPACITY,
   tabBarBottomOffset,
   tabBarReserve,
 } from './floating-tab-bar-layout';
@@ -37,5 +38,12 @@ describe('tabBarReserve — la marge basse des écrans à onglets', () => {
     for (const inset of [0, 16, 24, 34, 48]) {
       expect(tabBarReserve(inset)).toBeGreaterThan(tabBarBottomOffset(inset) + PILL_HEIGHT);
     }
+  });
+});
+
+describe('la surface de repli de la pilule', () => {
+  it('reste assez opaque pour qu’une photo ne brouille pas les libellés (≥ 92 %)', () => {
+    expect(PILL_SURFACE_OPACITY).toBeGreaterThanOrEqual(0.92);
+    expect(PILL_SURFACE_OPACITY).toBeLessThanOrEqual(1);
   });
 });

@@ -66,14 +66,16 @@ export function SeasonBanner({
     <Card style={[styles.card, style]}>
       <View style={styles.head}>
         <Icon name="calendar-clock" color={c.accent} size={16} />
-        <Txt variant="label">{season.name}</Txt>
+        <Txt variant="label" numberOfLines={1} style={styles.name}>
+          {season.name}
+        </Txt>
         <View style={[styles.state, { backgroundColor: c.surfaceRaised }]}>
           <Txt variant="label" size={11} tone="secondary">
             {stateKey ? t(stateKey) : season.state}
           </Txt>
         </View>
         {remaining ? (
-          <Txt variant="caption" tone="secondary" style={styles.remaining}>
+          <Txt variant="caption" tone="secondary" numberOfLines={1} style={styles.remaining}>
             {remaining}
           </Txt>
         ) : null}
@@ -105,7 +107,11 @@ export function SeasonBanner({
 
 const styles = StyleSheet.create({
   card: { gap: spacing['2'] },
-  head: { flexDirection: 'row', alignItems: 'center', gap: spacing['2'] },
+  // Sur 360 px, le nom et « Il reste 24 jours » se cassaient chacun sur deux
+  // lignes (audit du 12/10/2026) : chaque morceau garde sa ligne, et
+  // l'échéance passe en dessous quand la place manque.
+  head: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: spacing['2'] },
+  name: { flexShrink: 1 },
   state: { borderRadius: radius.full, paddingHorizontal: spacing['2'], paddingVertical: 2 },
   remaining: { marginLeft: 'auto' },
   track: { height: 6, borderRadius: radius.full, overflow: 'hidden' },

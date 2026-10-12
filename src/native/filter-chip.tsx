@@ -27,6 +27,7 @@ import {
   withAlpha,
 } from './core';
 import { Txt } from './text';
+import { touchTargetBox } from './touch-target';
 
 export interface FilterChipProps {
   label: string;
@@ -67,54 +68,63 @@ export function FilterChip({
       }
       accessibilityLabel={count != null ? `${label} (${count})` : label}
       disabled={disabled}
-      // La puce mesure 36 px ; le débord rétablit une zone tactile de 44 px.
-      hitSlop={{ top: 4, bottom: 4 }}
       onPress={onPress}
-      style={({ pressed }) => [
-        styles.chip,
-        {
-          borderColor: active ? withAlpha(c.accent, pill.stroke[mode]) : c.border,
-          backgroundColor: active
-            ? withAlpha(c.accent, pill.fill[mode])
-            : c.surface,
-        },
-        pressed && styles.pressed,
-        disabled && styles.disabled,
-        style,
-      ]}
+      // La puce mesure 36 px ; la zone tactile, 44 (audit du 12/10/2026) :
+      // `hitSlop` n'existe pas sur le web, la boîte elle-même déborde donc de
+      // 4 px en haut et en bas, rendus à la mise en page par une marge négative.
+      style={[touchTargetBox(44, CHIP_HEIGHT), styles.hit, style]}
     >
-      {icon}
-      <Txt
-        variant={active ? 'bodyBold' : 'bodyMedium'}
-        size={13}
-        color={ink}
-        numberOfLines={1}
-      >
-        {label}
-      </Txt>
-      {count != null ? (
+      {({ pressed }) => (
         <View
           style={[
-            styles.count,
+            styles.chip,
             {
-              backgroundColor: active
-                ? withAlpha(c.accent, 0.22)
-                : withAlpha(c.textMuted, 0.18),
+              borderColor: active ? withAlpha(c.accent, pill.stroke[mode]) : c.border,
+              backgroundColor: active ? withAlpha(c.accent, pill.fill[mode]) : c.surface,
             },
+            pressed && styles.pressed,
+            disabled && styles.disabled,
           ]}
         >
-          <Txt variant="bodyBold" size={11} color={ink} style={styles.countText}>
-            {count}
+          {icon}
+          <Txt
+            variant={active ? 'bodyBold' : 'bodyMedium'}
+            size={13}
+            color={ink}
+            numberOfLines={1}
+          >
+            {label}
           </Txt>
+          {count != null ? (
+            <View
+              style={[
+                styles.count,
+                {
+                  backgroundColor: active
+                    ? withAlpha(c.accent, 0.22)
+                    : withAlpha(c.textMuted, 0.18),
+                },
+              ]}
+            >
+              <Txt variant="bodyBold" size={11} color={ink} style={styles.countText}>
+                {count}
+              </Txt>
+            </View>
+          ) : null}
         </View>
-      ) : null}
+      )}
     </Pressable>
   );
 }
 
+/** Hauteur visible de la puce. */
+const CHIP_HEIGHT = 36;
+
 const styles = StyleSheet.create({
+  // La puce remplit la largeur de sa boîte tactile (une puce en `flex: 1`).
+  hit: { alignItems: 'stretch' },
   chip: {
-    minHeight: 36,
+    minHeight: CHIP_HEIGHT,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing['1-5'],

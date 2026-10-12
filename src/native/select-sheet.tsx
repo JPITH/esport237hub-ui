@@ -11,6 +11,11 @@ import { Icon } from '../icons/generated/native';
 export interface SelectOption {
   value: string;
   label: string;
+  /**
+   * Ligne discrète sous le libellé, dans la liste seulement (quartier,
+   * « Ouverte »…) : un nom seul ne suffit pas toujours à choisir.
+   */
+  hint?: string;
 }
 
 /**
@@ -76,13 +81,16 @@ export function SelectSheet({
                   setOpen(false);
                 }}
                 style={[styles.option, { borderBottomColor: c.border }]}>
-                <Txt
-                  variant={active ? 'label' : 'body'}
-                  size={15}
-                  tone={active ? 'accent' : 'primary'}
-                  style={{ flex: 1 }}>
-                  {o.label}
-                </Txt>
+                <View style={styles.optionText}>
+                  <Txt variant={active ? 'label' : 'body'} size={15} tone={active ? 'accent' : 'primary'}>
+                    {o.label}
+                  </Txt>
+                  {o.hint ? (
+                    <Txt variant="caption" tone="muted">
+                      {o.hint}
+                    </Txt>
+                  ) : null}
+                </View>
                 {active ? <Icon name="check" color={c.accent} size={18} /> : null}
               </Pressable>
             );
@@ -107,6 +115,9 @@ const styles = StyleSheet.create({
     minHeight: 48,
     flexDirection: 'row',
     alignItems: 'center',
+    gap: spacing['2'],
+    paddingVertical: spacing['2'],
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
+  optionText: { flex: 1, gap: 2 },
 });

@@ -36,6 +36,13 @@ export interface SeasonHistoryProps {
   /** Filtre d'affichage : ne montrer qu'une discipline. */
   gameSlug?: string;
   className?: string;
+  /**
+   * Phrase du palmarès VIDE. Par défaut, elle parle au joueur de SON
+   * palmarès ; la fiche d'un autre passe la sienne, à la 3e personne (audit
+   * du 12/10/2026 : « ouvre TON palmarès » sur la fiche de Grassfield10).
+   * Même prop que le natif.
+   */
+  emptyLabel?: string;
 }
 
 const TONE_CLASS: Record<string, string> = {
@@ -63,6 +70,7 @@ export function SeasonHistory({
   entries,
   gameSlug,
   className = "",
+  emptyLabel,
 }: SeasonHistoryProps) {
   const shown = gameSlug
     ? entries.filter((entry) => entry.game.slug === gameSlug)
@@ -71,8 +79,8 @@ export function SeasonHistory({
   if (shown.length === 0) {
     return (
       <p className={`text-sm text-secondary ${className}`.trim()}>
-        Aucune saison jouée pour l’instant. Le premier duel validé ouvre ton
-        palmarès.
+        {emptyLabel ??
+          "Aucune saison jouée pour l’instant. Le premier duel validé ouvre ton palmarès."}
       </p>
     );
   }

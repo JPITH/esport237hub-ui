@@ -15,7 +15,7 @@ export const enMoney: Record<keyof typeof frMoney, string> = {
 
   'money.payout.net': 'Revenue',
   'money.payout.payable': 'Payable',
-  'money.payout.processing': 'Processing…',
-  'money.payout.collect': 'Collect {amount}',
-  'money.payout.upToDate': 'Up to date — nothing to pay out.',
+  'money.payout.processing': 'Paying out…',
+  'money.payout.collect': 'Pay {amount} into my wallet',
+  'money.payout.upToDate': 'Up to date, nothing to pay out.',
 };

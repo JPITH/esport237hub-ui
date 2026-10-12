@@ -221,6 +221,7 @@ export {
   tabBarBottomOffset,
   tabBarReserve,
 } from './floating-tab-bar-layout';
+export { MIN_TOUCH, touchTargetBox } from './touch-target';
 export {
   Carousel,
   PROMO_SLIDE_HEIGHT,

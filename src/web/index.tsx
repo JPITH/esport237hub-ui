@@ -334,6 +334,7 @@ export {
 export type {
   AuthBrandPanelProps,
   AuthMetric,
+  AuthPoint,
   BrandLockupProps,
   SidebarNavLinkOptions,
   SidebarNavLinkProps,

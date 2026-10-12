@@ -28,6 +28,7 @@ import { font, radius, spacing, useE237Colors } from './core';
 import { haptic } from './haptics';
 import { useNeu } from './neu';
 import { Txt } from './text';
+import { touchTargetBox } from './touch-target';
 import { Icon } from '../icons/generated/native';
 
 /* ------------------------------------------------------------------ */
@@ -56,7 +57,10 @@ export interface IconButtonProps {
   icon: ReactNode;
   onPress: () => void;
   accessibilityLabel: string;
-  /** 36 par défaut ; la zone tactile reste ≥ 44 px via hitSlop. */
+  /**
+   * Diamètre VISIBLE, 36 par défaut. La zone tactile, elle, fait toujours au
+   * moins 44 px (`touchTargetBox`), sans changer l'emprise dans la page.
+   */
   size?: number;
   tone?: 'surface' | 'accent';
   disabled?: boolean;
@@ -83,7 +87,6 @@ export function IconButton({
       accessibilityLabel={accessibilityLabel}
       accessibilityState={{ disabled }}
       disabled={disabled}
-      hitSlop={10}
       onPress={onPress}
       onPressIn={() => {
         if (disabled) return;
@@ -91,7 +94,10 @@ export function IconButton({
         press.onPressIn();
       }}
       onPressOut={press.onPressOut}
-      style={style}
+      // 44 px réels autour du rond (audit du 12/10/2026) : `hitSlop` était
+      // ignoré sur le web, et le retour, les flèches de rail ou la quantité
+      // du panier restaient des cibles de 30 à 36 px.
+      style={[touchTargetBox(size), style]}
     >
       <Animated.View
         style={[
@@ -128,6 +134,9 @@ export interface PillButtonProps {
 }
 
 /** Petite pilule d'action : « Voir tout », « Jouer », « Défier ». */
+/** Hauteur visible de `PillButton`. */
+const PILL_BUTTON_HEIGHT = 32;
+
 export function PillButton({
   label,
   onPress,
@@ -148,7 +157,6 @@ export function PillButton({
       accessibilityRole="button"
       accessibilityState={{ disabled }}
       disabled={disabled}
-      hitSlop={8}
       onPress={onPress}
       onPressIn={() => {
         if (disabled) return;
@@ -156,7 +164,8 @@ export function PillButton({
         press.onPressIn();
       }}
       onPressOut={press.onPressOut}
-      style={style}
+      // Pastille de 32 px, zone tactile de 44 (audit du 12/10/2026).
+      style={[touchTargetBox(44, PILL_BUTTON_HEIGHT), styles.pillHit, style]}
     >
       <Animated.View
         style={[
@@ -229,6 +238,11 @@ export interface BalancePillProps {
   style?: StyleProp<ViewStyle>;
 }
 
+/** Hauteur visible de la pastille du solde (même rangée que cloche et avatar). */
+const BALANCE_HEIGHT = 34;
+/** Diamètre visible du « + » de recharge. */
+const BALANCE_ADD_SIZE = 26;
+
 /** Solde compact de la barre du haut : icône + valeur + « + ». */
 export function BalancePill({
   icon,
@@ -247,7 +261,7 @@ export function BalancePill({
   const amount = (
     <>
       <View style={[styles.balanceIcon, { backgroundColor: `${accent}26` }]}>{icon}</View>
-      <Txt variant="label" size={font.size.xs + 1} numberOfLines={1}>
+      <Txt variant="label" size={font.size.xs + 1} numberOfLines={1} style={styles.balanceValue}>
         {value}
       </Txt>
     </>
@@ -261,7 +275,6 @@ export function BalancePill({
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={pressLabel}
-          hitSlop={6}
           onPress={() => {
             haptic('light');
             onPress();
@@ -280,18 +293,20 @@ export function BalancePill({
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={addLabel}
-          hitSlop={10}
           onPress={() => {
             haptic('light');
             onAdd();
           }}
+          // Le rond reste de 26 px ; sa zone tactile fait 44 px (audit du
+          // 12/10/2026 : 24 × 24, on ouvrait le portefeuille ou la cloche).
           style={({ pressed }) => [
-            styles.balanceAdd,
-            { backgroundColor: accent },
+            touchTargetBox(BALANCE_ADD_SIZE),
             pressed && styles.pressed,
           ]}
         >
-          <Icon name="plus" color={c.onAccent} size={12} strokeWidth={3} />
+          <View style={[styles.balanceAdd, { backgroundColor: accent }]}>
+            <Icon name="plus" color={c.onAccent} size={12} strokeWidth={3} />
+          </View>
         </Pressable>
       ) : null}
     </View>
@@ -305,8 +320,10 @@ export function BalancePill({
 export interface TopBarProps {
   title?: string;
   subtitle?: string;
-  /** Affiche le bouton retour rond. */
+  /** Affiche la flèche de retour (même dessin que l'en-tête de pile natif). */
   onBack?: () => void;
+  /** Libellé accessible du retour — « Retour » par défaut (« Retour aux duels »…). */
+  backLabel?: string;
   /** Contenu à droite (soldes, actions). */
   right?: ReactNode;
   /** Remplace le titre (logo, avatar + pseudo…). */
@@ -319,6 +336,7 @@ export function TopBar({
   title,
   subtitle,
   onBack,
+  backLabel = 'Retour',
   right,
   leading,
   style,
@@ -328,11 +346,21 @@ export function TopBar({
   return (
     <View style={[styles.topBar, style]}>
       {onBack ? (
-        <IconButton
-          icon={<Icon name="chevron-left" color={c.textPrimary} size={20} />}
-          onPress={onBack}
-          accessibilityLabel="Retour"
-        />
+        // Une flèche nue dans 44 px, comme le retour des en-têtes de pile
+        // (`HeaderBack` de l'app) : deux dessins de retour cohabitaient, un
+        // rond en relief ici et une flèche là (audit UI/UX du 12/10/2026).
+        // Le rond reste aux retours posés SUR une photo (fiche salle, produit).
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={backLabel}
+          onPress={() => {
+            haptic('light');
+            onBack();
+          }}
+          style={({ pressed }) => [styles.topBarBack, pressed && styles.pressed]}
+        >
+          <Icon name="arrow-left" color={c.textPrimary} size={24} />
+        </Pressable>
       ) : null}
 
       <View style={styles.topBarMain}>
@@ -745,11 +773,12 @@ const styles = StyleSheet.create({
   disabled: { opacity: 0.5 },
   pressed: { opacity: 0.8 },
 
+  pillHit: { alignItems: 'stretch' },
   pill: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing['1'],
-    minHeight: 32,
+    minHeight: PILL_BUTTON_HEIGHT,
     paddingHorizontal: spacing['3'],
     borderRadius: radius.full,
     borderCurve: 'continuous',
@@ -759,18 +788,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing['1'],
-    height: 34,
+    height: BALANCE_HEIGHT,
     paddingLeft: 4,
     paddingRight: 4,
     borderRadius: radius.full,
     borderCurve: 'continuous',
   },
+  // La zone du solde déborde la pastille (34 px) jusqu'à 44 px de haut :
+  // c'est une cible, pas seulement une étiquette.
   balanceTap: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing['1-5'],
     paddingRight: 2,
+    ...touchTargetBox(44, BALANCE_HEIGHT),
   },
+  balanceValue: { fontVariant: ['tabular-nums'] },
   balanceIcon: {
     width: 24,
     height: 24,
@@ -779,8 +812,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   balanceAdd: {
-    width: 24,
-    height: 24,
+    width: BALANCE_ADD_SIZE,
+    height: BALANCE_ADD_SIZE,
     borderRadius: radius.full,
     alignItems: 'center',
     justifyContent: 'center',
@@ -791,6 +824,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing['3'],
     minHeight: 44,
+  },
+  // Flèche alignée sur la gouttière : la boîte de 44 px déborde à gauche.
+  topBarBack: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: -10,
+    marginRight: -4,
   },
   topBarMain: { flex: 1, gap: 2 },
   topBarRight: { flexDirection: 'row', alignItems: 'center', gap: spacing['2'] },

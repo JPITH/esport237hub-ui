@@ -2,7 +2,7 @@
  * Duels (natif) — jumeaux de `./web/duel`, mêmes noms, mêmes props
  * (la navigation passe par `onPress` au lieu de `href`).
  */
-import type { DuelSideResult, DuelStatus } from '@esport237hub/types';
+import type { DuelSideResult, DuelStatus, DuelStatusView } from '@esport237hub/types';
 import type { ReactNode } from 'react';
 import {
   Pressable,
@@ -71,6 +71,11 @@ export interface DuelRowProps {
    * par la pastille vert / rouge (`DuelResultPill`).
    */
   result?: { outcome: DuelSideResult; score: string } | null;
+  /**
+   * Le statut vu de celui qui regarde (`duelStatusView`) : le même défi est
+   * « Défi envoyé » pour son auteur, « Défi reçu » pour son destinataire.
+   */
+  statusView?: Pick<DuelStatusView, 'labelKey' | 'tone'> | null;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -110,6 +115,7 @@ export function DuelRow({
   opponentScore,
   status,
   result,
+  statusView,
   style,
 }: DuelRowProps) {
   const neu = useNeu();
@@ -138,7 +144,7 @@ export function DuelRow({
                 {challengerScore}–{opponentScore}
               </Txt>
             ) : null}
-            <DuelStatusBadge status={status} />
+            <DuelStatusBadge status={status} view={statusView} />
           </>
         )}
       </View>

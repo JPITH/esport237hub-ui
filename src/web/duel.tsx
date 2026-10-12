@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import type { DuelSideResult, DuelStatus } from "@esport237hub/types";
+import type { DuelSideResult, DuelStatus, DuelStatusView } from "@esport237hub/types";
 
 import { useDsT } from "../i18n";
 import { DUEL_RESULT_META } from "../lib/duel-result";
@@ -65,10 +65,11 @@ export interface DuelRowProps {
    */
   result?: { outcome: DuelSideResult; score: string } | null;
   /**
-   * Remplace la pastille de statut quand son nom dépend de qui regarde : une
-   * demande `sent` est « Envoyée » pour son auteur, « Reçue » pour son
-   * destinataire (visite du 09/10/2026).
+   * Le statut vu de celui qui regarde (`duelStatusView`) : le même défi est
+   * « Défi envoyé » pour son auteur, « Défi reçu » pour son destinataire.
    */
+  statusView?: Pick<DuelStatusView, "labelKey" | "tone"> | null;
+  /** Remplace entièrement la pastille de statut. */
   statusBadge?: ReactNode;
   className?: string;
 }
@@ -93,6 +94,7 @@ export function DuelRow({
   opponentScore,
   status,
   result,
+  statusView,
   statusBadge,
   className = "",
 }: DuelRowProps) {
@@ -124,7 +126,7 @@ export function DuelRow({
                 {challengerScore}–{opponentScore}
               </span>
             ) : null}
-            {statusBadge ?? <DuelStatusBadge status={status} />}
+            {statusBadge ?? <DuelStatusBadge status={status} view={statusView} />}
           </>
         )}
       </div>

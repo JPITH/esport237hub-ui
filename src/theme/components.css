@@ -1675,6 +1675,12 @@
 /* Rail jeux : transparent (pas de fond / bordure / padding).
    Seule la pilule du milieu porte le relief ; top/bottom = icônes rondes. */
 .e237-game-rail {
+  /* Au-dessus du contenu de la page : l'info-bulle et la carte « tous les
+     jeux » débordent sur lui. La pilule est son propre contexte
+     d'empilement (`view-transition-name`) : sans ce plan, l'info-bulle
+     passait SOUS les panneaux voisins. */
+  position: relative;
+  z-index: 30;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -1728,6 +1734,12 @@
   box-shadow: var(--e237-shadow-card);
   /* Morph pilule ⇄ carte « tous les jeux » (View Transitions). */
   view-transition-name: e237-game-pill;
+}
+
+/* Pilule sans jeu (outils pro : comptoir, Ma salle, console d'évènement, où
+   la discipline ne filtre rien) : pas de pilule vide à l'écran. */
+.e237-game-rail__pill:not(:has(.e237-game-rail__btn)) {
+  display: none;
 }
 
 /* Ouverte : la pilule *devient* la carte, flottant au-dessus du contenu. */
@@ -1866,16 +1878,88 @@
   box-shadow: var(--e237-neu-pressed-sm);
 }
 
+/* La discipline ACTIVE se voit de loin : liseré cyan plein et une barre au
+   bord de la pilule (audit du 12/10/2026 : l'état actif se confondait avec
+   le survol). */
 .e237-game-rail__btn--active {
-  border-color: color-mix(in srgb, var(--e237-cyan) 45%, transparent);
+  position: relative;
+  border-color: var(--e237-cyan);
   background: color-mix(in srgb, var(--e237-cyan) 12%, var(--e237-surface-raised));
   color: var(--e237-cyan);
   box-shadow: var(--e237-neu-pressed);
 }
 
+.e237-game-rail__btn--active::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -7px;
+  width: 3px;
+  height: 20px;
+  translate: 0 -50%;
+  border-radius: var(--e237-radius-full);
+  background: var(--e237-cyan);
+}
+
 .e237-game-rail__btn--soon {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+/* Info-bulle du rail : immédiate au survol et au focus clavier, à droite de
+   la pilule, au-dessus du contenu. */
+.e237-game-rail__btn {
+  position: relative;
+}
+
+.e237-game-rail__tip {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 14px);
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: max-content;
+  max-width: 240px;
+  padding: 8px 12px;
+  translate: -4px -50%;
+  border: 1px solid var(--e237-border);
+  border-radius: var(--e237-radius-md);
+  background: var(--e237-surface-raised);
+  box-shadow: var(--e237-shadow-pop);
+  color: var(--e237-text-primary);
+  text-align: left;
+  white-space: normal;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--e237-dur-fast) var(--e237-ease-out),
+    translate var(--e237-dur-fast) var(--e237-ease-out),
+    visibility 0s linear var(--e237-dur-fast);
+}
+
+.e237-game-rail__tip-name {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.e237-game-rail__tip-hint {
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--e237-text-secondary);
+}
+
+.e237-game-rail__btn:hover .e237-game-rail__tip,
+.e237-game-rail__btn:focus-visible .e237-game-rail__tip {
+  opacity: 1;
+  visibility: visible;
+  translate: 0 -50%;
+  transition:
+    opacity var(--e237-dur-fast) var(--e237-ease-out),
+    translate var(--e237-dur-fast) var(--e237-ease-out);
 }
 
 .e237-game-rail__icon {
@@ -5560,6 +5644,16 @@ a.mkt-social:focus-visible {
   outline: none;
 }
 
+/* Un titre qui EST un menu (le nom de la salle sur l'accueil du gérant) : le
+   panneau doit déborder du titre ; le nom, lui, se tronque dans le bouton. */
+.e237-page-header__title:has(> .e237-menu) {
+  overflow: visible;
+}
+
+.e237-page-header__title > .e237-menu {
+  max-width: 100%;
+}
+
 .e237-page-header__meta {
   display: inline-flex;
   flex-shrink: 0;
@@ -5634,6 +5728,55 @@ a.mkt-social:focus-visible {
   .e237-page-header__more-trigger {
     width: 36px;
     height: 36px;
+  }
+}
+
+/* En-tête qui se REPLIE (`className="e237-page-header--wrap"`, outils pro :
+   comptoir, gestion de tournoi). Une action principale longue (« Démarrer
+   « Phase de poules » ») ne mange plus le titre : sous 1 024 px les
+   secondaires passent dans « … » ; sous 640 px le titre garde sa ligne (sur
+   deux lignes au besoin) et l'action principale passe dessous, pleine
+   largeur. */
+@media (max-width: 1023px) {
+  .e237-page-header--wrap .e237-page-header__more-inline {
+    display: none;
+  }
+
+  .e237-page-header--wrap .e237-page-header__more-menu {
+    display: block;
+  }
+}
+
+@media (max-width: 639px) {
+  .e237-page-header--wrap {
+    flex-wrap: wrap;
+    row-gap: 12px;
+  }
+
+  .e237-page-header--wrap .e237-page-header__title-row {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+
+  .e237-page-header--wrap .e237-page-header__title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    white-space: normal;
+  }
+
+  .e237-page-header--wrap .e237-page-header__subtitle {
+    white-space: normal;
+  }
+
+  .e237-page-header--wrap .e237-page-header__actions {
+    flex-basis: 100%;
+    margin-left: 0;
+  }
+
+  .e237-page-header--wrap .e237-page-header__actions > .btn {
+    flex: 1;
+    min-height: 44px;
   }
 }
 
@@ -5780,6 +5923,16 @@ a.mkt-social:focus-visible {
   font-size: 13px;
   line-height: 1.45;
   color: var(--e237-text-secondary);
+}
+
+/* Pile COMPACTE (`PageLayout className="e237-page--compact-alerts"`, outils
+   pro : comptoir, accueil du gérant). Sous 1 280 px, dès deux alertes, seuls
+   leurs titres et leurs actions restent : trois bandeaux ne repoussent plus
+   les postes et les chiffres sous la ligne de flottaison. */
+@media (max-width: 1279px) {
+  .e237-page--compact-alerts .e237-page-alerts:has(.e237-alert + .e237-alert) .e237-alert__body {
+    display: none;
+  }
 }
 
 .e237-alert__action {

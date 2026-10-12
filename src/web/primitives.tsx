@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { Icon } from "../icons/generated/web";
-import type { DuelStatus } from "@esport237hub/types";
+import type { DuelStatus, DuelStatusView } from "@esport237hub/types";
 
 import { DUEL_STATUS_META } from "../lib/duel-status";
 import { useDsT } from "../i18n";
@@ -55,9 +55,20 @@ export function PageContainer({
   );
 }
 
-export function DuelStatusBadge({ status }: { status: DuelStatus }) {
+/**
+ * Pastille du statut d'un duel. Avec `view` (`duelStatusView`, vu du joueur
+ * connecté), elle dit « Défi reçu » au destinataire et « Défi envoyé » à
+ * l'auteur du même défi ; sans, le libellé générique (salle, administration).
+ */
+export function DuelStatusBadge({
+  status,
+  view,
+}: {
+  status: DuelStatus;
+  view?: Pick<DuelStatusView, "labelKey" | "tone"> | null;
+}) {
   const t = useDsT();
-  const meta = DUEL_STATUS_META[status];
+  const meta = view ?? DUEL_STATUS_META[status];
   return (
     <Badge tone={meta?.tone ?? "neutral"}>
       {meta ? t(meta.labelKey) : status}

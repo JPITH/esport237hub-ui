@@ -164,12 +164,27 @@ export function GameRail({
                       active && 'e237-game-rail__btn--active',
                       coming && 'e237-game-rail__btn--soon',
                     )}
-                    title={coming ? `${g.name} (bientôt)` : g.name}
-                    aria-label={g.name}
+                    aria-label={coming ? `${g.name} (bientôt)` : g.name}
                     aria-current={active ? 'true' : undefined}
                     disabled={coming}
                     onClick={() => onSelect?.(g.id)}
                   >
+                    {/* Info-bulle IMMÉDIATE (survol et focus clavier) : le
+                        `title` natif n'apparaissait qu'après une seconde, et
+                        cinq vignettes sans nom ne disaient pas ce que le rail
+                        pilote (audit du 12/10/2026). */}
+                    <span className="e237-game-rail__tip" aria-hidden>
+                      <span className="e237-game-rail__tip-name">
+                        {coming ? `${g.name} (bientôt)` : g.name}
+                      </span>
+                      {coming ? null : (
+                        <span className="e237-game-rail__tip-hint">
+                          {active
+                            ? 'Ta discipline : carte, classement et accueil la suivent'
+                            : 'Passer ta carte, le classement et l’accueil sur ce jeu'}
+                        </span>
+                      )}
+                    </span>
                     {g.iconUrl && !broken[g.id] ? (
                       <Picture
                         src={g.iconUrl}

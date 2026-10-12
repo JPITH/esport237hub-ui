@@ -172,6 +172,12 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   hint?: string;
   icon?: ReactNode;
+  /**
+   * Erreur du champ, écrite SOUS lui en rouge, à la place de l'aide (audit
+   * du 12/10/2026 : plus de bulle native seule). Pose `aria-invalid` et
+   * relie le message au champ (`aria-describedby`).
+   */
+  error?: string | null;
 }
 
 /**
@@ -180,10 +186,12 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
  * inutile d'y penser à chaque usage.
  */
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, hint, icon, className, id, type = 'text', ...rest }, ref) => {
+  ({ label, hint, icon, error, className, id, type = 'text', ...rest }, ref) => {
     const t = useDsT();
     const autoId = useId();
     const fieldId = id ?? autoId;
+    const noteId = `${fieldId}-note`;
+    const note = error || hint;
     const [revealed, setRevealed] = useState(false);
     const isPassword = type === 'password';
     // Révélé → on bascule en `text` pour montrer le mot de passe.
@@ -210,6 +218,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               className,
             )}
             {...rest}
+            aria-invalid={error ? true : rest['aria-invalid']}
+            aria-describedby={note ? noteId : rest['aria-describedby']}
           />
           {isPassword ? (
             <button
@@ -227,7 +237,15 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             </button>
           ) : null}
         </div>
-        {hint ? <span className="e237-field-hint">{hint}</span> : null}
+        {note ? (
+          <span
+            id={noteId}
+            className={cx('e237-field-hint', !!error && 'e237-field-hint--error')}
+            aria-live={error ? 'polite' : undefined}
+          >
+            {note}
+          </span>
+        ) : null}
       </div>
     );
   },

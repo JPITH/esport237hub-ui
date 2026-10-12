@@ -16,7 +16,7 @@ export const frMoney = {
   // Bloc d'encaissement (PayoutCard)
   'money.payout.net': 'Recette',
   'money.payout.payable': 'À reverser',
-  'money.payout.processing': 'Encaissement…',
-  'money.payout.collect': 'Encaisser {amount}',
-  'money.payout.upToDate': 'À jour — rien à reverser.',
+  'money.payout.processing': 'Reversement…',
+  'money.payout.collect': 'Reverser {amount} sur mon portefeuille',
+  'money.payout.upToDate': 'À jour, rien à reverser.',
 } as const;

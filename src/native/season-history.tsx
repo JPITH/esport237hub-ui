@@ -46,9 +46,15 @@ export interface SeasonHistoryProps {
   /** Filtre d'affichage : ne montrer qu'une discipline. */
   gameSlug?: string;
   style?: StyleProp<ViewStyle>;
+  /**
+   * Le texte du palmarès vide. Par défaut il TUTOIE le joueur (son propre
+   * profil) ; la fiche d'un autre joueur le dit à la troisième personne
+   * (audit du 12/10/2026 : « ton palmarès » sur la fiche de Bastos_Elite).
+   */
+  emptyLabel?: string;
 }
 
-export function SeasonHistory({ entries, gameSlug, style }: SeasonHistoryProps) {
+export function SeasonHistory({ entries, gameSlug, style, emptyLabel }: SeasonHistoryProps) {
   const c = useE237Colors();
   const shown = gameSlug
     ? entries.filter((entry) => entry.game.slug === gameSlug)
@@ -60,8 +66,8 @@ export function SeasonHistory({ entries, gameSlug, style }: SeasonHistoryProps) 
       // compile pas (userSelect diverge entre ViewStyle et TextStyle).
       <View style={style}>
         <Txt variant="body" tone="secondary">
-          Aucune saison jouée pour l’instant. Le premier duel validé ouvre ton
-          palmarès.
+          {emptyLabel ??
+            'Aucune saison jouée pour l’instant. Le premier duel validé ouvre ton palmarès.'}
         </Txt>
       </View>
     );

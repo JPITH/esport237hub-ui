@@ -30,7 +30,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 
-import { font, radius, spacing, useE237Colors } from './core';
+import { font, radius, spacing, useE237Colors, useE237Mode } from './core';
 import { AppMark } from './mark';
 import { haptic } from './haptics';
 import { useNeu } from './neu';
@@ -83,17 +83,23 @@ export function AuthScreen({
   ScrollComponent?: ComponentType<AuthScrollProps>;
 }) {
   const c = useE237Colors();
+  const light = useE237Mode() === 'light';
   const insets = useSafeAreaInsets();
   const Scroll = ScrollComponent;
 
   return (
-    <View style={[styles.screenRoot, { backgroundColor: c.bg }]}>
+    // `overflow: hidden` : l'image de fond (900 px de large) ne doit pas
+    // élargir la page sur le web (défilement horizontal relevé le 12/10/2026).
+    <View style={[styles.screenRoot, styles.clip, { backgroundColor: c.bg }]}>
       <ImageBackground
         source={background}
         style={StyleSheet.absoluteFill}
         resizeMode="cover"
       >
-        <View style={[styles.scrim, { backgroundColor: `${c.bg}D9` }]} />
+        {/* En clair, le voile couvre presque tout (audit du 12/10/2026) : le
+            fond de nuit en dessous donnait un gris terne strié de vert, loin
+            du fond clair des autres écrans. */}
+        <View style={[styles.scrim, { backgroundColor: `${c.bg}${light ? 'F5' : 'D9'}` }]} />
       </ImageBackground>
 
       <Scroll
@@ -222,17 +228,20 @@ export const GradientButton = forwardRef<View, AuthButtonProps>(
     const scale = useSharedValue(1);
     const anim = useAnimatedStyle(() => ({
       transform: [{ scale: scale.value }],
-      opacity: disabled ? 0.5 : 1,
     }));
 
-    const fillStyle = Platform.select<ViewStyle>({
-      web: {
-        backgroundImage: `linear-gradient(180deg, ${c.accentBright}, ${c.accent})`,
-      } as ViewStyle,
-      default: {
-        backgroundColor: c.accent,
-      },
-    });
+    // Inactif : un gris neutre au texte lisible, plus un vert pâle à 50 %
+    // sous un texte blanc (audit du 12/10/2026, contraste insuffisant).
+    const fillStyle = disabled
+      ? ({ backgroundColor: c.surfaceRaised, borderWidth: 1, borderColor: c.border } as ViewStyle)
+      : Platform.select<ViewStyle>({
+          web: {
+            backgroundImage: `linear-gradient(180deg, ${c.accentBright}, ${c.accent})`,
+          } as ViewStyle,
+          default: {
+            backgroundColor: c.accent,
+          },
+        });
 
     return (
       <Pressable
@@ -258,11 +267,11 @@ export const GradientButton = forwardRef<View, AuthButtonProps>(
           style={[
             styles.gradientBtn,
             fillStyle,
-            pressed ? neu.pressedSm : neu.primaryGlow(c.accent),
+            disabled ? null : pressed ? neu.pressedSm : neu.primaryGlow(c.accent),
             anim,
           ]}
         >
-          <Text style={[styles.gradientLabel, { color: c.onAccent }]}>{label}</Text>
+          <Text style={[styles.gradientLabel, { color: disabled ? c.textSecondary : c.onAccent }]}>{label}</Text>
         </Animated.View>
       </Pressable>
     );
@@ -373,6 +382,7 @@ function GoogleMark() {
 
 const styles = StyleSheet.create({
   screenRoot: { flex: 1 },
+  clip: { overflow: 'hidden' },
   scrim: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
   screenContent: {
     flexGrow: 1,
@@ -386,7 +396,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   switchHit: {
-    minHeight: 40,
+    // 44 px : le plancher des cibles tactiles (audit du 12/10/2026).
+    minHeight: 44,
     justifyContent: 'center',
     paddingHorizontal: spacing['1'],
   },

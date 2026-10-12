@@ -31,6 +31,7 @@ import Svg, { Circle, Path } from 'react-native-svg';
 import { useDsT } from '../i18n';
 import { color, radius, spacing, type ColorScale } from '../tokens';
 import { Txt } from './text';
+import { touchTargetBox } from './touch-target';
 import { fontFamily } from './typography';
 
 /** Palette active selon le mode système (dark par défaut, ADN de la marque). */
@@ -228,6 +229,14 @@ export type FieldProps = TextInputProps & {
   /** Champ obligatoire : un astérisque suit le libellé (`FieldLabel`). */
   required?: boolean;
   style?: StyleProp<ViewStyle>;
+  /** Aide discrète sous le champ (« 8 caractères minimum »). */
+  hint?: string | null;
+  /**
+   * Erreur du champ, écrite SOUS lui en rouge, à la place de l'aide (audit
+   * du 12/10/2026 : plus de bandeau en tête de formulaire qui décale tout).
+   * Le liseré du champ passe au rouge et le lecteur d'écran l'annonce.
+   */
+  error?: string | null;
 };
 
 /** Champ de saisie. Jamais de TextInput natif brut dans les écrans. */
@@ -236,6 +245,8 @@ export function Field({
   required,
   style,
   secureTextEntry,
+  hint,
+  error,
   ...props
 }: FieldProps) {
   const c = useColors();
@@ -267,6 +278,7 @@ export function Field({
             styles.field,
             NO_WEB_OUTLINE,
             fieldSurface(c, neu, focused),
+            !!error && { borderWidth: 1, borderColor: c.danger },
             { color: c.textPrimary },
             isPassword && { paddingRight: 44 },
           ]}
@@ -291,6 +303,14 @@ export function Field({
           </Pressable>
         ) : null}
       </View>
+      {error || hint ? (
+        <Text
+          accessibilityLiveRegion={error ? 'polite' : undefined}
+          style={[styles.fieldNote, { color: error ? c.danger : c.textMuted }]}
+        >
+          {error || hint}
+        </Text>
+      ) : null}
     </View>
   );
 }
@@ -642,17 +662,24 @@ export function FieldIconButton({
         haptic('light');
         onPress();
       }}
-      hitSlop={4}
-      style={({ pressed }) => [
-        styles.composerIcon,
-        accent && { backgroundColor: c.accent },
-        { opacity: disabled ? 0.4 : pressed ? 0.7 : 1 },
-      ]}
+      // Rond de 36 px, zone tactile de 44 : toute la hauteur du champ
+      // (audit du 12/10/2026 — « envoyer » et « partager une salle »).
+      style={touchTargetBox(COMPOSER_ICON)}
     >
-      {loading ? (
-        <ActivityIndicator size="small" color={accent ? c.onAccent : c.accent} />
-      ) : (
-        icon
+      {({ pressed }) => (
+        <View
+          style={[
+            styles.composerIcon,
+            accent && { backgroundColor: c.accent },
+            { opacity: disabled ? 0.4 : pressed ? 0.7 : 1 },
+          ]}
+        >
+          {loading ? (
+            <ActivityIndicator size="small" color={accent ? c.onAccent : c.accent} />
+          ) : (
+            icon
+          )}
+        </View>
       )}
     </Pressable>
   );
@@ -791,6 +818,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   fieldRow: { position: 'relative', justifyContent: 'center' },
+  fieldNote: {
+    fontFamily: fontFamily.bodyMedium,
+    fontSize: 12,
+    paddingHorizontal: spacing['2'],
+  },
   field: {
     minHeight: 48,
     borderRadius: radius.full,

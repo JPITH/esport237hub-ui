@@ -8,7 +8,11 @@ export interface QrFrameProps {
    * `react-native-qrcode-svg` côté natif). Absent = squelette de chargement.
    */
   children?: ReactNode;
-  /** Côté du cadre en pixels (défaut 140). */
+  /**
+   * Côté du cadre en pixels (défaut 140) — un MAXIMUM : le cadre ne dépasse
+   * jamais la largeur de son conteneur (`max-width: 100%`, carré gardé par
+   * `aspect-ratio`). Un QR rogné sur un écran de 360 px ne se scanne pas.
+   */
   size?: number;
   /**
    * Le code a déjà servi : on le grise sans le retirer, pour que le porteur
@@ -44,7 +48,7 @@ export function QrFrame({
     return (
       <div
         className={`ui-skeleton rounded-lg ${className}`.trim()}
-        style={{ width: size, height: size }}
+        style={{ width: size, maxWidth: "100%", aspectRatio: "1 / 1" }}
         aria-label={`${label} — chargement`}
         role="img"
       />
@@ -58,7 +62,7 @@ export function QrFrame({
       className={`grid shrink-0 place-items-center overflow-hidden rounded-lg ${
         used ? "opacity-40 grayscale" : ""
       } ${className}`.trim()}
-      style={{ width: size, height: size }}
+      style={{ width: size, maxWidth: "100%", aspectRatio: "1 / 1" }}
     >
       {children}
     </div>
