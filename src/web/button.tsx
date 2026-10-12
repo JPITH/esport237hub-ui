@@ -1,12 +1,15 @@
 "use client";
 
 import {
+  Children,
   forwardRef,
   type AnchorHTMLAttributes,
   type ButtonHTMLAttributes,
   type ElementType,
   type ReactNode,
 } from "react";
+
+import { widenAmountGaps } from "../lib/money";
 
 type Variant = "primary" | "secondary" | "ghost" | "danger" | "success";
 type Size = "sm" | "md" | "lg";
@@ -18,6 +21,20 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   block?: boolean;
   icon?: ReactNode;
   iconRight?: ReactNode;
+}
+
+/**
+ * Les textes d'un libellé de bouton, montants lisibles : l'espace fine des
+ * milliers de `formatXaf` disparaît dans la police grasse du bouton
+ * (« Payer 1500 FCFA », audit webB-20) ; elle devient une espace insécable
+ * pleine. Les éléments (icônes, `<span>`…) passent tels quels.
+ */
+function labelText(children: ReactNode): ReactNode {
+  if (typeof children === "string") return widenAmountGaps(children);
+  if (!Array.isArray(children)) return children;
+  return Children.map(children, (child) =>
+    typeof child === "string" ? widenAmountGaps(child) : child,
+  );
 }
 
 /** Bouton maison — variantes, tailles, état loading, icônes, micro-press. */
@@ -56,7 +73,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             {icon}
           </span>
         ) : null}
-        {children}
+        {labelText(children)}
         {iconRight && !loading ? (
           <span className="grid place-items-center [&>svg]:size-[18px]">
             {iconRight}
@@ -119,7 +136,7 @@ export const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
             {icon}
           </span>
         ) : null}
-        {children}
+        {labelText(children)}
         {iconRight ? (
           <span className="grid place-items-center [&>svg]:size-[18px]">
             {iconRight}

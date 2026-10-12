@@ -975,6 +975,12 @@
   letter-spacing: 0.18em;
   opacity: 0.75;
 }
+/* Les abrégés de la carte (PAC, LIT…) disent leur sens au survol (audit
+   mobA-13) : une infobulle, sans le pointillé d'un <abbr> par défaut. */
+.pcard abbr[title] {
+  text-decoration: none;
+  cursor: help;
+}
 .pcard__pos {
   margin-top: 4%;
   font-family: var(--e237-font-display);

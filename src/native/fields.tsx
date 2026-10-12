@@ -49,12 +49,23 @@ function useColors(): ColorScale {
  * Le focus reste visible — trait gris de 1 px (`textMuted`, ≥ 3:1 sur la
  * surface, WCAG 1.4.11) en plus du curseur —, mais discret : le vert reste
  * réservé à ce qui se touche (règle de l'accent, DESIGN.md).
+ *
+ * Exportée pour `SelectSheet` (audit UI/UX mobB-38, 12/10/2026) : le
+ * sélecteur de région était un rectangle à bordure entre deux champs en
+ * pilule. Tous les champs ont désormais cette forme.
+ *
+ * Au repos, un liseré `borderStrong` (le « trait affirmé » des champs de
+ * saisie, tokens) : sans lui, un champ posé sur une carte (fond `surface`,
+ * la même couleur que le champ) ne tenait qu'à son ombre intérieure, à
+ * peine lisible en clair, et absente là où le moteur natif ne rend pas
+ * `boxShadow` (revue du 12/10/2026, constat 10). Le trait garde la même
+ * épaisseur au focus : le champ ne bouge plus d'un pixel en prenant la main.
  */
-function fieldSurface(c: ColorScale, neu: ReturnType<typeof useNeu>, focused: boolean) {
+export function fieldSurface(c: ColorScale, neu: ReturnType<typeof useNeu>, focused: boolean) {
   return {
     backgroundColor: c.surface,
-    borderWidth: focused ? 1 : 0,
-    borderColor: focused ? c.textMuted : 'transparent',
+    borderWidth: 1,
+    borderColor: focused ? c.textMuted : c.borderStrong,
     ...neu.pressedSm,
   };
 }

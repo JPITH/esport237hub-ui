@@ -56,6 +56,68 @@ function Clickable({
 }
 
 /* ------------------------------------------------------------------ */
+/* Gabarit commun de l'agenda : évènement ET tournoi                    */
+/* ------------------------------------------------------------------ */
+
+/**
+ * UNE carte pour l'agenda (audit UI/UX du 12/10/2026, webB-21 : deux
+ * gabarits coexistaient — les tournois sans jeu ni pastille de type, les
+ * évènements avec — et la liste se comparait mal). Même squelette pour les
+ * deux : pastilles (type, jeu, disponibilité), titre, à droite le prix ou
+ * l'état, puis la date et le lieu avec leurs icônes, et un détail.
+ */
+function AgendaCardBody({
+  kind,
+  gameName,
+  badges,
+  title,
+  trailing,
+  dateLabel,
+  placeLabel,
+  detail,
+}: {
+  kind: ReactNode;
+  gameName?: string | null;
+  badges?: ReactNode;
+  title: string;
+  trailing: ReactNode;
+  dateLabel?: string | null;
+  placeLabel?: string | null;
+  detail?: string | null;
+}) {
+  return (
+    <Card className="flex flex-col gap-2 transition-colors hover:border-accent">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 flex-col gap-1">
+          <div className="flex flex-wrap items-center gap-2">
+            {kind}
+            {gameName ? <Badge tone="neutral">{gameName}</Badge> : null}
+            {badges}
+          </div>
+          <span className="font-semibold">{title}</span>
+        </div>
+        <span className="shrink-0">{trailing}</span>
+      </div>
+      <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted">
+        {dateLabel ? (
+          <span className="inline-flex items-center gap-1">
+            <Icon name="calendar" size={14} />
+            {dateLabel}
+          </span>
+        ) : null}
+        {placeLabel ? (
+          <span className="inline-flex items-center gap-1">
+            <Icon name="map-pin" size={14} />
+            {placeLabel}
+          </span>
+        ) : null}
+        {detail ? <span>· {detail}</span> : null}
+      </div>
+    </Card>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /* EventCard                                                           */
 /* ------------------------------------------------------------------ */
 
@@ -108,42 +170,30 @@ export function EventCard({
 }: EventCardProps) {
   return (
     <Clickable href={href} onClick={onClick} className={className}>
-      <Card className="flex flex-col gap-2 transition-colors hover:border-accent">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex min-w-0 flex-col gap-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge tone={eventTypeTone(type)}>{eventTypeLabel(type)}</Badge>
-              {gameName ? <Badge tone="neutral">{gameName}</Badge> : null}
-              {availabilityLabel ? (
-                <Badge tone={availabilityTone} size="sm">
-                  {availabilityLabel}
-                </Badge>
-              ) : null}
-            </div>
-            <span className="font-semibold">{title}</span>
-          </div>
+      <AgendaCardBody
+        kind={<Badge tone={eventTypeTone(type)}>{eventTypeLabel(type)}</Badge>}
+        gameName={gameName}
+        badges={
+          availabilityLabel ? (
+            <Badge tone={availabilityTone} size="sm">
+              {availabilityLabel}
+            </Badge>
+          ) : null
+        }
+        title={title}
+        trailing={
           <span
-            className={`shrink-0 text-sm font-bold tabular-nums ${
+            className={`text-sm font-bold tabular-nums ${
               isPaid ? "text-accent" : "text-secondary"
             }`}
           >
             {priceLabel}
           </span>
-        </div>
-        <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted">
-          <span className="inline-flex items-center gap-1">
-            <Icon name="calendar" size={14} />
-            {dateLabel}
-          </span>
-          {placeLabel ? (
-            <span className="inline-flex items-center gap-1">
-              <Icon name="map-pin" size={14} />
-              {placeLabel}
-            </span>
-          ) : null}
-          {capacity ? <span>· {capacity} places</span> : null}
-        </div>
-      </Card>
+        }
+        dateLabel={dateLabel}
+        placeLabel={placeLabel}
+        detail={capacity ? `${capacity} places` : null}
+      />
     </Clickable>
   );
 }
@@ -165,6 +215,8 @@ export interface CompetitionCardProps {
   /** Date de début déjà mise en forme ; absente = non annoncée. */
   dateLabel?: string | null;
   venueName?: string | null;
+  /** Le jeu du tournoi, en pastille comme sur la carte d'un évènement. */
+  gameName?: string | null;
   /** Disponibilité sans chiffre (« Places limitées », « Complet »). */
   availabilityLabel?: string | null;
   availabilityTone?: "warning" | "danger";
@@ -177,7 +229,11 @@ export interface CompetitionCardProps {
   className?: string;
 }
 
-/** Carte d'une compétition en liste — jumelle de l'écran mobile. */
+/**
+ * Carte d'une compétition en liste — le gabarit de l'évènement (webB-21) :
+ * pastille « Tournoi » et jeu, titre, l'état à la place du prix, date, lieu
+ * et format.
+ */
 export function CompetitionCard({
   href,
   onClick,
@@ -188,6 +244,7 @@ export function CompetitionCard({
   city,
   dateLabel,
   venueName,
+  gameName,
   availabilityLabel,
   availabilityTone = "warning",
   inAppLabel,
@@ -195,10 +252,11 @@ export function CompetitionCard({
 }: CompetitionCardProps) {
   return (
     <Clickable href={href} onClick={onClick} className={className}>
-      <Card className="flex flex-col gap-2 transition-colors hover:border-accent">
-        <div className="flex items-center justify-between gap-2">
-          <span className="font-semibold">{title}</span>
-          <span className="flex shrink-0 items-center gap-1.5">
+      <AgendaCardBody
+        kind={<Badge tone={eventTypeTone("tournament")}>{eventTypeLabel("tournament")}</Badge>}
+        gameName={gameName}
+        badges={
+          <>
             {inAppLabel ? (
               <Badge tone="info" size="sm">
                 {inAppLabel}
@@ -209,18 +267,16 @@ export function CompetitionCard({
                 {availabilityLabel}
               </Badge>
             ) : null}
-            <Badge tone={competitionStatusTone(status)}>
-              {competitionStatusLabel(status)}
-            </Badge>
-          </span>
-        </div>
-        <div className="flex flex-wrap gap-2 text-xs text-muted">
-          <span>{competitionFormatLabel(format)}</span>
-          <span>· {isOnline ? "En ligne" : (city ?? "En salle")}</span>
-          {dateLabel ? <span>· {dateLabel}</span> : null}
-          {venueName ? <span>· {venueName}</span> : null}
-        </div>
-      </Card>
+          </>
+        }
+        title={title}
+        trailing={
+          <Badge tone={competitionStatusTone(status)}>{competitionStatusLabel(status)}</Badge>
+        }
+        dateLabel={dateLabel}
+        placeLabel={isOnline ? "En ligne" : [venueName, city].filter(Boolean).join(" · ") || "En salle"}
+        detail={competitionFormatLabel(format)}
+      />
     </Clickable>
   );
 }

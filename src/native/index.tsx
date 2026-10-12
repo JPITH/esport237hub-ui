@@ -369,6 +369,7 @@ export type { OrderStatusBadgeProps } from './order-status-badge';
 export {
   cardStats,
   cityAbbr,
+  cityPlaceLabel,
   gameCategory,
   statValue,
   STAT_DEFS,

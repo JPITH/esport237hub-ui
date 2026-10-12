@@ -10,7 +10,7 @@ import { Icon } from "../icons/generated/web";
 
 import { useDsT } from "../i18n";
 import { cardRecord } from "../lib/game-cards";
-import { cardStats, cityAbbr, type StatDef } from "../lib/player-stats";
+import { cardStatText, cardStats, cityAbbr, cityPlaceLabel, type StatDef } from "../lib/player-stats";
 import { DivisionBadge } from "./division-badge";
 import {
   BUILTIN_SKINS,
@@ -106,6 +106,7 @@ function CardImage({
 function CardBadge({
   ovr,
   cityText,
+  cityTitle,
   country,
   division,
   divisionRank,
@@ -113,6 +114,8 @@ function CardBadge({
 }: {
   ovr: number;
   cityText: string;
+  /** Le lieu en toutes lettres (« Littoral »), dit au survol de l'abrégé. */
+  cityTitle: string;
   country: string;
   division?: string | null;
   divisionRank?: number | null;
@@ -122,7 +125,9 @@ function CardBadge({
     <div className="pcard__badge">
       {/* La note monte en compteur quand elle augmente (duel validé). */}
       <RisingNumber value={ovr} className="pcard__ovr" />
-      <span className="pcard__pos">{cityText}</span>
+      <abbr className="pcard__pos" title={cityTitle}>
+        {cityText}
+      </abbr>
       <span className="pcard__flag">
         <Flag country={country} />
       </span>
@@ -150,6 +155,12 @@ export interface PlayerCardProps {
   stats?: Record<string, number> | null;
   /** Stats configurées par le back-office (prioritaires sur les catégories internes). */
   statDefs?: StatDef[];
+  /**
+   * Carte NEUVE, sans duel joué : les stats s'affichent « — » au lieu de
+   * valeurs dérivées du pseudo (aperçu de l'onboarding, mobA-28). Les cartes
+   * qui ont des stats ne changent pas.
+   */
+  statsPending?: boolean;
   /** Nom de la division (Élite, Challenger…) — sert d'`aria-label` et de repli. */
   division?: string | null;
   /** Rang de la division : affiche « DIV 3 » sous le drapeau. */
@@ -244,6 +255,7 @@ function PlayerCardFront({
   gameName,
   stats,
   statDefs,
+  statsPending = false,
   division,
   divisionRank,
   divisionColor,
@@ -266,6 +278,7 @@ function PlayerCardFront({
       <CardBadge
         ovr={rating}
         cityText={cityAbbr(city)}
+        cityTitle={cityPlaceLabel(city)}
         country={country}
         division={division}
         divisionRank={divisionRank}
@@ -288,9 +301,11 @@ function PlayerCardFront({
 
       <div className="pcard__stats">
         {rows.map((s) => (
-          <div key={s.abbr} className="pcard__stat" title={s.label}>
-            <b>{s.value}</b>
-            <span>{s.abbr}</span>
+          <div key={s.abbr} className="pcard__stat">
+            <b>{cardStatText(s.value, statsPending)}</b>
+            <span>
+              <abbr title={s.label}>{s.abbr}</abbr>
+            </span>
           </div>
         ))}
       </div>
@@ -337,6 +352,7 @@ export function PlayerCardBack({
   gameName,
   stats,
   statDefs,
+  statsPending = false,
   skin = "signature",
   still = false,
 }: Omit<PlayerCardProps, "interactive" | "flippable" | "back">) {
@@ -373,9 +389,9 @@ export function PlayerCardBack({
         {rows.map((row) => (
           <li key={row.abbr} className="pcard__back-row">
             <span className="pcard__back-label">{row.label}</span>
-            <b className="pcard__back-value">{row.value}</b>
+            <b className="pcard__back-value">{cardStatText(row.value, statsPending)}</b>
             <span className="pcard__back-bar" aria-hidden>
-              <i style={{ width: pct(Math.min(1, Math.max(0, row.value / STAT_MAX))) }} />
+              <i style={{ width: statsPending ? 0 : pct(Math.min(1, Math.max(0, row.value / STAT_MAX))) }} />
             </span>
           </li>
         ))}

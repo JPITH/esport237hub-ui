@@ -15,7 +15,7 @@ import { Image, StyleSheet, Text, View } from 'react-native';
 
 import { useDsT } from '../i18n';
 import { cardRecord } from '../lib/game-cards';
-import { cardStats, cityAbbr, type StatDef } from '../lib/player-stats';
+import { cardStatText, cardStats, cityAbbr, cityPlaceLabel, type StatDef } from '../lib/player-stats';
 import {
   CARD_MARK_SIZE,
   FLAG_RADIUS,
@@ -195,6 +195,12 @@ export interface PlayerCardProps {
   stats?: Record<string, number> | null;
   /** Stats configurées par le back-office (prioritaires sur les catégories internes). */
   statDefs?: StatDef[];
+  /**
+   * Carte NEUVE, sans duel joué : les stats s'affichent « — » au lieu de
+   * valeurs dérivées du pseudo (aperçu de l'onboarding, mobA-28). Les cartes
+   * qui ont des stats ne changent pas.
+   */
+  statsPending?: boolean;
   /** Nom de la division (Élite, Challenger…) — `accessibilityLabel` et repli. */
   division?: string | null;
   /** Rang de la division : affiche « DIV 3 » sous le drapeau. */
@@ -294,6 +300,7 @@ function PlayerCardBody({
   gameName,
   stats,
   statDefs,
+  statsPending = false,
   division,
   divisionRank,
   divisionColor,
@@ -321,7 +328,10 @@ function PlayerCardBody({
           color={spec.ink}
           style={s.ovrBox}
         />
-        <Text style={[s.pos, { color: spec.ink }]}>{cityAbbr(city)}</Text>
+        {/* L'abrégé se dit en toutes lettres au lecteur d'écran (mobA-13). */}
+        <Text style={[s.pos, { color: spec.ink }]} accessibilityLabel={cityPlaceLabel(city)}>
+          {cityAbbr(city)}
+        </Text>
         <View style={s.flag}>
           <Flag country={country} />
         </View>
@@ -357,13 +367,17 @@ function PlayerCardBody({
         {rows.map((row, i) => (
           <View
             key={row.abbr}
+            accessible
+            accessibilityLabel={`${row.label} ${cardStatText(row.value, statsPending)}`}
             style={[
               s.stat,
               i % 2 === 0
                 ? [s.statLeft, { borderRightColor: spec.line }]
                 : s.statRight,
             ]}>
-            <Text style={[s.statValue, { color: spec.ink }]}>{row.value}</Text>
+            <Text style={[s.statValue, { color: spec.ink }]}>
+              {cardStatText(row.value, statsPending)}
+            </Text>
             <Text style={[s.statAbbr, { color: spec.ink }]}>{row.abbr}</Text>
           </View>
         ))}
@@ -565,6 +579,8 @@ export interface PlayerCardBackProps {
   gameName?: string;
   stats?: Record<string, number> | null;
   statDefs?: StatDef[];
+  /** Carte neuve : stats « — » (voir `PlayerCardProps.statsPending`). */
+  statsPending?: boolean;
   skin?: CardSkinInput;
   /** Signe du pied immobile (voir `PlayerCardProps.still`). */
   still?: boolean;
@@ -595,6 +611,7 @@ export function PlayerCardBackBody({
   gameName,
   stats,
   statDefs,
+  statsPending = false,
   skin = 'signature',
   still = false,
 }: PlayerCardBackProps) {
@@ -636,13 +653,17 @@ export function PlayerCardBackBody({
 
       <View style={s.stats}>
         {rows.map((row) => (
-          <View key={row.abbr} style={s.row} accessible accessibilityLabel={`${row.label} ${row.value}`}>
+          <View
+            key={row.abbr}
+            style={s.row}
+            accessible
+            accessibilityLabel={`${row.label} ${cardStatText(row.value, statsPending)}`}>
             <View style={s.rowHead}>
               <Txt color={spec.ink} numberOfLines={1} style={s.rowLabel}>
                 {row.label}
               </Txt>
               <Txt color={spec.ink} style={s.rowValue}>
-                {row.value}
+                {cardStatText(row.value, statsPending)}
               </Txt>
             </View>
             <View style={[s.track, { backgroundColor: spec.line }]}>
@@ -650,7 +671,7 @@ export function PlayerCardBackBody({
                 style={[
                   s.fill,
                   {
-                    width: pct(Math.min(1, Math.max(0, row.value / STAT_MAX))),
+                    width: statsPending ? 0 : pct(Math.min(1, Math.max(0, row.value / STAT_MAX))),
                     backgroundColor: spec.accent,
                   },
                 ]}

@@ -73,3 +73,17 @@ export function formatXafCompact(
 export function priceOrFreeLabel(amountXaf: number | null | undefined): string {
   return amountXaf && amountXaf > 0 ? formatXaf(amountXaf) : 'Gratuit';
 }
+
+/**
+ * Un montant lisible DANS UN BOUTON : l'espace fine des milliers (U+202F)
+ * devient une espace insécable pleine (U+00A0).
+ *
+ * Dans la police des boutons (Space Grotesk, graisse 600), l'espace fine ne
+ * fait que 2 px : « Payer 1 500 FCFA » se lisait « Payer 1500 FCFA » (audit
+ * UI/UX du 12/10/2026, webB-20). Ailleurs, la règle typographique reste
+ * `formatXaf` ; seul le libellé d'un bouton, court et sur une ligne, prend
+ * l'espace pleine — toujours insécable : le montant ne se coupe pas.
+ */
+export function widenAmountGaps(text: string): string {
+  return text.replaceAll(THIN, NBSP);
+}

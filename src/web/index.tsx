@@ -434,6 +434,7 @@ export type { GlobalSearchProps, GlobalSearchItem } from './global-search';
 export {
   cardStats,
   cityAbbr,
+  cityPlaceLabel,
   gameCategory,
   statValue,
   STAT_DEFS,

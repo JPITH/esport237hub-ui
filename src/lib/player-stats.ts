@@ -128,6 +128,18 @@ export function cardStats(input: {
   }));
 }
 
+/**
+ * Le texte d'une stat sur la carte. `pending` : carte NEUVE, sans duel joué.
+ * Les valeurs seraient alors dérivées du pseudo (`statValue`) et changeraient
+ * à chaque lettre tapée, sans rapport avec la région ou le niveau choisis :
+ * l'onboarding mobile promettait « ta carte se construit à chaque choix » et
+ * montrait des notes au hasard (audit du 12/10/2026, mobA-28). Neutre, « — »,
+ * jusqu'au premier duel.
+ */
+export function cardStatText(value: number, pending = false): string {
+  return pending ? "—" : String(value);
+}
+
 const CITY_ABBR: Record<string, string> = {
   douala: "DLA",
   yaounde: "YDE",
@@ -144,6 +156,15 @@ const CITY_ABBR: Record<string, string> = {
   limbe: "LMB",
   limbé: "LMB",
 };
+
+/**
+ * Le lieu en toutes lettres derrière l'abrégé de la carte (« LIT » →
+ * « Littoral », « CMR » → « Cameroun ») : l'infobulle et l'étiquette
+ * accessible de l'abrégé (audit mobA-13).
+ */
+export function cityPlaceLabel(city: string | null | undefined): string {
+  return city?.trim() || "Cameroun";
+}
 
 /** Abrégé 3 lettres de la ville (remplace le « poste » sur la carte). */
 export function cityAbbr(city: string | null | undefined): string {

@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from 'bun:test';
 
-import { formatXaf, formatXafCompact, priceOrFreeLabel } from './money';
+import { formatXaf, formatXafCompact, priceOrFreeLabel, widenAmountGaps } from './money';
 
 /** Espace fine insécable (milliers) et espace insécable (unité). */
 const THIN = String.fromCharCode(0x202f);
@@ -99,5 +99,17 @@ describe('priceOrFreeLabel', () => {
     expect(priceOrFreeLabel(0)).toBe('Gratuit');
     expect(priceOrFreeLabel(null)).toBe('Gratuit');
     expect(priceOrFreeLabel(2000)).toBe(`2${THIN}000${NBSP}FCFA`);
+  });
+});
+
+describe('widenAmountGaps — montant lisible dans un bouton', () => {
+  it('remplace l’espace fine des milliers par une espace insécable pleine', () => {
+    expect(widenAmountGaps(`Payer ${formatXaf(1500)}`)).toBe(`Payer 1${NBSP}500${NBSP}FCFA`);
+    expect(widenAmountGaps(formatXaf(2_000_000))).toBe(`2${NBSP}000${NBSP}000${NBSP}FCFA`);
+  });
+
+  it('reste insécable et ne touche pas au reste du texte', () => {
+    expect(widenAmountGaps(`Acheter · ${formatXaf(18_000)}`)).toBe(`Acheter · 18${NBSP}000${NBSP}FCFA`);
+    expect(widenAmountGaps('Recharger')).toBe('Recharger');
   });
 });

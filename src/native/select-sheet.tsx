@@ -2,7 +2,8 @@ import { radius, spacing, useE237Colors } from './core';
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { FieldLabel, requiredFieldLabel } from './fields';
+import { FieldLabel, fieldSurface, requiredFieldLabel } from './fields';
+import { useNeu } from './neu';
 import { Sheet } from './sheet';
 import { Txt } from './text';
 import { useDsT } from '../i18n';
@@ -39,6 +40,7 @@ export function SelectSheet({
   onChange: (value: string) => void;
 }) {
   const c = useE237Colors();
+  const neu = useNeu();
   const t = useDsT();
   const [open, setOpen] = useState(false);
   const selected = options.find((o) => o.value === value) ?? null;
@@ -51,7 +53,9 @@ export function SelectSheet({
         accessibilityRole="button"
         accessibilityLabel={requiredFieldLabel(t, label, required)}
         onPress={() => setOpen(true)}
-        style={[styles.trigger, { backgroundColor: c.surface, borderColor: c.border }]}>
+        // La forme des autres champs (pilule en creux, `fieldSurface`) : un
+        // formulaire n'a qu'une forme de champ (mobB-38).
+        style={[styles.trigger, fieldSurface(c, neu, open)]}>
         <Txt
           numberOfLines={1}
           variant="body"
@@ -103,13 +107,13 @@ export function SelectSheet({
 
 const styles = StyleSheet.create({
   trigger: {
-    minHeight: 44,
+    minHeight: 48,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing['2'],
-    borderWidth: 1,
-    borderRadius: radius.md,
-    paddingHorizontal: spacing['3'],
+    borderRadius: radius.full,
+    borderCurve: 'continuous',
+    paddingHorizontal: spacing['4'],
   },
   option: {
     minHeight: 48,

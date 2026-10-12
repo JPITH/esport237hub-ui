@@ -50,6 +50,71 @@ function Clickable({
 }
 
 /* ------------------------------------------------------------------ */
+/* Gabarit commun de l'agenda : évènement ET tournoi                    */
+/* ------------------------------------------------------------------ */
+
+/**
+ * UNE carte pour l'agenda (audit UI/UX du 12/10/2026, webB-21) — jumelle du
+ * web : pastilles (type, jeu, disponibilité), titre, à droite le prix ou
+ * l'état, puis la date et le lieu avec leurs icônes, et un détail.
+ */
+function AgendaCardBody({
+  kind,
+  gameName,
+  badges,
+  title,
+  trailing,
+  dateLabel,
+  placeLabel,
+  detail,
+}: {
+  kind: ReactNode;
+  gameName?: string | null;
+  badges?: ReactNode;
+  title: string;
+  trailing: ReactNode;
+  dateLabel?: string | null;
+  placeLabel?: string | null;
+  detail?: string | null;
+}) {
+  const c = useE237Colors();
+  return (
+    <Card style={styles.stack}>
+      <View style={styles.headRow}>
+        <View style={styles.headMain}>
+          <View style={styles.badges}>
+            {kind}
+            {gameName ? <Badge tone="neutral">{gameName}</Badge> : null}
+            {badges}
+          </View>
+          <Txt variant="label">{title}</Txt>
+        </View>
+        {trailing}
+      </View>
+      <View style={styles.metaRow}>
+        {dateLabel ? (
+          <View style={styles.metaItem}>
+            <Icon name="calendar" color={c.textMuted} size={14} />
+            <Txt variant="caption" tone="muted">{dateLabel}</Txt>
+          </View>
+        ) : null}
+        {placeLabel ? (
+          <View style={styles.metaItem}>
+            <Icon name="map-pin" color={c.textMuted} size={14} />
+            <Txt variant="caption" tone="muted">{placeLabel}</Txt>
+          </View>
+        ) : null}
+        {detail ? (
+          <Txt variant="caption" tone="muted">
+            · {detail}
+          </Txt>
+        ) : null}
+      </View>
+    </Card>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /* EventCard                                                           */
 /* ------------------------------------------------------------------ */
 
@@ -88,45 +153,28 @@ export function EventCard({
   availabilityTone = 'warning',
   style,
 }: EventCardProps) {
-  const c = useE237Colors();
   return (
     <Clickable onPress={onPress} style={style}>
-      <Card style={styles.stack}>
-        <View style={styles.headRow}>
-          <View style={styles.headMain}>
-            <View style={styles.badges}>
-              <Badge tone={eventTypeTone(type)}>{eventTypeLabel(type)}</Badge>
-              {gameName ? <Badge tone="neutral">{gameName}</Badge> : null}
-              {availabilityLabel ? (
-                <Badge tone={availabilityTone} size="sm">
-                  {availabilityLabel}
-                </Badge>
-              ) : null}
-            </View>
-            <Txt variant="label">{title}</Txt>
-          </View>
+      <AgendaCardBody
+        kind={<Badge tone={eventTypeTone(type)}>{eventTypeLabel(type)}</Badge>}
+        gameName={gameName}
+        badges={
+          availabilityLabel ? (
+            <Badge tone={availabilityTone} size="sm">
+              {availabilityLabel}
+            </Badge>
+          ) : null
+        }
+        title={title}
+        trailing={
           <Txt variant="bodyBold" tone={isPaid ? 'accent' : 'secondary'}>
             {priceLabel}
           </Txt>
-        </View>
-        <View style={styles.metaRow}>
-          <View style={styles.metaItem}>
-            <Icon name="calendar" color={c.textMuted} size={14} />
-            <Txt variant="caption" tone="muted">{dateLabel}</Txt>
-          </View>
-          {placeLabel ? (
-            <View style={styles.metaItem}>
-              <Icon name="map-pin" color={c.textMuted} size={14} />
-              <Txt variant="caption" tone="muted">{placeLabel}</Txt>
-            </View>
-          ) : null}
-          {capacity ? (
-            <Txt variant="caption" tone="muted">
-              · {capacity} places
-            </Txt>
-          ) : null}
-        </View>
-      </Card>
+        }
+        dateLabel={dateLabel}
+        placeLabel={placeLabel}
+        detail={capacity ? `${capacity} places` : null}
+      />
     </Clickable>
   );
 }
@@ -147,12 +195,21 @@ export interface CompetitionCardProps {
   /** Date de début déjà mise en forme ; absente = non annoncée. */
   dateLabel?: string | null;
   venueName?: string | null;
+  /** Le jeu du tournoi, en pastille comme sur la carte d'un évènement. */
+  gameName?: string | null;
   /** Disponibilité sans chiffre (« Places limitées », « Complet »). */
   availabilityLabel?: string | null;
   availabilityTone?: 'warning' | 'danger';
+  /** Tournoi d'un jeu joué DANS l'app : « En ligne · dans l'app ». */
+  inAppLabel?: string | null;
   style?: StyleProp<ViewStyle>;
 }
 
+/**
+ * Carte d'une compétition en liste — le gabarit de l'évènement (webB-21) :
+ * pastille « Tournoi » et jeu, titre, l'état à la place du prix, date, lieu
+ * et format.
+ */
 export function CompetitionCard({
   onPress,
   title,
@@ -162,37 +219,39 @@ export function CompetitionCard({
   city,
   dateLabel,
   venueName,
+  gameName,
   availabilityLabel,
   availabilityTone = 'warning',
+  inAppLabel,
   style,
 }: CompetitionCardProps) {
-  const parts = [
-    competitionFormatLabel(format),
-    isOnline ? 'En ligne' : (city ?? 'En salle'),
-    dateLabel ?? null,
-    venueName ?? null,
-  ].filter(Boolean) as string[];
-
   return (
     <Clickable onPress={onPress} style={style}>
-      <Card style={styles.stack}>
-        <View style={styles.headRow}>
-          <Txt variant="label" style={styles.grow}>
-            {title}
-          </Txt>
-          {availabilityLabel ? (
-            <Badge tone={availabilityTone} size="sm">
-              {availabilityLabel}
-            </Badge>
-          ) : null}
-          <Badge tone={competitionStatusTone(status)}>
-            {competitionStatusLabel(status)}
-          </Badge>
-        </View>
-        <Txt variant="caption" tone="muted">
-          {parts.join(' · ')}
-        </Txt>
-      </Card>
+      <AgendaCardBody
+        kind={<Badge tone={eventTypeTone('tournament')}>{eventTypeLabel('tournament')}</Badge>}
+        gameName={gameName}
+        badges={
+          <>
+            {inAppLabel ? (
+              <Badge tone="info" size="sm">
+                {inAppLabel}
+              </Badge>
+            ) : null}
+            {availabilityLabel ? (
+              <Badge tone={availabilityTone} size="sm">
+                {availabilityLabel}
+              </Badge>
+            ) : null}
+          </>
+        }
+        title={title}
+        trailing={
+          <Badge tone={competitionStatusTone(status)}>{competitionStatusLabel(status)}</Badge>
+        }
+        dateLabel={dateLabel}
+        placeLabel={isOnline ? 'En ligne' : [venueName, city].filter(Boolean).join(' · ') || 'En salle'}
+        detail={competitionFormatLabel(format)}
+      />
     </Clickable>
   );
 }

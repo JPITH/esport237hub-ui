@@ -29,6 +29,7 @@ import {
   type ThemeMode,
 } from '../tokens';
 import type { Tone } from '../lib/tone';
+import { widenAmountGaps } from '../lib/money';
 import { haptic } from './haptics';
 import { useNeu } from './neu';
 import { fontFamily } from './typography';
@@ -160,8 +161,9 @@ export function Button({
         </View>
       ) : null}
       {!loading && icon ? icon : null}
+      {/* Montant lisible : espace pleine insécable à la place de l'espace fine (webB-20). */}
       <Text style={[...labelStyle, loading && styles.btnLabelHidden]}>
-        {label}
+        {widenAmountGaps(label)}
       </Text>
       {!loading && iconRight ? iconRight : null}
     </Pressable>
