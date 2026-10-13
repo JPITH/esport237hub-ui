@@ -244,9 +244,14 @@ export function Table<T>({
       {table}
       <ul className={`flex flex-col gap-2 sm:hidden ${className}`}>
         {selection && rows.length > 0 ? (
-          <li className="flex min-h-11 items-center gap-3 px-3 text-sm text-secondary">
+          // Tout le libellé coche (contre-visite du 13/10/2026) : la case arrête
+          // son propre clic, le texte le relaie — pas de double bascule.
+          <li
+            className="flex min-h-11 w-fit cursor-pointer select-none items-center gap-3 px-3 text-sm text-secondary"
+            onClick={() => selection.onToggleAll()}
+          >
             {allBox}
-            <span>{t("form.table.selectAll")}</span>
+            <span aria-hidden>{t("form.table.selectAll")}</span>
           </li>
         ) : null}
         {rows.length === 0 ? (

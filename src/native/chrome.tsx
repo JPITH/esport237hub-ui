@@ -787,7 +787,10 @@ const styles = StyleSheet.create({
   balance: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing['1'],
+    // Entre la zone du solde et celle du « + » (44 px chacune, débordant
+    // leur visuel) : 16 px de visuel laissent ~7 px entre les deux zones —
+    // avec 4 px, elles se chevauchaient de 5 px (contre-visite du 13/10/2026).
+    gap: spacing['4'],
     height: BALANCE_HEIGHT,
     paddingLeft: 4,
     paddingRight: 4,
