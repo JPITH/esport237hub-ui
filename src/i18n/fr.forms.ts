@@ -75,6 +75,8 @@ export const frForms = {
 
   // Table (web/table.tsx)
   'form.table.empty': 'Aucune donnée.',
+  'form.table.selectAll': 'Tout sélectionner',
+  'form.table.selectRow': 'Sélectionner {label}',
 
   // GlobalSearch (web/global-search.tsx)
   'form.search.placeholder': 'Rechercher joueurs, duels, jeux, salles…',

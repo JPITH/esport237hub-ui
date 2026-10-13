@@ -81,8 +81,8 @@ export { BrandIcon, BRAND_ICON_PATHS } from './brand-icons';
 export type { BrandIconName, BrandIconProps } from './brand-icons';
 
 export { Flag, CameroonFlag } from './flag';
-export { Table } from './table';
-export type { Column, TableProps } from './table';
+export { SelectionBox, Table } from './table';
+export type { Column, TableProps, TableSelection } from './table';
 
 export { Tabs, FilterChip, Tooltip, Pagination } from './nav';
 export { Switch } from './switch';

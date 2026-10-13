@@ -61,6 +61,8 @@ export const enForms: Record<keyof typeof frForms, string> = {
   'form.stepper.navLabel': 'Steps',
 
   'form.table.empty': 'No data.',
+  'form.table.selectAll': 'Select all',
+  'form.table.selectRow': 'Select {label}',
 
   'form.search.placeholder': 'Search players, duels, games, venues…',
   'form.search.dialogLabel': 'Search',
