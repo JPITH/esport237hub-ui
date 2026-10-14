@@ -483,6 +483,12 @@ export interface SubscriptionCardProps {
   city?: string | null;
   pricePaidXaf: number;
   perks?: readonly string[] | null;
+  /**
+   * Actions et détails propres à l'écran (séances, « Voir la salle »),
+   * posés DANS la carte sous un trait fin : des liens flottant entre deux
+   * cartes ne disaient pas à laquelle ils appartenaient (porteur, 14/10/2026).
+   */
+  children?: ReactNode;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -496,6 +502,7 @@ export function SubscriptionCard({
   city,
   pricePaidXaf,
   perks,
+  children,
   style,
 }: SubscriptionCardProps) {
   const c = useE237Colors();
@@ -538,6 +545,10 @@ export function SubscriptionCard({
       </View>
 
       <PerkList items={perks} />
+
+      {children ? (
+        <View style={[styles.cardFooter, { borderTopColor: c.border }]}>{children}</View>
+      ) : null}
     </Card>
   );
 }
@@ -680,6 +691,11 @@ export function VenueCard({
 }
 
 const styles = StyleSheet.create({
+  cardFooter: {
+    gap: spacing['2'],
+    paddingTop: spacing['3'],
+    borderTopWidth: StyleSheet.hairlineWidth,
+  },
   venueMedia: { position: 'relative' },
   rankPill: {
     position: 'absolute',
