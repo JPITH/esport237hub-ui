@@ -4,6 +4,8 @@
  */
 import { useEffect, useState, type ComponentType, type ReactNode } from 'react';
 import {
+  Animated as RNAnimated,
+  Easing as RNEasing,
   Image,
   Pressable,
   StyleSheet,
@@ -11,14 +13,7 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import Animated, {
-  Easing,
-  cancelAnimation,
-  makeMutable,
-  useAnimatedStyle,
-  withRepeat,
-  withTiming,
-} from 'react-native-reanimated';
+import Animated, { Easing, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
@@ -33,7 +28,6 @@ import {
 import { dsLocale, useDsT } from '../i18n';
 import { initials } from '../lib/initials';
 import { haptic } from './haptics';
-import { useMountedGate } from './mounted-gate';
 import { ScrollView, type ScrollIndicatorInsets } from './scroll';
 import { Txt } from './text';
 import { Icon } from '../icons/generated/native';
@@ -176,25 +170,37 @@ const SHIMMER_DURATION = 1400;
  * Horloge unique : 0 → 1 en boucle, partagée par tous les squelettes montés.
  * Un compteur de montages évite qu'un écran qui se démonte laisse tourner une
  * animation pour personne (batterie, cas typique d'un onglet quitté).
+ *
+ * PAS Reanimated, ici (diagnostic ANR du 14/10/2026, émulateur EAS) : un
+ * squelette vit pour être DÉMONTÉ — par paquets, à l'instant où les données
+ * arrivent (quatorze d'un coup sur la Boutique). Reanimated continuait de
+ * pousser le balayage vers ces vues retirées ; chaque échec écrivait une pile
+ * Java sur le fil principal, vingt secondes durant, et Android finissait par
+ * afficher « G-HUB ne répond pas ». L'`Animated` de React Native, en pilote
+ * natif, détache ses nœuds avec la vue : le balayage s'arrête avec elle.
  */
-const shimmerClock = makeMutable(0);
+const shimmerClock = new RNAnimated.Value(0);
+const shimmerLoop = RNAnimated.loop(
+  RNAnimated.timing(shimmerClock, {
+    toValue: 1,
+    duration: SHIMMER_DURATION,
+    easing: RNEasing.linear,
+    useNativeDriver: true,
+  }),
+);
 let shimmerMounts = 0;
 
 function retainShimmerClock(): () => void {
   shimmerMounts += 1;
   if (shimmerMounts === 1) {
-    shimmerClock.value = 0;
-    shimmerClock.value = withRepeat(
-      withTiming(1, { duration: SHIMMER_DURATION, easing: Easing.linear }),
-      -1,
-      false,
-    );
+    shimmerClock.setValue(0);
+    shimmerLoop.start();
   }
   return () => {
     shimmerMounts -= 1;
     if (shimmerMounts === 0) {
-      cancelAnimation(shimmerClock);
-      shimmerClock.value = 0;
+      shimmerLoop.stop();
+      shimmerClock.setValue(0);
     }
   };
 }
@@ -206,12 +212,11 @@ export function Skeleton({ height = 64 }: { height?: number }) {
   const [width, setWidth] = useState(0);
 
   useEffect(retainShimmerClock, []);
-  // La bande ne suit l'horloge qu'une fois montée (voir `mounted-gate`).
-  const { ready, onLayout } = useMountedGate();
 
-  const bandStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: ready.value ? -width + shimmerClock.value * 2 * width : -width }],
-  }));
+  const translateX = shimmerClock.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-width, width],
+  });
 
   // Le dégradé SVG remplacé par trois bandes de la même encre, d'opacité
   // croissante puis décroissante : à 7 % sur fond de surface, l'œil ne fait
@@ -230,9 +235,8 @@ export function Skeleton({ height = 64 }: { height?: number }) {
       }}
     >
       {width > 0 ? (
-        <Animated.View
+        <RNAnimated.View
           pointerEvents="none"
-          onLayout={onLayout}
           style={[
             {
               position: 'absolute',
@@ -241,13 +245,13 @@ export function Skeleton({ height = 64 }: { height?: number }) {
               flexDirection: 'row',
               width: width * 0.6,
             },
-            bandStyle,
+            { transform: [{ translateX }] },
           ]}
         >
           <View style={{ flex: 1, backgroundColor: bandSoft }} />
           <View style={{ flex: 1, backgroundColor: band }} />
           <View style={{ flex: 1, backgroundColor: bandSoft }} />
-        </Animated.View>
+        </RNAnimated.View>
       ) : null}
     </View>
   );
