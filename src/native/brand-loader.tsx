@@ -15,7 +15,7 @@
  * « Réduire les animations » : le signe complet, immobile. Le lecteur
  * d'écran entend « Chargement de G-HUB… ».
  */
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import Animated, {
   Easing,
@@ -68,8 +68,11 @@ export function BrandLoader({ size = 72, label, mode, style }: BrandLoaderProps)
   const t = useDsT();
   const reduced = useReducedMotion();
   const clock = useSharedValue(reduced ? 0.7 : 0);
-
+  // La boucle ne démarre qu'une fois le signe monté (voir `mounted-gate`) :
+  // lancée au montage, elle visait des vues qu'Android n'avait pas encore.
+  const [mounted, setMounted] = useState(false);
   useEffect(() => {
+    if (!mounted) return;
     if (reduced) {
       cancelAnimation(clock);
       // 0,7 : l'instant du cycle où le signe est complet et immobile.
@@ -83,7 +86,7 @@ export function BrandLoader({ size = 72, label, mode, style }: BrandLoaderProps)
       false,
     );
     return () => cancelAnimation(clock);
-  }, [clock, reduced]);
+  }, [clock, reduced, mounted]);
 
   const ringProps = useAnimatedProps(() => {
     const v = clock.value;
@@ -137,6 +140,9 @@ export function BrandLoader({ size = 72, label, mode, style }: BrandLoaderProps)
       accessibilityRole="progressbar"
       accessibilityLabel={label ?? t('ui.loader.label')}
       style={[{ width: size, height: size }, style]}
+      onLayout={() => {
+        if (!mounted) setTimeout(() => setMounted(true), 120);
+      }}
     >
       <Animated.View style={[StyleSheet.absoluteFill, breathe]}>
         <Svg viewBox={MARK_VIEW_BOX} width={size} height={size}>

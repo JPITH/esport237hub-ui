@@ -46,6 +46,7 @@ import {
 } from '../lib/brand-mark';
 import { CARD_MARK_CYCLE_MS, CARD_MARK_GLINT, glintTravel } from '../lib/brand-motion';
 import { BRAND_NAME } from '../lib/brand-name';
+import { useMountedGate } from './mounted-gate';
 import { cardMarkInks } from '../skins/geometry';
 import type { SkinSpec } from '../skins/spec';
 
@@ -114,18 +115,23 @@ function MarkGlint({ size, solid, color }: { size: number; solid: boolean; color
   /* La bande part d'un côté de signe à gauche du centre et finit d'un côté à
      droite : hors du signe aux deux bouts (comme le masque du web). */
   const reach = size;
+  // Pas de reflet avant que les fentes soient montées (voir `mounted-gate`).
+  const { ready, onLayout } = useMountedGate();
   const slitStyle = useAnimatedStyle(() => {
-    const x = -reach + 2 * reach * glintTravel(glintClock.value);
+    const x = ready.value ? -reach + 2 * reach * glintTravel(glintClock.value) : -reach;
     return { transform: [{ translateX: x }, { rotate: ANGLE }] };
   });
   const counterStyle = useAnimatedStyle(() => {
-    const x = -reach + 2 * reach * glintTravel(glintClock.value);
+    const x = ready.value ? -reach + 2 * reach * glintTravel(glintClock.value) : -reach;
     return { transform: [{ rotate: COUNTER_ANGLE }, { translateX: -x }] };
   });
 
   const height = size * SLIT_HEIGHT;
   return (
-    <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, width: size, height: size }}>
+    <View
+      pointerEvents="none"
+      onLayout={onLayout}
+      style={{ position: 'absolute', top: 0, left: 0, width: size, height: size }}>
       {SLITS.map((slit) => {
         const width = size * slit.width;
         return (

@@ -60,6 +60,7 @@ import {
   type SkinSpec,
 } from '../skins/spec';
 import { useSkin } from '../skins/context';
+import { useMountedGate } from './mounted-gate';
 
 /**
  * Familles display chargées par l'app (Space Grotesk + Chivo — comme le web).
@@ -130,6 +131,8 @@ function Sheen({ sheen, width }: { sheen: DrawSheen; width: number }) {
   const from = sheen.from * scale;
   const to = sheen.to * scale;
   const x = useSharedValue(from);
+  // La boucle attend que la bande soit montée (voir `mounted-gate`).
+  const { ready, onLayout } = useMountedGate();
   /* Un id par instance : sur le web, les ids SVG sont globaux au document et
      deux cartes premium de skins différents prendraient le même dégradé. */
   const gradientId = `pcs${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
@@ -153,13 +156,16 @@ function Sheen({ sheen, width }: { sheen: DrawSheen; width: number }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [from, to, scale, sheen.holdMs, sheen.travelMs]);
 
-  const style = useAnimatedStyle(() => ({ transform: [{ translateX: x.value }] }));
+  const style = useAnimatedStyle(() => ({
+    transform: [{ translateX: ready.value ? x.value : from }],
+  }));
 
   if (scale === 0) return null;
 
   const band = (
     <Animated.View
       pointerEvents="none"
+      onLayout={onLayout}
       style={[
         /* Confiné à la zone utile du bouclier (évite de peindre les coins
            transparents des crans). */

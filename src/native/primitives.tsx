@@ -33,6 +33,7 @@ import {
 import { dsLocale, useDsT } from '../i18n';
 import { initials } from '../lib/initials';
 import { haptic } from './haptics';
+import { useMountedGate } from './mounted-gate';
 import { ScrollView, type ScrollIndicatorInsets } from './scroll';
 import { Txt } from './text';
 import { Icon } from '../icons/generated/native';
@@ -205,9 +206,11 @@ export function Skeleton({ height = 64 }: { height?: number }) {
   const [width, setWidth] = useState(0);
 
   useEffect(retainShimmerClock, []);
+  // La bande ne suit l'horloge qu'une fois montée (voir `mounted-gate`).
+  const { ready, onLayout } = useMountedGate();
 
   const bandStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: -width + shimmerClock.value * 2 * width }],
+    transform: [{ translateX: ready.value ? -width + shimmerClock.value * 2 * width : -width }],
   }));
 
   // Le dégradé SVG remplacé par trois bandes de la même encre, d'opacité
@@ -229,6 +232,7 @@ export function Skeleton({ height = 64 }: { height?: number }) {
       {width > 0 ? (
         <Animated.View
           pointerEvents="none"
+          onLayout={onLayout}
           style={[
             {
               position: 'absolute',
