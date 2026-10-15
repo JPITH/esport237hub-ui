@@ -137,7 +137,9 @@ Quel composant pour quel besoin :
 | Alerte en haut de page, fermable | `AlertBanner` dans `PageAlerts` | `Notice` |
 | Profil et réglages (navigation + section) | `SettingsLayout`, `SettingsSection`, `SettingsRow` | `SettingsList` (`./native/expo`) |
 | Liste à chevrons (raccourcis, sections) | `NavGroup` + `NavItem` | `NavGroup` + `NavItem` |
-| Vide, erreur, chargement | `EmptyState`, `ErrorNote` / `Notice`, `Skeleton` / `Spinner` | idem |
+| Vide, erreur, chargement | `EmptyState` (`action`), `ErrorNote` (`onRetry`) / `LoadError` / `Notice`, `Skeleton` / `Spinner` (jamais dans un `Button` : `loading`) | idem (`action.onPress`) |
+| Confirmer un geste réussi (« Annuler » 10 s) | `showToast` + `<ToastHost />` monté une fois | `showToast` + `<ToastHost />` |
+| Confirmer un geste lourd (question, conséquence, « Garder… », erreur dedans) | `ConfirmDialog` | `Dialog` |
 | Tableau, pagination | `Table`, `Pagination` | `ListRow` |
 | Boutons | `Button` (`ghost` pour une action secondaire), `ButtonLink` (un lien du routeur qui a l'air d'un bouton), `LinkButton` (`<a>`, ou `as`), `IconButton` | `Button`, `IconButton`, `PillButton` |
 | Champs | `Input`, `Select` (prop `label`), `SearchField`, `NumberInput`, `DatePicker` | `Field`, `SelectSheet`, `DateField` |

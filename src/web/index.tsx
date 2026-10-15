@@ -193,6 +193,7 @@ export {
   Skeleton,
   EmptyState,
   ErrorNote,
+  LoadError,
   VerifiedMark,
   Avatar,
   AvatarGroup,
@@ -200,11 +201,25 @@ export {
   formatDate,
 } from './primitives';
 export type {
+  AppDateStyle,
   AvatarProps,
   AvatarGroupProps,
   AvatarPerson,
   AvatarSize,
+  EmptyStateProps,
+  ErrorNoteProps,
+  LoadErrorProps,
+  StateAction,
 } from './primitives';
+
+/*
+ * États des gestes (audit web du 15/10/2026) : le bandeau de confirmation
+ * global (même API que le natif) et la confirmation d'un geste lourd.
+ */
+export { Toast, ToastHost, currentToast, hideToast, showToast } from './toast';
+export type { ToastAction, ToastExtra, ToastState } from './toast';
+export { ConfirmDialog } from './confirm-dialog';
+export type { ConfirmDialogProps } from './confirm-dialog';
 
 export {
   Input,

@@ -99,6 +99,40 @@ export function withDismissed(
 }
 
 /**
+ * Une alerte est-elle MÉMORISÉE fermée par défaut ? Pas une erreur (audit
+ * web du 15/10/2026, WA1) : « Validation impossible » fermé une fois, même
+ * identifiant, même texte, ne s'affichait plus jamais, y compris pour un
+ * nouvel échec le lendemain. Une erreur est une OCCURRENCE, pas un avis
+ * durable : sa croix vaut pour l'écran, pas pour toujours.
+ */
+export function rememberAlertByDefault(tone: string): boolean {
+  return tone !== 'danger';
+}
+
+/**
+ * L'alerte s'affiche-t-elle ?
+ * - non fermable : toujours ;
+ * - mémorisée (`remember`) : sauf si CE contenu a été fermé (et pas tant que
+ *   la mémoire est inconnue, pendant l'hydratation : rien ne clignote) ;
+ * - occurrence (`remember` faux) : sauf si elle vient d'être fermée ICI
+ *   (`closedHere`, la signature fermée dans cette page) ; la mémoire du
+ *   navigateur n'y compte jamais.
+ */
+export function alertVisible(input: {
+  id: string;
+  signature: string;
+  dismissible: boolean;
+  remember: boolean;
+  dismissed: DismissedAlerts | null;
+  closedHere: string | null;
+}): boolean {
+  if (!input.dismissible) return true;
+  if (!input.remember) return input.closedHere !== input.signature;
+  if (input.dismissed === null) return false;
+  return !isAlertDismissed(input.dismissed, input.id, input.signature);
+}
+
+/**
  * Écriture protégée. Rend `false` si le stockage a refusé (quota, navigation
  * privée) : l'appelant garde alors la fermeture en mémoire pour la page.
  */

@@ -4,7 +4,9 @@ import {
   ALERT_DISMISSAL_KEY,
   ALERT_DISMISSAL_MAX,
   alertSignature,
+  alertVisible,
   isAlertDismissed,
+  rememberAlertByDefault,
   parseDismissed,
   readDismissed,
   withDismissed,
@@ -97,5 +99,41 @@ describe('la mémoire des alertes fermées', () => {
       ['a', '2'],
       ['c', '1'],
     ]);
+  });
+});
+
+describe('alertVisible : une nouvelle occurrence revient (audit web WA1)', () => {
+  const base = { id: 'admin-decision', signature: 'sig', dismissible: true, closedHere: null };
+
+  it('une alerte mémorisée fermée reste fermée, tant que son contenu ne change pas', () => {
+    expect(alertVisible({ ...base, remember: true, dismissed: { 'admin-decision': 'sig' } })).toBe(false);
+    expect(alertVisible({ ...base, remember: true, dismissed: { 'admin-decision': 'autre' } })).toBe(true);
+  });
+
+  it('pendant l’hydratation, une alerte mémorisée attend (pas de clignotement)', () => {
+    expect(alertVisible({ ...base, remember: true, dismissed: null })).toBe(false);
+  });
+
+  it('une occurrence (échec après décision) n’est jamais mémorisée : la même phrase revient', () => {
+    // Le même texte d'échec fermé hier ne masque pas l'échec d'aujourd'hui.
+    expect(alertVisible({ ...base, remember: false, dismissed: { 'admin-decision': 'sig' } })).toBe(true);
+    expect(alertVisible({ ...base, remember: false, dismissed: null })).toBe(true);
+  });
+
+  it('fermée ICI, une occurrence se cache jusqu’à la suivante', () => {
+    expect(alertVisible({ ...base, remember: false, dismissed: null, closedHere: 'sig' })).toBe(false);
+    expect(alertVisible({ ...base, remember: false, dismissed: null, closedHere: 'sig#1' })).toBe(true);
+  });
+
+  it('non fermable : toujours visible', () => {
+    expect(
+      alertVisible({ ...base, dismissible: false, remember: true, dismissed: { 'admin-decision': 'sig' } }),
+    ).toBe(true);
+  });
+
+  it('le ton danger n’est pas mémorisé par défaut', () => {
+    expect(rememberAlertByDefault('danger')).toBe(false);
+    expect(rememberAlertByDefault('warning')).toBe(true);
+    expect(rememberAlertByDefault('info')).toBe(true);
   });
 });

@@ -2,11 +2,20 @@
 
 import type { ReactNode } from "react";
 import { Icon } from "../icons/generated/web";
-import type { DuelStatus, DuelStatusView } from "@esport237hub/types";
+import {
+  formatAppDate,
+  localeTag,
+  type AppDateStyle,
+  type DuelStatus,
+  type DuelStatusView,
+} from "@esport237hub/types";
 
 import { DUEL_STATUS_META } from "../lib/duel-status";
 import { useDsT } from "../i18n";
+import { dsLocale } from "../i18n/store";
+import { Button } from "./button";
 import { Badge } from "./foundation";
+import { ButtonLink } from "./page-layout";
 
 /** Lien de retour avec chevron — placé en haut à gauche des pages. */
 export function BackLink({
@@ -76,11 +85,18 @@ export function DuelStatusBadge({
   );
 }
 
+/**
+ * Chargement d'un BLOC sans forme connue (« Chargement… »). Gris discret
+ * (`text-muted`) : l'accent est réservé aux gestes (DESIGN.md), et un rond
+ * vert qui tourne se lisait comme un bouton (audit web WA5). Jamais dans un
+ * `Button` : le bouton a son propre état (`loading`). Pour des DONNÉES dont
+ * on connaît la forme (liste, carte), préférer `Skeleton`.
+ */
 export function Spinner({ label }: { label?: string }) {
   const t = useDsT();
   return (
-    <div className="flex items-center gap-3 py-8 text-sm text-secondary">
-      <span className="ui-spinner size-4 text-accent" />
+    <div className="flex items-center gap-3 py-8 text-sm text-muted" role="status">
+      <span className="ui-spinner size-4 text-muted" aria-hidden />
       {label ?? t("ui.loading")}
     </div>
   );
@@ -91,21 +107,156 @@ export function Skeleton({ className = "" }: { className?: string }) {
   return <div className={`ui-skeleton ${className}`} />;
 }
 
-export function EmptyState({ children }: { children: ReactNode }) {
+/**
+ * Un geste proposé par un état (vide, erreur) : « Trouver un adversaire »,
+ * « Effacer les filtres ». Lien (`href`, via le lien du routeur posé par
+ * `DsLinkProvider`) ou action (`onClick`). Jumeau web du `StateAction` natif
+ * (`onPress` y devient `onClick`/`href`).
+ */
+export interface StateAction {
+  label: string;
+  href?: string;
+  onClick?: () => void;
+  /** Pictogramme avant le libellé. */
+  icon?: ReactNode;
+}
+
+function StateActionButton({
+  action,
+  variant = "secondary",
+}: {
+  action: StateAction;
+  variant?: "secondary" | "ghost";
+}) {
+  if (action.href) {
+    return (
+      <ButtonLink href={action.href} variant={variant} size="sm" icon={action.icon}>
+        {action.label}
+      </ButtonLink>
+    );
+  }
+  return (
+    <Button variant={variant} size="sm" icon={action.icon} onClick={action.onClick}>
+      {action.label}
+    </Button>
+  );
+}
+
+export interface EmptyStateProps {
+  children: ReactNode;
+  /**
+   * La sortie d'une liste vide (audit web WJ17/WA15 : ~15 vides joueur et
+   * 32/32 vides admin n'en avaient pas) : « Trouver un adversaire »,
+   * « Effacer les filtres ». Un seul geste.
+   */
+  action?: StateAction;
+}
+
+export function EmptyState({ children, action }: EmptyStateProps) {
   return (
     <div className="rounded-xl border border-dashed border-edge p-8 text-center text-sm text-secondary">
       {children}
+      {action ? (
+        <div className="mt-4 flex justify-center">
+          <StateActionButton action={action} />
+        </div>
+      ) : null}
     </div>
   );
 }
 
-export function ErrorNote({ message }: { message: string }) {
+export interface ErrorNoteProps {
+  /** Ce qui s'est passé, en clair (`friendlyError` côté app). */
+  message: string;
+  /** Relance l'action ou la lecture : un bouton « Réessayer » dans l'encart. */
+  onRetry?: () => void;
+  /** Libellé du bouton ; défaut « Réessayer » (`ui.retry`). */
+  retryLabel?: string;
+  /** La relance est en cours : le bouton se verrouille. */
+  retrying?: boolean;
+}
+
+/**
+ * Encart d'erreur EN LIGNE (sous un formulaire, dans une fenêtre).
+ *
+ * Audit web du 15/10/2026 (WJ9) : `onRetry` pose le « Réessayer » dans
+ * l'encart, comme le natif ; trois façons de réessayer coexistaient
+ * (`RetryNote`, `ErrorNote` + un bouton à la main, rien du tout). Pour un
+ * bloc ou un écran qui n'a pas pu se CHARGER : `LoadError`.
+ */
+export function ErrorNote({ message, onRetry, retryLabel, retrying }: ErrorNoteProps) {
+  const t = useDsT();
   return (
     <div className="e237-notice e237-notice--danger" role="alert">
       <span className="e237-notice__icon">
         <Icon name="alert-triangle" size={16} />
       </span>
       <span className="e237-notice__text">{message}</span>
+      {onRetry ? (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="e237-notice__action"
+          loading={retrying}
+          onClick={onRetry}
+        >
+          {retryLabel ?? t("ui.retry")}
+        </Button>
+      ) : null}
+    </div>
+  );
+}
+
+export interface LoadErrorProps {
+  /** Ce qui s'est passé, en clair (l'`error` de `useApiQuery` l'est déjà). */
+  message: string;
+  /** Ce qui n'a pas pu être lu, en titre (« la file des salles ») ; facultatif. */
+  title?: ReactNode;
+  /** Relance la lecture (le `retry` de `useApiQuery`). */
+  onRetry?: () => void;
+  retrying?: boolean;
+  /** Une autre sortie que « Réessayer » : revenir, ouvrir un autre écran. */
+  action?: StateAction;
+}
+
+/**
+ * Le bloc (ou l'écran) n'a pas pu se CHARGER : à la place du contenu, ce
+ * qui s'est passé et quoi faire ensuite. Jamais une impasse : « Réessayer »
+ * relance la lecture, `action` offre une autre sortie. Remplace `RetryNote`
+ * (web) et `LoadFailure` (admin), qui n'en sont plus que des raccourcis.
+ *
+ * @example
+ * if (q.error) return <LoadError message={q.error} onRetry={q.retry} />;
+ */
+export function LoadError({ message, title, onRetry, retrying, action }: LoadErrorProps) {
+  const t = useDsT();
+  return (
+    <div className="flex flex-col items-start gap-2" role="alert">
+      <div className="e237-notice e237-notice--danger">
+        <span className="e237-notice__icon">
+          <Icon name="alert-triangle" size={16} />
+        </span>
+        <span className="e237-notice__text">
+          {title ? <span className="e237-notice__title">{title}</span> : null}
+          <span>{message}</span>
+        </span>
+      </div>
+      {onRetry || action ? (
+        <div className="flex flex-wrap gap-2">
+          {onRetry ? (
+            <Button
+              variant="secondary"
+              size="sm"
+              icon={<Icon name="rotate-cw" />}
+              loading={retrying}
+              onClick={onRetry}
+            >
+              {t("ui.retry")}
+            </Button>
+          ) : null}
+          {action ? <StateActionButton action={action} variant="ghost" /> : null}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -134,33 +285,24 @@ export { Avatar, AvatarGroup, toAvatarSize } from './avatar';
 export type { AvatarProps, AvatarGroupProps, AvatarPerson, AvatarSize } from './avatar';
 
 /**
- * Locale d'affichage : celle CHOISIE dans l'app, pas celle du navigateur.
+ * LE formateur de dates du web (audit web du 15/10/2026, WA11).
  *
- * Le dashboard pose `<html lang>` depuis le cookie `e237_locale` (voir
- * `apps/web/src/app/layout.tsx`) : c'est donc la source de vérité. La lire ici
- * évite de faire passer la locale en paramètre par la centaine d'appels à
- * `formatDate`, et fait tomber d'un coup le « 10 sept., 11:19 » qui s'affichait
- * en anglais parce que le format était figé sur `fr-FR`.
+ * - la langue CHOISIE dans l'app (`dsLocale`, posée par le provider, sinon
+ *   `<html lang>`), jamais `fr-FR` en dur ;
+ * - le fuseau du PRODUIT (`Africa/Douala`), pas celui du poste : un admin en
+ *   déplacement et le rendu serveur (UTC) lisent la même heure que la salle ;
+ * - une date absente rend une chaîne VIDE, jamais « — ».
  *
- * `document` est absent au rendu serveur : on retombe alors sur le français,
- * qui est la langue par défaut du produit.
+ * `style` : `dateTime` « 05 oct., 14:30 » (défaut), `date` « 5 oct. 2026 »,
+ * `time` « 14:30 », `dayTime` « sam. 11 oct., 15:00 », `precise`
+ * « 05/10/2026 14:30:12 » (journaux). Règle pure : `formatAppDate`
+ * (`packages/types/src/time.ts`).
  */
-function displayLocale(): string {
-  if (typeof document === "undefined") return "fr-FR";
-  const lang = document.documentElement.lang;
-  return lang && lang.length > 1 ? lang : "fr-FR";
+export function formatDate(
+  value: string | null | undefined,
+  style: AppDateStyle = "dateTime",
+): string {
+  return formatAppDate(value, localeTag(dsLocale()), style);
 }
 
-export function formatDate(value: string | null, locale?: string): string {
-  if (!value) return "—";
-  try {
-    return new Date(value).toLocaleString(locale ?? displayLocale(), {
-      day: "2-digit",
-      month: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  } catch {
-    return value;
-  }
-}
+export type { AppDateStyle };

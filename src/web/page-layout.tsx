@@ -33,6 +33,7 @@ import {
   createContext,
   isValidElement,
   useContext,
+  useState,
   useSyncExternalStore,
   type ElementType,
   type ReactNode,
@@ -44,8 +45,9 @@ import { useDsT } from "../i18n/hooks";
 import {
   ALERT_DISMISSAL_KEY,
   alertSignature,
-  isAlertDismissed,
+  alertVisible,
   readDismissed,
+  rememberAlertByDefault,
   withDismissed,
   writeDismissed,
   type AlertStorage,
@@ -426,6 +428,19 @@ export interface AlertBannerProps {
    * corps : une alerte fermée revient quand ce texte change.
    */
   version?: string;
+  /**
+   * La fermeture est-elle MÉMORISÉE dans le navigateur ? Défaut : oui, sauf
+   * pour `danger` (audit web du 15/10/2026, WA1). Une erreur est une
+   * occurrence : fermée, elle se cache pour cet écran, et un nouvel échec
+   * (même texte) s'affiche à nouveau. Faux aussi pour tout message qui suit
+   * un geste (« Duel validé »), qui n'a rien à faire dans la mémoire.
+   */
+  remember?: boolean;
+  /**
+   * Numéro de l'occurrence (un compteur, l'instant de l'échec) : une
+   * nouvelle valeur fait revenir l'alerte même fermée, même mémorisée.
+   */
+  occurrence?: string | number;
   /** Appelé après la fermeture (mesure, analytics). */
   onDismiss?: () => void;
   className?: string;
@@ -449,15 +464,21 @@ export function AlertBanner({
   dismissible = true,
   icon,
   version,
+  remember,
+  occurrence,
   onDismiss,
   className,
 }: AlertBannerProps) {
   const t = useDsT();
   const dismissed = useSyncExternalStore(subscribeDismissed, dismissedSnapshot, serverSnapshot);
-  const signature = version ?? alertSignature(`${nodeText(title)}\n${nodeText(body)}`);
+  // Fermée DANS cet écran (occurrence non mémorisée) : sa signature.
+  const [closedHere, setClosedHere] = useState<string | null>(null);
+  const content = version ?? alertSignature(`${nodeText(title)}\n${nodeText(body)}`);
+  const signature = occurrence === undefined ? content : `${content}#${occurrence}`;
+  const remembered = remember ?? rememberAlertByDefault(tone);
 
   // Hydratation en cours (état inconnu) ou alerte déjà fermée : rien.
-  if (dismissible && (dismissed === null || isAlertDismissed(dismissed, id, signature))) {
+  if (!alertVisible({ id, signature, dismissible, remember: remembered, dismissed, closedHere })) {
     return null;
   }
 
@@ -465,7 +486,8 @@ export function AlertBanner({
 
   function close(button: HTMLButtonElement) {
     moveFocusAway(button);
-    rememberDismissal(id, signature);
+    if (remembered) rememberDismissal(id, signature);
+    else setClosedHere(signature);
     onDismiss?.();
   }
 

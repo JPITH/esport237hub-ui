@@ -5150,6 +5150,20 @@ a.mkt-social:focus-visible {
     min-width: 44px;
   }
 
+  /* Audit web du 15/10/2026 (WP7) : `.btn--sm` (34 px) et `.btn--md`
+     (40 px) restaient sous le minimum au doigt, y compris « Encaisser » au
+     comptoir. La hauteur grandit, la police et le dessin ne bougent pas ;
+     à la souris, rien ne change. */
+  .btn,
+  .e237-toast__close,
+  .e237-alert__close {
+    min-height: 44px;
+  }
+  .e237-toast__close,
+  .e237-alert__close {
+    min-width: 44px;
+  }
+
   /* Les liens « Voir tout » des en-têtes de section : on élargit la zone
      cliquable par le padding, la ligne de texte ne bouge pas. */
   .e237-match-list__head a,
@@ -6672,4 +6686,95 @@ a.e237-activity:hover {
   min-height: 44px;
   padding: 6px 8px;
   border-radius: var(--e237-radius-md);
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   États des gestes (audit web du 15/10/2026) : réessayer DANS l'encart
+   d'erreur, bandeau de confirmation global (`ToastHost`).
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* « Réessayer » à droite de l'encart d'erreur (`ErrorNote onRetry`). */
+.e237-notice__action {
+  margin-block: -6px;
+  margin-inline-start: auto;
+  align-self: center;
+  flex-shrink: 0;
+}
+
+/* Le bandeau : au-dessus des fenêtres (un geste fait DANS une modale se
+   confirme encore), au-dessus de la barre d'onglets du téléphone. */
+.e237-toast-dock {
+  position: fixed;
+  z-index: 70;
+  left: 16px;
+  right: 16px;
+  bottom: calc(88px + env(safe-area-inset-bottom));
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+@media (min-width: 900px) {
+  .e237-toast-dock {
+    bottom: 24px;
+  }
+}
+
+.e237-toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 480px;
+  min-width: 0;
+  padding: 6px 6px 6px 16px;
+  border: 1px solid var(--e237-border);
+  border-radius: var(--e237-radius-lg);
+  background: var(--e237-surface-raised);
+  box-shadow: var(--e237-shadow-pop);
+  color: var(--e237-text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  pointer-events: auto;
+}
+
+.e237-toast__icon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  color: var(--e237-success);
+}
+
+.e237-toast--failed .e237-toast__icon {
+  color: var(--e237-danger);
+}
+
+.e237-toast__text {
+  min-width: 0;
+  padding-block: 6px;
+}
+
+.e237-toast__close {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: var(--e237-radius-md);
+  background: none;
+  color: var(--e237-text-muted);
+  cursor: pointer;
+}
+
+.e237-toast__close:hover {
+  background: var(--e237-surface-sunken);
+  color: var(--e237-text-primary);
+}
+
+/* L'anneau de focus du DS (`:where(a, button…):focus-visible`) ne doit pas
+   être rogné par un conteneur qui défile (tableaux, listes horizontales) :
+   il passe à l'intérieur de l'élément (audit web WA17). */
+:where(.overflow-x-auto, .overflow-auto) :where(a, button, [role="button"], [tabindex]):focus-visible {
+  outline-offset: -2px;
 }
