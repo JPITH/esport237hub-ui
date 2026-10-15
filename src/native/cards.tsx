@@ -482,6 +482,13 @@ export interface SubscriptionCardProps {
   expiresLabel?: string | null;
   city?: string | null;
   pricePaidXaf: number;
+  /**
+   * Libellés traduits par l'app (audit du 15/10/2026, M4) ; à défaut, le
+   * français d'origine. `paidLabel` porte déjà le montant (« Payé 5 000 FCFA »).
+   */
+  usableLabel?: string;
+  noExpiryLabel?: string;
+  paidLabel?: string;
   perks?: readonly string[] | null;
   /**
    * Actions et détails propres à l'écran (séances, « Voir la salle »),
@@ -501,6 +508,9 @@ export function SubscriptionCard({
   expiresLabel,
   city,
   pricePaidXaf,
+  usableLabel = 'Utilisable',
+  noExpiryLabel = 'Sans péremption',
+  paidLabel,
   perks,
   children,
   style,
@@ -518,8 +528,9 @@ export function SubscriptionCard({
           </View>
           <Txt variant="caption" tone="muted">{planName}</Txt>
         </View>
-        <Badge tone={usable ? 'accent' : 'neutral'}>
-          {usable ? 'Utilisable' : statusLabel}
+        {/* Un ÉTAT : `success`, jamais l'accent (réservé à l'interactif). */}
+        <Badge tone={usable ? 'success' : 'neutral'}>
+          {usable ? usableLabel : statusLabel}
         </Badge>
       </View>
 
@@ -531,7 +542,7 @@ export function SubscriptionCard({
           </Txt>
         </View>
         <Txt variant="caption" tone="secondary">
-          {expiresLabel ?? 'Sans péremption'}
+          {expiresLabel ?? noExpiryLabel}
         </Txt>
         {city ? (
           <View style={styles.metaItem}>
@@ -540,7 +551,7 @@ export function SubscriptionCard({
           </View>
         ) : null}
         <Txt variant="caption" tone="secondary">
-          Payé {formatXaf(pricePaidXaf)}
+          {paidLabel ?? `Payé ${formatXaf(pricePaidXaf)}`}
         </Txt>
       </View>
 
