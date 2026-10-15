@@ -14,6 +14,7 @@ export {
   useE237Mode,
   useToneColor,
   useToneSurface,
+  useToneTint,
   useNeu,
   createNeu,
   fontFamily,
@@ -52,7 +53,24 @@ export {
   VerifiedMark,
   SegmentedTabs,
   formatDate,
+  LoadError,
+  ThemedRefreshControl,
 } from './primitives';
+export type { EmptyStateProps, ErrorNoteProps, LoadErrorProps, StateAction } from './primitives';
+
+// Bandeau de confirmation (15/10/2026) : global (`ToastHost` + `showToast`) ou local (`useToast` + `Toast`).
+export {
+  Toast,
+  ToastHost,
+  hideToast,
+  setToastOffset,
+  showToast,
+  useToast,
+  TOAST_ACTION_MS,
+  TOAST_MS,
+  toastLifetimeMs,
+} from './toast';
+export type { ToastAction, ToastExtra, ToastState } from './toast';
 
 export { FilterChip } from './filter-chip';
 export type { FilterChipProps } from './filter-chip';

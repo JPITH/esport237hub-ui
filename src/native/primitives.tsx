@@ -2,14 +2,17 @@
  * Primitives d'interface native (sans composites API).
  * Couleurs via useE237Colors() — light et dark (DESIGN.md).
  */
-import { useEffect, useState, type ComponentType, type ReactNode } from 'react';
+import { dateTimeShort, localeTag } from '@esport237hub/types';
+import { useEffect, useState, type ComponentType, type ReactElement, type ReactNode } from 'react';
 import {
   Animated as RNAnimated,
   Easing as RNEasing,
   Image,
   Pressable,
+  RefreshControl,
   StyleSheet,
   View,
+  type RefreshControlProps,
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
@@ -17,12 +20,14 @@ import Animated, { Easing, useAnimatedStyle, withTiming } from 'react-native-rea
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
+  Button,
   pill,
   radius,
   spacing,
   useE237Colors,
   useE237Mode,
   useToneSurface,
+  useToneTint,
   withAlpha,
 } from './core';
 import { dsLocale, useDsT } from '../i18n';
@@ -44,8 +49,36 @@ type ScreenScrollProps = {
   extraKeyboardSpace?: number;
   /** Curseur vert du design system (`ScrollView` de `./scroll`). */
   indicatorInsets?: ScrollIndicatorInsets;
+  /** Tirer pour rafraîchir (`Screen onRefresh`). */
+  refreshControl?: ReactElement<RefreshControlProps>;
   children?: ReactNode;
 };
+
+/**
+ * Le « tirer pour rafraîchir » du design system, aux couleurs du thème : rond
+ * en `textMuted` (iOS), flèche accent sur fond de surface (Android). Les
+ * données restent à l'écran pendant le rechargement (`useApi`) : `refreshing`
+ * ne vaut vrai que si l'écran n'a RIEN d'autre pour dire qu'il travaille.
+ *
+ * Toutes les props passent au `RefreshControl` natif (la `ScrollView`
+ * d'Android lui confie son style et son contenu) : à poser tel quel dans
+ * `refreshControl`, ou via `onRefresh` de `Screen` et de `FastList`.
+ */
+export function ThemedRefreshControl({
+  refreshing = false,
+  ...props
+}: Omit<RefreshControlProps, 'refreshing'> & { refreshing?: boolean }) {
+  const c = useE237Colors();
+  return (
+    <RefreshControl
+      tintColor={c.textMuted}
+      colors={[c.accent]}
+      progressBackgroundColor={c.surface}
+      {...props}
+      refreshing={refreshing}
+    />
+  );
+}
 
 /**
  * Fond de page + défilement. Passe `ScrollComponent` pour le clavier-aware.
@@ -53,6 +86,9 @@ type ScreenScrollProps = {
  * Le défilement par défaut est celui du design system : curseur vert maison
  * (natif) ou barre du navigateur peinte en vert (web). Sa piste s'arrête sous
  * l'encoche et au-dessus de la réserve basse (pilule d'onglets).
+ *
+ * `onRefresh` (15/10/2026) : tirer vers le bas relance la lecture de l'écran
+ * (en général le `reload` de `useApi`), avec `ThemedRefreshControl`.
  */
 export function Screen({
   children,
@@ -60,6 +96,8 @@ export function Screen({
   padBottom,
   contentStyle,
   safeTop = true,
+  onRefresh,
+  refreshing,
 }: {
   children: ReactNode;
   ScrollComponent?: ComponentType<ScreenScrollProps>;
@@ -72,12 +110,19 @@ export function Screen({
    * `SafeAreaView` passent `false`.
    */
   safeTop?: boolean;
+  /** Tirer pour rafraîchir : relance la lecture de l'écran. */
+  onRefresh?: () => void;
+  /** Rond visible pendant le rechargement ; par défaut `false` (les données restent affichées). */
+  refreshing?: boolean;
 }) {
   const c = useE237Colors();
   const insets = useSafeAreaInsets();
   const Scroll = ScrollComponent;
   return (
     <Scroll
+      refreshControl={
+        onRefresh ? <ThemedRefreshControl refreshing={refreshing} onRefresh={onRefresh} /> : undefined
+      }
       style={{ backgroundColor: c.bg, flex: 1 }}
       indicatorInsets={{
         top: (safeTop ? insets.top : 0) + spacing['1'],
@@ -108,31 +153,122 @@ export function SectionTitle({ children }: { children: ReactNode }) {
   );
 }
 
-export function ErrorNote({ message }: { message: string }) {
+/** Un geste proposé par un état (vide, erreur) : « Réessayer », « Trouver un adversaire ». */
+export interface StateAction {
+  label: string;
+  onPress: () => void;
+  /** Pictogramme avant le libellé. */
+  icon?: ReactNode;
+}
+
+export interface ErrorNoteProps {
+  /** Ce qui s'est passé, en clair (`friendlyError` côté app). */
+  message: string;
+  /** Relance l'action ou la lecture : un bouton « Réessayer » dans l'encart. */
+  onRetry?: () => void;
+  /** Libellé du bouton ; défaut « Réessayer » (`ui.retry`). */
+  retryLabel?: string;
+  /** La relance est en cours : le bouton se verrouille. */
+  retrying?: boolean;
+  style?: StyleProp<ViewStyle>;
+}
+
+/**
+ * Encart d'erreur EN LIGNE (sous un formulaire, dans une feuille).
+ *
+ * 15/10/2026 (audit T5) : `onRetry` pose le « Réessayer » dans l'encart ;
+ * 23 écrans le dessinaient chacun à sa façon, avec sa propre clé. Fond et
+ * liseré viennent de la rampe `danger` (`useToneTint`), plus d'une opacité
+ * inventée. Pour une ERREUR DE CHARGEMENT qui remplace l'écran : `LoadError`.
+ */
+export function ErrorNote({ message, onRetry, retryLabel, retrying, style }: ErrorNoteProps) {
   const c = useE237Colors();
+  const t = useDsT();
+  const tint = useToneTint('danger');
   return (
-    <View
-      style={[
-        styles.note,
-        { backgroundColor: `${c.danger}18`, borderColor: `${c.danger}66` },
-      ]}
-    >
+    <View accessibilityRole="alert" style={[styles.note, tint, style]}>
       <Icon name="alert-circle" color={c.danger} size={16} />
       <Txt selectable variant="body" tone="danger" style={{ flex: 1 }}>
         {message}
       </Txt>
+      {onRetry ? (
+        <Button
+          label={retryLabel ?? t('ui.retry')}
+          variant="ghost"
+          loading={retrying}
+          onPress={onRetry}
+          style={styles.noteAction}
+        />
+      ) : null}
     </View>
   );
 }
 
-export function EmptyState({ children }: { children: ReactNode }) {
+export interface LoadErrorProps {
+  /** Ce qui s'est passé, en clair (l'`error` de `useApi` l'est déjà). */
+  message: string;
+  /** Relance la lecture (le `reload` de `useApi`). */
+  onRetry?: () => void;
+  retrying?: boolean;
+  /** Une autre sortie que « Réessayer » : revenir, ouvrir un autre écran. */
+  action?: StateAction;
+  style?: StyleProp<ViewStyle>;
+}
+
+/**
+ * L'écran (ou le bloc) n'a pas pu se CHARGER : à la place du contenu, ce qui
+ * s'est passé et quoi faire ensuite (audit du 15/10/2026, T5). Jamais une
+ * impasse : « Réessayer » relance la lecture, `action` offre une autre sortie.
+ *
+ * @example
+ * if (error && !data) return <LoadError message={error} onRetry={reload} />;
+ */
+export function LoadError({ message, onRetry, retrying, action, style }: LoadErrorProps) {
+  const c = useE237Colors();
+  const t = useDsT();
+  return (
+    <View accessibilityRole="alert" style={[styles.empty, { borderColor: c.border }, style]}>
+      <Icon name="alert-circle" color={c.danger} size={22} />
+      <Txt selectable variant="body" tone="secondary" align="center">
+        {message}
+      </Txt>
+      {onRetry || action ? (
+        <View style={styles.stateActions}>
+          {onRetry ? (
+            <Button label={t('ui.retry')} variant="secondary" loading={retrying} onPress={onRetry} />
+          ) : null}
+          {action ? (
+            <Button label={action.label} variant="ghost" icon={action.icon} onPress={action.onPress} />
+          ) : null}
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
+export interface EmptyStateProps {
+  children: ReactNode;
+  /**
+   * La sortie d'une liste vide (audit T6 : 39 vides sur 54 n'en avaient
+   * pas) : « Trouver un adversaire », « Voir l'agenda ». Un seul geste.
+   */
+  action?: StateAction;
+  style?: StyleProp<ViewStyle>;
+}
+
+export function EmptyState({ children, action, style }: EmptyStateProps) {
   const c = useE237Colors();
   return (
-    <View style={[styles.empty, { borderColor: c.border }]}>
+    <View style={[styles.empty, { borderColor: c.border }, style]}>
       <Icon name="inbox" color={c.textMuted} size={22} />
       <Txt variant="body" tone="secondary" align="center">
         {children}
       </Txt>
+      {action ? (
+        <View style={styles.stateActions}>
+          <Button label={action.label} variant="secondary" icon={action.icon} onPress={action.onPress} />
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -350,21 +486,13 @@ export function VerifiedMark({ size = 14 }: { size?: number }) {
  *
  * La locale vient du design system, pas d'un `'fr-FR'` figé : un joueur en
  * anglais lisait « 10 sept., 11:19 » au milieu d'un écran traduit.
+ *
+ * 15/10/2026 (audit T10) : la règle vit dans le module de temps commun
+ * (`dateTimeShort`, `@esport237hub/types`) ; une date absente rend une chaîne
+ * VIDE, plus « — » (pas de tiret long à l'écran, AGENTS.md règle 14).
  */
 export function formatDate(value: string | null | undefined): string {
-  if (!value) return '—';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '—';
-  try {
-    return date.toLocaleString(dsLocale() === 'en' ? 'en-GB' : 'fr-FR', {
-      day: '2-digit',
-      month: 'short',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  } catch {
-    return value;
-  }
+  return dateTimeShort(value, localeTag(dsLocale()));
 }
 
 /**
@@ -486,6 +614,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     padding: spacing['3'],
   },
+  // Le bouton fantôme garde sa cible de 44 px ; l'encart ne grandit pas.
+  noteAction: { marginVertical: -spacing['2'], marginRight: -spacing['2'] },
   empty: {
     alignItems: 'center',
     gap: spacing['2'],
@@ -494,6 +624,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     padding: spacing['6'],
   },
+  stateActions: { alignItems: 'center', gap: spacing['1'], marginTop: spacing['1'] },
   segment: {
     flexDirection: 'row',
     borderWidth: 1,

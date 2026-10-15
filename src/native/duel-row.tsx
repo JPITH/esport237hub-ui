@@ -8,6 +8,7 @@ import type { DuelStatus } from '@esport237hub/types';
 
 import { Card, radius, spacing } from './core';
 import { DuelStatusBadge } from './duel-status-badge';
+import { formatDate } from './primitives';
 import { Txt } from './text';
 
 export interface DuelRowData {
@@ -23,17 +24,9 @@ export interface DuelRowData {
   game?: { name?: string | null } | null;
 }
 
+/** Même horodatage que toute liste du DS (`formatDate`, locale du DS, plus de `'fr-FR'` figé). */
 function formatWhen(iso: string): string {
-  try {
-    return new Date(iso).toLocaleDateString('fr-FR', {
-      day: 'numeric',
-      month: 'short',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  } catch {
-    return iso;
-  }
+  return formatDate(iso);
 }
 
 export function DuelRow({

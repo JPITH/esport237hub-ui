@@ -6,6 +6,9 @@ import { DateTimePicker } from '@expo/ui/community/datetime-picker';
 import { useState } from 'react';
 
 import type { IconName } from '../../icons/names';
+import { localeTag } from '@esport237hub/types';
+
+import { useDsLocale } from '../../i18n';
 import { useE237Colors } from '../core';
 import { FieldTrigger } from '../date-time';
 import { Sheet } from './sheet';
@@ -100,8 +103,9 @@ export function DateField({
   placeholder?: string;
 }) {
   const current = parseDate(value);
+  const locale = useDsLocale();
   const display = value
-    ? current.toLocaleDateString('fr-FR', {
+    ? current.toLocaleDateString(localeTag(locale), {
         weekday: 'short',
         day: 'numeric',
         month: 'short',

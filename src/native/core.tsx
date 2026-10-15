@@ -23,9 +23,12 @@ import {
   font,
   pill,
   radius,
+  ramp,
+  ROLE,
   spacing,
   withAlpha,
   type ColorScale,
+  type RampName,
   type ThemeMode,
 } from '../tokens';
 import type { Tone } from '../lib/tone';
@@ -63,6 +66,24 @@ export function useToneSurface(tone: string): {
   return {
     backgroundColor: withAlpha(tone, pill.fill[mode]),
     borderColor: withAlpha(tone, pill.stroke[mode]),
+  };
+}
+
+/**
+ * Fond + liseré OPAQUES d'un encart teinté, pris dans la rampe aux échelons
+ * de `ROLE` (`tint` : 50 en clair, 950 en sombre ; `tintBorder` : 200 / 800).
+ * Jumeau natif de `--e237-<ton>-subtle` / `--e237-<ton>-border` du web.
+ * Remplace les teintes inventées (`${c.danger}18`, `${c.danger}66`) :
+ * DESIGN.md, « un échelon dans une rampe, jamais une nuance inventée ».
+ */
+export function useToneTint(name: RampName): {
+  backgroundColor: string;
+  borderColor: string;
+} {
+  const role = ROLE[useE237Mode()];
+  return {
+    backgroundColor: ramp[name][role.tint],
+    borderColor: ramp[name][role.tintBorder],
   };
 }
 

@@ -18,6 +18,8 @@ export * from './brand-name';
 export * from './initials';
 export * from './phone-countries';
 export * from './alert-dismissal';
+export * from './toast-lifetime';
+export * from './toast-model';
 /*
  * Le STORE seul, pas les hooks.
  *

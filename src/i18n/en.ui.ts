@@ -16,6 +16,9 @@ export const enUi: Record<keyof typeof frUi, string> = {
   'ui.carousel.position': '{label}: item {index} of {total}.',
 
   'ui.loading': 'Loading…',
+  'ui.retry': 'Try again',
+  'ui.toast.undo': 'Undo',
+  'ui.toast.dismiss': 'Dismiss message',
   'ui.previous': 'Back',
   'ui.previousPage': 'Previous page',
   'ui.online': 'Online',

@@ -19,6 +19,10 @@ export const frUi = {
 
   // États transverses
   'ui.loading': 'Chargement…',
+  // Erreur de chargement (`ErrorNote onRetry`, `LoadError`) et bandeau de confirmation (`Toast`)
+  'ui.retry': 'Réessayer',
+  'ui.toast.undo': 'Annuler',
+  'ui.toast.dismiss': 'Fermer le message',
   'ui.previous': 'Précédent',
   'ui.previousPage': 'Page précédente',
   'ui.online': 'En ligne',

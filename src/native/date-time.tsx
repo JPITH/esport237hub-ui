@@ -7,7 +7,8 @@ import { radius, spacing, useE237Colors } from './core';
 import { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, View, type ScrollView as RNScrollView } from 'react-native';
 
-import { useDsT, type DsKey } from '../i18n';
+import { localeTag } from '@esport237hub/types';
+import { useDsLocale, useDsT, type DsKey } from '../i18n';
 import { FieldLabel, requiredFieldLabel } from './fields';
 import { ScrollView } from './scroll';
 import { Sheet } from './sheet';
@@ -107,6 +108,7 @@ export function DateField({
 }) {
   const c = useE237Colors();
   const t = useDsT();
+  const locale = useDsLocale();
   const MONTHS = MONTH_KEYS.map((key) => t(key));
   const WEEKDAYS = WEEKDAY_KEYS.map((key) => t(key));
   const fieldPlaceholder = placeholder ?? t('form.date.placeholder');
@@ -133,7 +135,7 @@ export function DateField({
   };
 
   const display = value
-    ? new Date(`${value}T12:00:00`).toLocaleDateString('fr-FR', {
+    ? new Date(`${value}T12:00:00`).toLocaleDateString(localeTag(locale), {
         weekday: 'short',
         day: 'numeric',
         month: 'short',
